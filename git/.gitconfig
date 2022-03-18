@@ -1,0 +1,48 @@
+[user]
+	name = Panat Taranat
+	email = panat.taranat@gmail.com
+	signingkey = CCACDB1344B8B7EC0B4DD439655CBB5895152028
+[credential]
+	helper = /opt/homebrew/bin/gh auth git-credential
+[alias]
+	graphgpg = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)[gpg:%GK%x20%G?]%C(reset)%n%x20%s%n"
+	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
+	last = log -1 --stat
+	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
+[color]
+	ui = always
+	branch = always
+	diff = always
+	interactive = always
+	status = always
+	grep = always
+	pager = true
+	decorate = always
+	showbranch = always
+[core]
+	pager = delta
+[delta]
+	plus-style = "syntax #012800"
+	minus-style = "syntax #340001"
+	syntax-theme = OneHalfDark
+	navigate = true
+	side-by-side = true
+[interactive]
+	diffFilter = delta --color-only
+[pull]
+	ff = only
+[gpg]
+	program = gpg
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[init]
+	defaultBranch = main
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[rebase]
+	autosquash = true
