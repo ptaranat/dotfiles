@@ -7,10 +7,10 @@ cmd - k : yabai -m window --focus north
 cmd - l : yabai -m window --focus east
 
 # Moving windows
-shift + cmd - h : yabai -m window --warp west
-shift + cmd - j : yabai -m window --warp south
-shift + cmd - k : yabai -m window --warp north
-shift + cmd - l : yabai -m window --warp east
+shift + cmd - h : yabai -m window --warp west || $(yabai -m window --display west; yabai -m display --focus west)
+shift + cmd - j : yabai -m window --warp south || $(yabai -m window --display south; yabai -m display --focus south)
+shift + cmd - k : yabai -m window --warp north || $(yabai -m window --display north; yabai -m display --focus north)
+shift + cmd - l : yabai -m window --warp east || $(yabai -m window --display east; yabai -m display --focus east)
 
 # Move floating window
 shift + alt - h : yabai -m window --move rel:-20:0
@@ -100,9 +100,9 @@ cmd + shift - 9 : yabai -m window --space \
 cmd + shift - 0 : yabai -m window --space \
                     $(yabai -m query --displays --display mouse | jq -r '.spaces[9]')
 
-# Move windows to another display
-cmd + shift - left : yabai -m window --display west
-cmd + shift - right : yabai -m window --display east
+# Move window to another display
+cmd + shift - left : yabai -m window --display west; yabai -m display --focus west
+cmd + shift - right : yabai -m window --display east; yabai -m display --focus east
 
 
 # Terminal
