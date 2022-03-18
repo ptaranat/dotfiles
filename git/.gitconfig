@@ -31,6 +31,10 @@
 	diffFilter = delta --color-only
 [pull]
 	ff = only
+[diff]
+	tool = vimdiff
+[difftool "vimdiff"]
+	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
 	program = gpg
 [commit]
