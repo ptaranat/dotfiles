@@ -61,6 +61,9 @@ alias ghc="gh repo clone"
 # Update cargo packages using cargo-update
 alias cargoupdate="cargo install-update -a"
 
+# Kubectl-argo-rollouts
+alias kar="kubectl-argo-rollouts"
+
 # Files
 alias -s md="glow -p"
 
