@@ -166,6 +166,9 @@ let g:ale_fixers = {
   \ 'go': ['gofmt'],
   \ }
 let g:ale_fix_on_save = 1
+let g:ale_linters = {
+  \'clojure': ['clj-kondo']
+  \ }
 
 " limit modelines
 set nomodeline
@@ -225,8 +228,8 @@ function! MyReadonly()
 endfunction
 
 function! MyFugitive()
-  if exists("*fugitive#head")
-    let _ = fugitive#head()
+  if exists("*Fugitive#Head")
+    let _ = Fugitive#Head()
     return strlen(_) ? ' '._ : ''
   endif
   return ''

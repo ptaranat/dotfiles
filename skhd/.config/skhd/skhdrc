@@ -1,60 +1,60 @@
 cmd + shift - w : open -n "/Applications/Google Chrome.app"
 
 # Navigation
-cmd - h : yabai -m window --focus west
-cmd - j : yabai -m window --focus south
-cmd - k : yabai -m window --focus north
-cmd - l : yabai -m window --focus east
+# cmd - h : yabai -m window --focus west
+# cmd - j : yabai -m window --focus south
+# cmd - k : yabai -m window --focus north
+# cmd - l : yabai -m window --focus east
 
 # Moving windows
-shift + cmd - h : yabai -m window --warp west || $(yabai -m window --display west; yabai -m display --focus west)
-shift + cmd - j : yabai -m window --warp south || $(yabai -m window --display south; yabai -m display --focus south)
-shift + cmd - k : yabai -m window --warp north || $(yabai -m window --display north; yabai -m display --focus north)
-shift + cmd - l : yabai -m window --warp east || $(yabai -m window --display east; yabai -m display --focus east)
+# shift + cmd - h : yabai -m window --warp west || $(yabai -m window --display west; yabai -m display --focus west)
+# shift + cmd - j : yabai -m window --warp south || $(yabai -m window --display south; yabai -m display --focus south)
+# shift + cmd - k : yabai -m window --warp north || $(yabai -m window --display north; yabai -m display --focus north)
+# shift + cmd - l : yabai -m window --warp east || $(yabai -m window --display east; yabai -m display --focus east)
 
 # Move floating window
-shift + alt - h : yabai -m window --move rel:-20:0
-shift + alt - j : yabai -m window --move rel:0:20
-shift + alt - k : yabai -m window --move rel:0:-20
-shift + alt - l : yabai -m window --move rel:20:0
+# shift + alt - h : yabai -m window --move rel:-20:0
+# shift + alt - j : yabai -m window --move rel:0:20
+# shift + alt - k : yabai -m window --move rel:0:-20
+# shift + alt - l : yabai -m window --move rel:20:0
 
 # Float/unfloat windows
-shift + cmd - space : yabai -m window --toggle float; \
-yabai -m window --grid 4:4:1:1:2:2
+# shift + cmd - space : yabai -m window --toggle float; \
+# yabai -m window --grid 4:4:1:1:2:2
 
 # Fullscreen
-alt - f : yabai -m window --toggle zoom-fullscreen
+# alt - f : yabai -m window --toggle zoom-fullscreen
 shift + alt - f : yabai -m window --toggle native-fullscreen
 
 # Resize windows
-ctrl + alt - h : \
-    yabai -m window --resize left:-20:0 ; \
-    yabai -m window --resize right:-20:0
+# ctrl + alt - h : \
+#     yabai -m window --resize left:-20:0 ; \
+#     yabai -m window --resize right:-20:0
 
-ctrl + alt - j : \
-    yabai -m window --resize bottom:0:20 ; \
-    yabai -m window --resize top:0:20
+# ctrl + alt - j : \
+#     yabai -m window --resize bottom:0:20 ; \
+#     yabai -m window --resize top:0:20
 
-ctrl + alt - k : \
-    yabai -m window --resize top:0:-20 ; \
-    yabai -m window --resize bottom:0:-20
+# ctrl + alt - k : \
+#     yabai -m window --resize top:0:-20 ; \
+#     yabai -m window --resize bottom:0:-20
 
-ctrl + alt - l : \
-    yabai -m window --resize right:20:0 ; \
-    yabai -m window --resize left:20:0
+# ctrl + alt - l : \
+#     yabai -m window --resize right:20:0 ; \
+#     yabai -m window --resize left:20:0
 
 # Toggle window split type
-alt - e : yabai -m window --toggle split
+# alt - e : yabai -m window --toggle split
 
 # Balance size of windows
-shift + alt - 0 : yabai -m space --balance
-ctrl + alt - 0 : yabai -m space --balance
+# shift + alt - 0 : yabai -m space --balance
+# ctrl + alt - 0 : yabai -m space --balance
 
 # Workspace init
 ctrl + alt - n      : yabai -m space --create && \
                       index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
                       yabai -m space --focus "${index}"
-ctrl + alt - d      : yabai -m space --destroy
+# ctrl + alt - d      : yabai -m space --destroy
 
 # Workspace focus
 cmd - 1      : yabai -m space --focus \

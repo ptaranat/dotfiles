@@ -21,7 +21,7 @@ znap source ohmyzsh/ohmyzsh \
 	plugins/golang \
 	plugins/{node,npm,yarn} \
 	plugins/{ruby,gem} \
-	plugins/{ansible,aws,terraform}
+	plugins/{ansible,aws,kubectl,terraform}
 
 znap source aloxaf/fzf-tab
 znap install lukechilds/zsh-nvm
@@ -29,6 +29,7 @@ znap source djui/alias-tips
 znap source marlonrichert/zsh-hist
 znap source zdharma/fast-syntax-highlighting
 znap eval zoxide "zoxide init --cmd j zsh"
+znap fpath _kubectl-argo-rollouts "kubectl-argo-rollouts completion zsh"
 znap source jeffreytse/zsh-vi-mode
 znap source unixorn/fzf-zsh-plugin
 export ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE

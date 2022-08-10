@@ -31,10 +31,14 @@ if has ('nvim')
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'neovim/nvim-lspconfig'
   Plug 'hrsh7th/nvim-compe'
-  " Plug 'tzachar/compe-tabnine', { 'do': './install.sh' }
   Plug 'glepnir/dashboard-nvim'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'romgrk/barbar.nvim'
+  " conjure
+  Plug 'Olical/conjure'
+  Plug 'tpope/vim-dispatch'
+  Plug 'clojure-vim/vim-jack-in'
+  Plug 'radenling/vim-dispatch-neovim'
 endif
 " snippets
 Plug 'rafamadriz/friendly-snippets'

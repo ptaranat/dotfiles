@@ -31,6 +31,9 @@
 	diffFilter = delta --color-only
 [pull]
 	ff = only
+[push]
+	default = current
+	autoSetupRemote = true
 [diff]
 	tool = vimdiff
 [difftool "vimdiff"]
@@ -50,3 +53,18 @@
 	required = true
 [rebase]
 	autosquash = true
+[maintenance]
+	repo = /Users/panat/.zsh_plugins/alias-tips
+	repo = /Users/panat/.zsh_plugins/fast-syntax-highlighting
+	repo = /Users/panat/.zsh_plugins/fzf-tab
+	repo = /Users/panat/.zsh_plugins/fzf-zsh-plugin
+	repo = /Users/panat/.zsh_plugins/ohmyzsh
+	repo = /Users/panat/.zsh_plugins/powerlevel10k
+	repo = /Users/panat/.zsh_plugins/zsh-autosuggestions
+	repo = /Users/panat/.zsh_plugins/zsh-completions
+	repo = /Users/panat/.zsh_plugins/zsh-hist
+	repo = /Users/panat/.zsh_plugins/zsh-history-substring-search
+	repo = /Users/panat/.zsh_plugins/zsh-nvm
+	repo = /Users/panat/.zsh_plugins/zsh-snap
+	repo = /Users/panat/.zsh_plugins/zsh-vi-mode
+	repo = /Users/panat/.zsh_plugins/zsh-autocomplete
