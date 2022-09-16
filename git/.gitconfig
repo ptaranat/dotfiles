@@ -68,3 +68,5 @@
 	repo = /Users/panat/.zsh_plugins/zsh-snap
 	repo = /Users/panat/.zsh_plugins/zsh-vi-mode
 	repo = /Users/panat/.zsh_plugins/zsh-autocomplete
+[merge]
+	conflictstyle = diff3
