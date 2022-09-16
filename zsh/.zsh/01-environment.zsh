@@ -25,6 +25,10 @@ export NOTES_DIR=$HOME/Documents/notes
 # Language
 export LANG=en_US.UTF-8
 
+# Go
+export GOBIN="$GOPATH/bin"
+export GOROOT="$(brew --prefix golang)/libexec"
+
 # Python
 export PYTHONPATH="/opt/homebrew/bin/python3"
 
@@ -44,3 +48,6 @@ export AWS_DEFAULT_REGION=us-east-1
 # NVM
 export NVM_LAZY_LOAD=true
 export NVM_NO_USE=true
+
+# Jira
+export JIRA_URL='https://rokt.atlassian.net'

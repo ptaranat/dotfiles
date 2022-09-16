@@ -21,7 +21,8 @@ znap source ohmyzsh/ohmyzsh \
 	plugins/golang \
 	plugins/{node,npm,yarn} \
 	plugins/{ruby,gem} \
-	plugins/{ansible,aws,kubectl,terraform}
+	plugins/{ansible,aws,kubectl,terraform} \
+	plugins/jira
 
 znap source aloxaf/fzf-tab
 znap install lukechilds/zsh-nvm
