@@ -41,10 +41,6 @@ eval "$(pyenv init -)"
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules}/*" 2> /dev/null'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-# AWS
-export AWS_PROFILE=admin-lab
-export AWS_DEFAULT_REGION=us-east-1
-
 # NVM
 export NVM_LAZY_LOAD=true
 export NVM_NO_USE=true
