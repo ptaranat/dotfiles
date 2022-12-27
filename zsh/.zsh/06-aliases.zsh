@@ -36,8 +36,9 @@ alias lmr="exa -ls modified --group-directories-first --git"
 
 # Edit configs
 alias zshrc="$EDITOR ~/.zshrc"
-alias zshalias="$EDITOR ~/.zsh/06-aliases.zsh"
 alias zshenv="$EDITOR ~/.zsh/01-environment.zsh"
+alias zshalias="$EDITOR ~/.zsh/06-aliases.zsh"
+alias zshrpg="$EDITOR ~/.zsh/07-rpg.zsh"
 alias vimrc="$EDITOR ~/.vim/general.vim"
 alias vimplug="$EDITOR ~/.vim/plugins.vim"
 alias vimplugs="$EDITOR ~/.vim/plugin-settings.vim"

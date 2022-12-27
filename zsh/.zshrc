@@ -60,8 +60,6 @@ zstyle :bracketed-paste-magic paste-finish pastefinish
 
 plugins=()
 
-# User configuration
-export ZSH_CUSTOM="$HOME/.zsh"
 # Source custom zsh files
 for config ($HOME/.zsh/*.zsh) source $config
 
