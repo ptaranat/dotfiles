@@ -45,7 +45,6 @@ bindkey '^[[B' history-substring-search-down
 ZSH_AUTOSUGGEST_STRATEGY=(history)
 znap source zsh-users/zsh-autosuggestions
 
-# znap source ohmyzsh/ohmyzsh
 # Speed up pasting w/ autosuggest
 pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}

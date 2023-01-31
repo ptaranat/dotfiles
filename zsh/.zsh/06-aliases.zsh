@@ -18,8 +18,10 @@ alias memo="bat -p ~/.memo.md"
 alias yup="yarn up"
 alias ywh="yarn why"
 
-# GitHub
+# Git
 alias ghpr="gh pr create -w"
+alias ghc="gh repo clone"
+alias grum="git rebase upstream/main"
 
 # Overrides
 alias cp="cp -i"
@@ -55,9 +57,6 @@ alias disks='echo "╓───── m o u n t . p o i n t s"; \
 
 # Recursively convert line endings to Unix
 alias fixdos="find . -type f -print0 | xargs -0 dos2unix"
-
-# GitHub CLI
-alias ghc="gh repo clone"
 
 # Update cargo packages using cargo-update
 alias cargoupdate="cargo install-update -a"
