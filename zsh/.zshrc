@@ -15,7 +15,7 @@ znap source romkatv/powerlevel10k
 # Plugins
 znap source ohmyzsh/ohmyzsh
 znap source ohmyzsh/ohmyzsh \
-	plugins/{archlinux,colored-man-pages,gpg-agent} \
+	plugins/{macos,colored-man-pages,gpg-agent} \
 	plugins/{git,gitfast,git-extras} \
 	plugins/{python,pip} \
 	plugins/golang \
@@ -28,7 +28,7 @@ znap source aloxaf/fzf-tab
 znap install lukechilds/zsh-nvm
 znap source djui/alias-tips
 znap source marlonrichert/zsh-hist
-znap source zdharma/fast-syntax-highlighting
+znap source z-shell/F-Sy-H
 znap eval zoxide "zoxide init --cmd j zsh"
 znap fpath _kubectl-argo-rollouts "kubectl-argo-rollouts completion zsh"
 znap source jeffreytse/zsh-vi-mode
@@ -67,3 +67,5 @@ for config ($HOME/.zsh/*.zsh) source $config
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"

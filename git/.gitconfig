@@ -68,6 +68,8 @@
 	repo = /Users/panat/.zsh_plugins/zsh-snap
 	repo = /Users/panat/.zsh_plugins/zsh-vi-mode
 	repo = /Users/panat/.zsh_plugins/zsh-autocomplete
+	repo = /Users/panat/.zsh_plugins/roll
+	repo = /Users/panat/.zsh_plugins/F-Sy-H
 [merge]
 	conflictstyle = diff3
 [url "ssh://git@github.com/"]
