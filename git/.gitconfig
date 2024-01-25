@@ -70,7 +70,22 @@
 	repo = /Users/panat/.zsh_plugins/zsh-autocomplete
 	repo = /Users/panat/.zsh_plugins/roll
 	repo = /Users/panat/.zsh_plugins/F-Sy-H
+	repo = /Users/panat/.zsh_plugins/aloxaf/fzf-tab
+	repo = /Users/panat/.zsh_plugins/djui/alias-tips
+	repo = /Users/panat/.zsh_plugins/jeffreytse/zsh-vi-mode
+	repo = /Users/panat/.zsh_plugins/lukechilds/zsh-nvm
+	repo = /Users/panat/.zsh_plugins/marlonrichert/zsh-hist
+	repo = /Users/panat/.zsh_plugins/matteocorti/roll
+	repo = /Users/panat/.zsh_plugins/ohmyzsh/ohmyzsh
+	repo = /Users/panat/.zsh_plugins/romkatv/powerlevel10k
+	repo = /Users/panat/.zsh_plugins/unixorn/fzf-zsh-plugin
+	repo = /Users/panat/.zsh_plugins/z-shell/F-Sy-H
+	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-autosuggestions
+	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-completions
+	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-history-substring-search
 [merge]
 	conflictstyle = diff3
 [url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[url "git@github.com:"]
 	insteadOf = https://github.com/
