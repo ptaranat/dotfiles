@@ -13,7 +13,8 @@ endif
 call plug#begin('~/.vim/plugged')
 
 " colors
-Plug 'yunlingz/equinusocio-material.vim'
+" Plug 'yunlingz/equinusocio-material.vim'
+Plug 'srcery-colors/srcery-vim'
 Plug 'luochen1990/rainbow'
 
 " programming
@@ -29,12 +30,15 @@ if has ('nvim')
   Plug 'nvim-lua/popup.nvim'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-telescope/telescope.nvim'
+  Plug 'nvim-telescope/telescope-frecency.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'neovim/nvim-lspconfig'
   Plug 'hrsh7th/nvim-compe'
-  Plug 'glepnir/dashboard-nvim'
+  Plug 'goolord/alpha-nvim'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'romgrk/barbar.nvim'
+  Plug 'Shatur/neovim-session-manager'
+  Plug 'github/copilot.vim'
   " conjure
   Plug 'Olical/conjure'
   Plug 'tpope/vim-dispatch'

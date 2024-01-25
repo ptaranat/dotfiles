@@ -1,17 +1,27 @@
-" banner
-let g:dashboard_custom_header = [
-\ ' ███╗   ██╗ ███████╗ ██████╗  ██╗   ██╗ ██╗ ███╗   ███╗',
-\ ' ████╗  ██║ ██╔════╝██╔═══██╗ ██║   ██║ ██║ ████╗ ████║',
-\ ' ██╔██╗ ██║ █████╗  ██║   ██║ ██║   ██║ ██║ ██╔████╔██║',
-\ ' ██║╚██╗██║ ██╔══╝  ██║   ██║ ╚██╗ ██╔╝ ██║ ██║╚██╔╝██║',
-\ ' ██║ ╚████║ ███████╗╚██████╔╝  ╚████╔╝  ██║ ██║ ╚═╝ ██║',
-\ ' ╚═╝  ╚═══╝ ╚══════╝ ╚═════╝    ╚═══╝   ╚═╝ ╚═╝     ╚═╝',
-\]
-
+if has('nvim')
+lua <<EOF
+require'alpha'.setup(require'alpha.themes.dashboard'.config)
+require('session_manager').setup({autoload_mode = 'Disabled'})
+require'nvim-web-devicons'.get_icons()
+EOF
+nnoremap <silent> <A-,> <Cmd>BufferPrevious<CR>
+nnoremap <silent> <A-.> <Cmd>BufferNext<CR>
+nnoremap <silent> <A-1> <Cmd>BufferGoto 1<CR>
+nnoremap <silent> <A-2> <Cmd>BufferGoto 2<CR>
+nnoremap <silent> <A-3> <Cmd>BufferGoto 3<CR>
+nnoremap <silent> <A-4> <Cmd>BufferGoto 4<CR>
+nnoremap <silent> <A-5> <Cmd>BufferGoto 5<CR>
+nnoremap <silent> <A-6> <Cmd>BufferGoto 6<CR>
+nnoremap <silent> <A-7> <Cmd>BufferGoto 7<CR>
+nnoremap <silent> <A-8> <Cmd>BufferGoto 8<CR>
+nnoremap <silent> <A-9> <Cmd>BufferGoto 9<CR>
+nnoremap <silent> <A-0> <Cmd>BufferLast<CR>
+endif
 " colors
-let g:equinusocio_material_style = 'darker'
-let g:equinusocio_material_hide_vertsplit = 1
-colorscheme equinusocio_material
+" let g:equinusocio_material_style = 'darker'
+" let g:equinusocio_material_hide_vertsplit = 1
+" colorscheme equinusocio_material
+colorscheme srcery
 "hi Normal guibg=NONE ctermbg=NONE
 let g:rainbow_active = 1
 
@@ -63,6 +73,7 @@ require'nvim-treesitter.configs'.setup {
         enable = true,
     },
 }
+require'nvim-treesitter.install'.compilers = { "gcc" }
 require'lspconfig'.terraformls.setup{}
 EOF
 autocmd BufWritePre *tfvars lua vim.lsp.buf.formatting_sync()
@@ -137,14 +148,13 @@ endif
 " dashboard
 let g:mapleader="\<Space>"
 let g:dashboard_default_executive ='telescope'
-nmap <Leader>ss :<C-u>SessionSave<CR>
-nmap <Leader>sl :<C-u>SessionLoad<CR>
-nnoremap <silent> <Leader>fh :DashboardFindHistory<CR>
-nnoremap <silent> <Leader>ff :DashboardFindFile<CR>
-nnoremap <silent> <Leader>tc :DashboardChangeColorscheme<CR>
-nnoremap <silent> <Leader>fa :DashboardFindWord<CR>
-nnoremap <silent> <Leader>fb :DashboardJumpMark<CR>
-nnoremap <silent> <Leader>cn :DashboardNewFile<CR>
+nnoremap <Leader>ss :<C-u>SessionManager save_current_session<CR>
+nnoremap <silent> <Leader>sl :<C-u>SessionManager load_last_session<CR>
+nnoremap <silent> <Leader>ff :Telescope find_files<CR>
+nnoremap <silent> <Leader>fh :Telescope oldfiles<CR>
+nnoremap <silent> <Leader>fr :Telescope frecency<CR>
+nnoremap <silent> <Leader>fg :Rg<CR>
+nnoremap <silent> <Leader>fm :Marks<CR>
 
 " signify diff
 let g:signify_realtime = 1
@@ -180,7 +190,7 @@ let g:secure_modelines_modelines = 15
 
 " lightline http://git.io/lightline
 let g:lightline = {
-  \ 'colorscheme': 'equinusocio_material',
+  \ 'colorscheme': 'srcery',
   \ 'active': {
   \   'left': [ [ 'mode', 'paste' ],
   \             [ 'fugitive', 'readonly', 'filename', 'modified' ]
