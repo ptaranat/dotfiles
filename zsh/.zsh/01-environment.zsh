@@ -1,5 +1,4 @@
 # Paths
-path=($(go env GOPATH)/bin $path)
 path=($HOME/.local/bin $path)
 path=($HOME/bin $path)
 path=($PYENV_ROOT/bin $path)
@@ -24,10 +23,6 @@ export NOTES_DIR=$HOME/Documents/notes
 
 # Language
 export LANG=en_US.UTF-8
-
-# Go
-export GOBIN="$GOPATH/bin"
-export GOROOT="$(brew --prefix golang)/libexec"
 
 # Python
 export PYTHONPATH="/opt/homebrew/bin/python3"

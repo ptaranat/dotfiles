@@ -13,6 +13,7 @@ alias agenda="gcalcli agenda --color-now-marker brightblue"
 alias tfer="terraformer"
 alias blue="_ systemctl restart bluetooth"
 alias memo="bat -p ~/.memo.md"
+alias tm="tmux new -As1"
 
 # Yarn
 alias yup="yarn up"
@@ -28,13 +29,13 @@ alias cp="cp -i"
 alias mv="mv -i"
 alias rmrf="rm -rf"
 
-# Replace ls with exa
-alias ls="exa"
-alias l="exa --group-directories-first"
-alias ll="exa -l --group-directories-first --git"
-alias la="exa -la --group-directories-first --git"
-alias lm="exa -ls modified --group-directories-first --reverse --git"
-alias lmr="exa -ls modified --group-directories-first --git"
+# Replace ls with eza
+alias ls="eza"
+alias l="eza --group-directories-first"
+alias ll="eza -l --group-directories-first --git"
+alias la="eza -la --group-directories-first --git"
+alias lm="eza -ls modified --group-directories-first --reverse --git"
+alias lmr="eza -ls modified --group-directories-first --git"
 
 # Edit configs
 alias zshrc="$EDITOR ~/.zshrc"

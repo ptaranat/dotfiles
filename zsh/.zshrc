@@ -18,10 +18,10 @@ znap source ohmyzsh/ohmyzsh \
 	plugins/{macos,colored-man-pages,gpg-agent} \
 	plugins/{git,gitfast,git-extras} \
 	plugins/{python,pip} \
-	plugins/golang \
 	plugins/{node,npm,yarn} \
 	plugins/{ruby,gem} \
-	plugins/{ansible,aws,kubectl,terraform} \
+	plugins/golang \
+	plugins/{ansible,aws,kubectl,terraform,docker} \
 	plugins/jira
 
 znap source aloxaf/fzf-tab
