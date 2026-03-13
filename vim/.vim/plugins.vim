@@ -33,12 +33,16 @@ if has ('nvim')
   Plug 'nvim-telescope/telescope-frecency.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'neovim/nvim-lspconfig'
-  Plug 'hrsh7th/nvim-compe'
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-vsnip'
   Plug 'goolord/alpha-nvim'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'romgrk/barbar.nvim'
   Plug 'Shatur/neovim-session-manager'
-  Plug 'github/copilot.vim'
+  Plug 'supermaven-inc/supermaven-nvim'
   " conjure
   Plug 'Olical/conjure'
   Plug 'tpope/vim-dispatch'
