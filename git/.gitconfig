@@ -10,15 +10,7 @@
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
 [color]
-	ui = always
-	branch = always
-	diff = always
-	interactive = always
-	status = always
-	grep = always
-	pager = true
-	decorate = always
-	showbranch = always
+	ui = auto
 [core]
 	pager = delta
 [delta]
@@ -86,7 +78,5 @@
 	repo = /Users/panat/.zsh_plugins/dominik-schwabe/zsh-fnm
 [merge]
 	conflictstyle = diff3
-[url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
 [url "git@github.com:"]
 	insteadOf = https://github.com/
