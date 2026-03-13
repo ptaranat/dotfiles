@@ -25,7 +25,6 @@ znap source ohmyzsh/ohmyzsh \
 	plugins/jira
 
 znap source aloxaf/fzf-tab
-znap source lukechilds/zsh-nvm
 znap source dominik-schwabe/zsh-fnm
 znap source djui/alias-tips
 znap source marlonrichert/zsh-hist

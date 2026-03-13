@@ -44,38 +44,13 @@ autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 " treesitter
 if has('nvim')
 lua <<EOF
-require'nvim-treesitter.configs'.setup {
-    ensure_installed = {
-        "bash",
-        "c",
-        "cpp",
-        "css",
-        "dockerfile",
-        "go",
-        "gomod",
-        "html",
-        "javascript",
-        "json",
-        "lua",
-        "python",
-        "rust",
-        "ruby",
-        "toml",
-        "yaml",
-    },
-    highlight = {
-        enable = true,
-    },
-    indent = {
-        enable = true,
-        disable = {"python"}
-    },
-    incremental_selection = {
-        enable = true,
-    },
-}
-require'nvim-treesitter.install'.compilers = { "gcc" }
-require'lspconfig'.terraformls.setup{}
+vim.api.nvim_create_autocmd('FileType', {
+    callback = function()
+        pcall(vim.treesitter.start)
+    end,
+})
+vim.lsp.config('terraformls', {})
+vim.lsp.enable('terraformls')
 EOF
 autocmd BufWritePre *tfvars lua vim.lsp.buf.format()
 autocmd BufWritePre *.tf lua vim.lsp.buf.format()
