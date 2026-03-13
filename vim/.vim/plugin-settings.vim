@@ -45,7 +45,7 @@ if has('nvim')
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
     ensure_installed = {
-        "bash", 
+        "bash",
         "c",
         "cpp",
         "css",
@@ -76,8 +76,8 @@ require'nvim-treesitter.configs'.setup {
 require'nvim-treesitter.install'.compilers = { "gcc" }
 require'lspconfig'.terraformls.setup{}
 EOF
-autocmd BufWritePre *tfvars lua vim.lsp.buf.formatting_sync()
-autocmd BufWritePre *.tf lua vim.lsp.buf.formatting_sync()
+autocmd BufWritePre *tfvars lua vim.lsp.buf.format()
+autocmd BufWritePre *.tf lua vim.lsp.buf.format()
 endif
 
 " nvim-compe
