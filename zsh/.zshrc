@@ -25,7 +25,8 @@ znap source ohmyzsh/ohmyzsh \
 	plugins/jira
 
 znap source aloxaf/fzf-tab
-znap install lukechilds/zsh-nvm
+znap source lukechilds/zsh-nvm
+znap source dominik-schwabe/zsh-fnm
 znap source djui/alias-tips
 znap source marlonrichert/zsh-hist
 znap source z-shell/F-Sy-H
@@ -65,7 +66,7 @@ for config ($HOME/.zsh/*.zsh) source $config
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+# [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+# [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
