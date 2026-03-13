@@ -116,4 +116,4 @@ yabai -m window --toggle topmost;\
 yabai -m window --toggle pip
 
 # Restart
-cmd + shift - r : brew services restart skhd && brew services restart yabai
+cmd + shift - r : skhd --restart-service && yabai --restart-service
