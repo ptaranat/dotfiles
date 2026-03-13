@@ -83,6 +83,7 @@
 	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-autosuggestions
 	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-completions
 	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-history-substring-search
+	repo = /Users/panat/.zsh_plugins/dominik-schwabe/zsh-fnm
 [merge]
 	conflictstyle = diff3
 [url "ssh://git@github.com/"]
