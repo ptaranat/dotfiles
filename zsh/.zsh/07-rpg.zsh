@@ -1,3 +1,10 @@
 # Use uv script for dice rolling
 alias dice='uv run ~/.dotfiles/zsh/.zsh/rpg.py dice'
 alias thaco='uv run ~/.dotfiles/zsh/.zsh/rpg.py thaco'
+alias d4='roll d4'
+alias d6='roll d6'
+alias d8='roll d8'
+alias d10='roll d10'
+alias d12='roll d12'
+alias d20='roll d20'
+alias d100='roll d100'

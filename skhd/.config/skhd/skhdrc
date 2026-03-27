@@ -106,9 +106,9 @@ ctrl + alt + shift - right : yabai -m window --display east; yabai -m display --
 
 
 # Terminal
-cmd - return : pgrep -f "Alacritty" \
-  && osascript -e 'tell application "Alacritty" to create window with default profile' \
-  || open -n "/Applications/Alacritty.app"
+cmd - return : pgrep -x "ghostty" \
+  && osascript -e 'tell application "System Events" to tell process "ghostty" to click menu item "New Window" of menu "File" of menu bar 1' \
+  || open -a "/Applications/Ghostty.app"
 
 # Toggle sticky(+float), topmost, picture-in-picture
 alt - p : yabai -m window --toggle sticky;\
