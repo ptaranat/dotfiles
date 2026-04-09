@@ -97,4 +97,3 @@ function note() {
 		$EDITOR "$filename"
 	fi
 }
-
