@@ -13,7 +13,22 @@ alias agenda="gcalcli agenda --color-now-marker brightblue"
 alias tfer="terraformer"
 alias blue="_ systemctl restart bluetooth"
 alias memo="bat -p ~/.memo.md"
-alias tm="tmux new -As1"
+alias cc="claude"
+
+# attach/create a tmux session by name, or fzf-pick one; bare tm on an empty server -> main
+tm() {
+  local change target="$1"
+  [[ -n "$TMUX" ]] && change=switch-client || change=attach-session
+  if [[ -z "$target" ]]; then
+    if [[ -n "$(tmux list-sessions 2>/dev/null)" ]]; then
+      target=$(tmux list-sessions -F '#{session_name}' | fzf --exit-0) || return  # esc cancels
+      [[ -z "$target" ]] && return
+    else
+      target=main
+    fi
+  fi
+  tmux "$change" -t "$target" 2>/dev/null || { tmux new-session -d -s "$target" && tmux "$change" -t "$target"; }
+}
 
 # Yarn
 alias yup="yarn up"
@@ -95,5 +110,16 @@ function note() {
 		timestamp=$(date -u +"%Y-%m-%d")
 		filename="$NOTES_DIR/$timestamp.md"
 		$EDITOR "$filename"
+	fi
+}
+
+# Markedit
+markedit() {
+	if [ -t 0 ]; then
+		open -a Markedit "$@"
+	else
+		local f="$(mktemp -d -t dw)/note.md"
+		cat > "$f"
+		open -a Markedit "$f"
 	fi
 }
