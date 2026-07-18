@@ -102,16 +102,11 @@ gaps.outer.right =      6
     # All possible commands: https://nikitabobko.github.io/AeroSpace/commands
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
-    # You can uncomment the following lines to open up terminal with alt + enter shortcut
-    # (like in i3)
-    # alt-enter = '''exec-and-forget osascript -e \
-    # 'tell application "Terminal" to tell (do script) to activate' '''
-
-    # Ported from skhd
-    cmd-enter = '''exec-and-forget pgrep -x ghostty \
+    # Terminal (alt-enter, like i3) and browser
+    alt-enter = '''exec-and-forget pgrep -x ghostty \
       && osascript -e 'tell application "System Events" to tell process "ghostty" to click menu item "New Window" of menu "File" of menu bar 1' \
       || open -a "/Applications/Ghostty.app"'''
-    ctrl-shift-w = 'exec-and-forget open -n "/Applications/Google Chrome.app"'
+    alt-w = 'exec-and-forget open -na "Helium" --args --new-window'
     alt-shift-f = 'macos-native-fullscreen'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
