@@ -1,15 +1,22 @@
-# Naming the format explicitly means starship only evaluates these modules.
-# Left unset it probes for every language it supports on each prompt, which is
-# the main cost in a starship prompt.
-format = """
-$directory\
-$git_branch\
-$git_status\
-$kubernetes\
-$aws\
-$character"""
-
-right_format = "$cmd_duration$nodejs$python$golang"
+# Deliberately close to starship's default.
+#
+# An earlier version of this file hand-built a p10k-style powerline. Two things
+# made that a bad fit. Starship has no segment concept, so every background has
+# to be maintained by hand and naming modules explicitly in `format` means any
+# module left out never renders at all -- which silently hid gleam. And the
+# effect that made p10k's rainbow work, swapping the git background from green
+# to yellow when the tree is dirty, has no starship equivalent: only foreground
+# colours are conditional.
+#
+# So: no explicit `format`. Starship's default is `$all`, which renders every
+# module in a sensible order and, importantly, cannot lose a module the way an
+# explicit list can. Everything below is presentation only.
+#
+# Nerd Font glyphs are used throughout; a few starship defaults are actual
+# emoji rather than glyphs (gleam ships a star) and those are swapped for a
+# monochrome glyph or a short text label.
+#
+# ghostty is set to MesloLGS Nerd Font; "SF Mono Square" is also installed.
 
 add_newline = true
 command_timeout = 1000
@@ -22,6 +29,7 @@ vimcmd_symbol = "[❮](bold yellow)"
 [directory]
 truncation_length = 3
 truncate_to_repo = true
+truncation_symbol = "…/"
 style = "bold cyan"
 read_only = " 󰌾"
 
@@ -36,20 +44,21 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 untracked = "?${count}"
-stashed = "$"
+stashed = "*${count}"
 modified = "!${count}"
 staged = "+${count}"
 renamed = "»${count}"
 deleted = "✘${count}"
 
-# Only shown when the prompt takes real time, so it does not add noise.
 [cmd_duration]
 min_time = 2000
-format = "[$duration]($style) "
+format = "[took $duration]($style) "
 style = "dimmed yellow"
 
-# Cluster context matters enough to be worth the line: kubectl is the single
-# most-used command in this shell's history.
+# --- context ---------------------------------------------------------------
+
+# The kubeconfig is empty now, but this stays enabled so it lights up again if
+# a cluster is ever added, rather than being a module to remember to re-enable.
 [kubernetes]
 disabled = false
 symbol = "☸ "
@@ -61,17 +70,93 @@ symbol = " "
 style = "dimmed yellow"
 format = '[$symbol$profile( \($region\))]($style) '
 
+[terraform]
+symbol = "󱁢 "
+style = "dimmed 105"
+
+# Would print "orbstack" in every directory with a compose file, which is noise
+# when there is only ever one context.
+[docker_context]
+disabled = true
+
+# --- toolchains ------------------------------------------------------------
+
+# starship's default gleam symbol is a star emoji; no Nerd Font glyph exists
+# for gleam, so this uses a text label.
+[gleam]
+symbol = "gleam "
+style = "bold 219"
+
 [nodejs]
 symbol = " "
-style = "dimmed green"
-format = "[$symbol($version)]($style) "
+style = "bold green"
+
+[bun]
+symbol = "󰚦 "
+style = "bold 223"
 
 [python]
 symbol = " "
-style = "dimmed yellow"
-format = '[$symbol($version)( \($virtualenv\))]($style) '
+style = "bold yellow"
 
 [golang]
 symbol = " "
-style = "dimmed cyan"
-format = "[$symbol($version)]($style) "
+style = "bold cyan"
+
+[rust]
+symbol = " "
+style = "bold red"
+
+[java]
+symbol = " "
+style = "bold red"
+
+[kotlin]
+symbol = " "
+style = "bold 141"
+
+[ruby]
+symbol = " "
+style = "bold red"
+
+[elixir]
+symbol = " "
+style = "bold 141"
+
+[erlang]
+symbol = " "
+style = "bold 204"
+
+[php]
+symbol = " "
+style = "bold 105"
+
+[lua]
+symbol = " "
+style = "bold blue"
+
+[swift]
+symbol = " "
+style = "bold 208"
+
+[haskell]
+symbol = " "
+style = "bold 141"
+
+[c]
+symbol = " "
+style = "bold blue"
+
+[package]
+symbol = "󰏗 "
+style = "bold 178"
+
+[mise]
+disabled = false
+symbol = "mise "
+style = "dimmed 79"
+
+[direnv]
+disabled = false
+symbol = "󰙪 "
+style = "dimmed yellow"

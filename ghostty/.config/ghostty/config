@@ -1,5 +1,12 @@
 theme = srcery
 
+# No font-family was set here, so ghostty fell back to a system font with no
+# Nerd Font glyphs: powerline separators, git branch icons and eza's file
+# icons all rendered as tofu. MesloLGS is already installed (it is the font
+# p10k shipped with) and alacritty was already pointing at it.
+font-family = "MesloLGS Nerd Font"
+font-size = 13
+
 cursor-style = block
 cursor-style-blink = true
 
