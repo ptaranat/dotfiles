@@ -120,8 +120,15 @@ zstyle :bracketed-paste-magic paste-init pasteinit
 zstyle :bracketed-paste-magic paste-finish pastefinish
 
 # --- local config ------------------------------------------------------------
-# (N) so an empty rc.d is not an error.
+# (N) so an empty directory is not an error.
 for f in "${ZDOTDIR:-$HOME/.config/zsh}"/rc.d/*.zsh(N); do
+	source "$f"
+done
+
+# Work config, from a separate private repo cloned into $ZDOTDIR/work. Kept out
+# of this repo because it is public; sourced after rc.d so it can override.
+# Absent on a machine without access to that repo, hence the (N).
+for f in "${ZDOTDIR:-$HOME/.config/zsh}"/work/*.zsh(N); do
 	source "$f"
 done
 
