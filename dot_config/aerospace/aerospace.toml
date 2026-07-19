@@ -103,7 +103,22 @@ gaps.outer.right =      12
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
     # Terminal (alt-enter, like i3) and browser
-    alt-enter = '''exec-and-forget pgrep -x ghostty \
+    #
+    # The running check matches the bundle path, not the process name. This
+    # previously read `pgrep -x ghostty`, which cannot match: macOS truncates a
+    # process name to 16 characters, so Ghostty appears as "/Applications/Gh".
+    # The binding therefore always fell through to `open`, which focuses the
+    # existing window instead of opening a new one.
+    #
+    # The path must include Contents/MacOS. A looser `pgrep -f Ghostty.app`
+    # matches on the full command line including environment, so every process
+    # launched from a Ghostty terminal matches via the inherited
+    # GHOSTTY_RESOURCES_DIR (which points at Contents/Resources) and Ghostty
+    # would look like it was running long after being quit.
+    #
+    # System Events still knows the process as "ghostty", so the AppleScript is
+    # unaffected by the truncation.
+    alt-enter = '''exec-and-forget pgrep -f "Ghostty.app/Contents/MacOS" >/dev/null \
       && osascript -e 'tell application "System Events" to tell process "ghostty" to click menu item "New Window" of menu "File" of menu bar 1' \
       || open -a "/Applications/Ghostty.app"'''
     alt-w = 'exec-and-forget open -na "Helium" --args --new-window'
