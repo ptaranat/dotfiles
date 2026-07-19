@@ -1775,19 +1775,32 @@
   # picked up and the segment stays empty outside mise projects.
   function prompt_mise() {
     local dir=$PWD cfg= f
+    local -a idiomatic
+    # Walk up to the nearest directory holding any config mise would read, and
+    # take every such file at that one level. .nvmrc and friends are included
+    # because idiomatic_version_file_enable_tools is on for node and python, so
+    # mise honours them -- and a project may well pin node in .nvmrc (which CI
+    # also reads) while using mise.toml only for tools .nvmrc cannot express.
+    # Without them the segment would under-report what is actually active.
     while [[ $dir != / && -n $dir ]]; do
       for f in .mise.toml mise.toml .config/mise.toml .tool-versions; do
-        [[ -r $dir/$f ]] && { cfg=$dir/$f; break 2 }
+        [[ -r $dir/$f ]] && cfg=$dir/$f
       done
+      for f in .nvmrc .node-version .python-version; do
+        [[ -r $dir/$f ]] && idiomatic+=$dir/$f
+      done
+      [[ -n $cfg || $#idiomatic -gt 0 ]] && break
       dir=${dir:h}
     done
-    [[ -n $cfg ]] || return
+    [[ -n $cfg || $#idiomatic -gt 0 ]] || return
 
     local -a tools
     local line k v in_tools=0
-    if [[ $cfg == *.toml ]]; then
+    if [[ -n $cfg && $cfg == *.toml ]]; then
       while IFS= read -r line; do
-        line=${line%%#*}
+        # '#' must be escaped: p10k enables EXTENDED_GLOB, under which a bare
+        # '#' is a pattern operator and '#*' is not a valid pattern at all.
+        line=${line%%\#*}
         if [[ $line == \[*\]* ]]; then
           [[ $line == \[tools\]* ]] && in_tools=1 || in_tools=0
           continue
@@ -1798,14 +1811,32 @@
         k=${k//[[:space:]\"\']/}; v=${v//[[:space:]\"\'\[\]]/}
         [[ -n $k && -n $v ]] && tools+="$k ${v%%,*}"
       done < $cfg
-    else
+    elif [[ -n $cfg ]]; then
       # .tool-versions: "<name> <version>" per line
       while IFS= read -r line; do
-        line=${line%%#*}
+        # '#' must be escaped: p10k enables EXTENDED_GLOB, under which a bare
+        # '#' is a pattern operator and '#*' is not a valid pattern at all.
+        line=${line%%\#*}
         [[ -n ${line//[[:space:]]/} ]] || continue
         tools+="${line%%[[:space:]]*} ${${line#*[[:space:]]}##[[:space:]]#}"
       done < $cfg
     fi
+
+    # Single-version files: the tool is implied by the filename, and the
+    # contents are just a version, optionally with a leading v.
+    for f in $idiomatic; do
+      read -r line < $f 2>/dev/null || continue
+      line=${line//[[:space:]]/}
+      [[ -n $line ]] || continue
+      case ${f:t} in
+        .nvmrc|.node-version) k=node ;;
+        .python-version)      k=python ;;
+        *)                    continue ;;
+      esac
+      # Skip if the toml already named this tool, so it is not listed twice.
+      [[ ${tools[(I)$k *]} -eq 0 ]] && tools+="$k ${line#v}"
+    done
+
     (( $#tools )) || return
     p10k segment -b 0 -f 79 -t "${(j:, :)tools}"
   }
