@@ -1,0 +1,5 @@
+README.md
+Brewfile
+.github/
+*.zwc
+.vim/undo/
