@@ -52,6 +52,12 @@ alias la="eza -la --group-directories-first --git"
 alias lm="eza -ls modified --group-directories-first --reverse --git"
 alias lmr="eza -ls modified --group-directories-first --git"
 
+# Neovim. `v` runs the Lua config under its own NVIM_APPNAME, so it coexists
+# with the old vimscript one on plain `nvim` until it has earned the switch.
+alias v="NVIM_APPNAME=nvim-lua nvim"
+alias vlazy="NVIM_APPNAME=nvim-lua nvim +Lazy"
+alias vhealth="NVIM_APPNAME=nvim-lua nvim +checkhealth"
+
 # chezmoi
 alias cm="chezmoi"
 alias cma="chezmoi apply"
