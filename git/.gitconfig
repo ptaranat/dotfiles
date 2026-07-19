@@ -26,8 +26,6 @@
 [push]
 	default = current
 	autoSetupRemote = true
-[diff]
-	tool = vimdiff
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
@@ -45,38 +43,45 @@
 	required = true
 [rebase]
 	autosquash = true
-[maintenance]
-	repo = /Users/panat/.zsh_plugins/alias-tips
-	repo = /Users/panat/.zsh_plugins/fast-syntax-highlighting
-	repo = /Users/panat/.zsh_plugins/fzf-tab
-	repo = /Users/panat/.zsh_plugins/fzf-zsh-plugin
-	repo = /Users/panat/.zsh_plugins/ohmyzsh
-	repo = /Users/panat/.zsh_plugins/powerlevel10k
-	repo = /Users/panat/.zsh_plugins/zsh-autosuggestions
-	repo = /Users/panat/.zsh_plugins/zsh-completions
-	repo = /Users/panat/.zsh_plugins/zsh-hist
-	repo = /Users/panat/.zsh_plugins/zsh-history-substring-search
-	repo = /Users/panat/.zsh_plugins/zsh-nvm
-	repo = /Users/panat/.zsh_plugins/zsh-snap
-	repo = /Users/panat/.zsh_plugins/zsh-vi-mode
-	repo = /Users/panat/.zsh_plugins/zsh-autocomplete
-	repo = /Users/panat/.zsh_plugins/roll
-	repo = /Users/panat/.zsh_plugins/F-Sy-H
-	repo = /Users/panat/.zsh_plugins/aloxaf/fzf-tab
-	repo = /Users/panat/.zsh_plugins/djui/alias-tips
-	repo = /Users/panat/.zsh_plugins/jeffreytse/zsh-vi-mode
-	repo = /Users/panat/.zsh_plugins/lukechilds/zsh-nvm
-	repo = /Users/panat/.zsh_plugins/marlonrichert/zsh-hist
-	repo = /Users/panat/.zsh_plugins/matteocorti/roll
-	repo = /Users/panat/.zsh_plugins/ohmyzsh/ohmyzsh
-	repo = /Users/panat/.zsh_plugins/romkatv/powerlevel10k
-	repo = /Users/panat/.zsh_plugins/unixorn/fzf-zsh-plugin
-	repo = /Users/panat/.zsh_plugins/z-shell/F-Sy-H
-	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-autosuggestions
-	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-completions
-	repo = /Users/panat/.zsh_plugins/zsh-users/zsh-history-substring-search
-	repo = /Users/panat/.zsh_plugins/dominik-schwabe/zsh-fnm
+	# Stash and restore a dirty worktree around a rebase instead of refusing.
+	autoStash = true
+	# When rebasing a branch, also move any other local branches pointing at the
+	# rebased commits. Without this, stacked branches silently end up pointing
+	# at the pre-rebase commits.
+	updateRefs = true
+
+[rerere]
+	# Record how a conflict was resolved and replay it if the same conflict
+	# reappears, which it does constantly during a long rebase.
+	enabled = true
+	autoUpdate = true
+
+[branch]
+	# `git branch` sorted by most recent commit rather than alphabetically.
+	sort = -committerdate
+
+[column]
+	# Multi-column output for branch/tag/status listings when the terminal is
+	# wide enough.
+	ui = auto
+
+[fetch]
+	# Delete local refs for branches deleted on the remote.
+	prune = true
+	pruneTags = true
+
+[diff]
+	# Produces noticeably more readable diffs than the default Myers algorithm,
+	# particularly when a block moves or braces shift.
+	algorithm = histogram
+	# Detect renames and copies.
+	renames = copies
+	# Nicer prefixes than a/ and b/ in the header.
+	mnemonicPrefix = true
+	tool = vimdiff
 [merge]
-	conflictstyle = diff3
+	# Like diff3, but omits lines the two sides already agree on, so the
+	# conflict hunk is smaller. Requires git >= 2.35.
+	conflictstyle = zdiff3
 [url "git@github.com:"]
 	insteadOf = https://github.com/
