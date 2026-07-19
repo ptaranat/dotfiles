@@ -12,15 +12,6 @@
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
-	# Structural diff, for when a change is buried in reformatting.
-	#
-	# core.pager is overridden per alias. Left alone, difftastic's side-by-side
-	# output would be piped into delta, which tries to parse its input as a
-	# unified diff and cannot make sense of it. `less -R` just renders the ANSI
-	# difftastic already emitted; -F quits immediately if it fits on one screen.
-	dft = -c diff.external=difft -c core.pager='less -RF' diff
-	dlog = -c diff.external=difft -c core.pager='less -RF' log -p --ext-diff
-	dshow = -c diff.external=difft -c core.pager='less -RF' show --ext-diff
 [color]
 	ui = auto
 [core]
@@ -38,17 +29,6 @@
 [push]
 	default = current
 	autoSetupRemote = true
-# difftastic: diffs the syntax tree rather than lines, so reformatting and
-# moved code stop showing as churn. Opt-in per command (`git dft`, or
-# `git difftool -t difftastic`) rather than replacing the pager, because delta
-# is better for review and difftastic cannot produce applyable patches.
-[diff "difftastic"]
-	command = difft
-[difftool "difftastic"]
-	cmd = difft "$LOCAL" "$REMOTE"
-[difftool]
-	prompt = false
-
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
