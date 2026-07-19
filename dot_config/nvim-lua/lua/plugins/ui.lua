@@ -22,6 +22,21 @@ return {
 			-- comments and keywords started rendering italic. Set explicitly
 			-- rather than relying on either default.
 			vim.g.srcery_italic = 0
+
+			-- Match the terminal background exactly.
+			--
+			-- Upstream srcery changed g:srcery_black from #1C1B19 to #121110,
+			-- and derives g:srcery_background from it. The ghostty srcery
+			-- theme still uses #1c1b19, so the editor rendered visibly darker
+			-- than the surrounding terminal. Pin it to the terminal's value.
+			vim.g.srcery_background = "#1c1b19"
+
+			-- Style floating windows. Off by default upstream, but this config
+			-- is full of floats -- completion, telescope, which-key,
+			-- diagnostics -- and without it they fall back to Normal and lose
+			-- their border against the buffer behind them.
+			vim.g.srcery_normal_float = 1
+
 			vim.cmd.colorscheme("srcery")
 		end,
 	},
