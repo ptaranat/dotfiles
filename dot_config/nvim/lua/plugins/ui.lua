@@ -56,8 +56,15 @@ return {
 			options = {
 				theme = "srcery",
 				globalstatus = true, -- one statusline, not one per split
-				section_separators = { left = "", right = "" },
-				component_separators = { left = "", right = "" },
+				-- Powerline separators. Written as \u escapes because these
+				-- live in the Unicode private use area and do not survive
+				-- being pasted around as literal characters.
+				--   U+E0B0  right-pointing solid, between sections
+				--   U+E0B2  left-pointing solid, on the right-hand sections
+				--   U+E0B1  right-pointing thin, between components
+				--   U+E0B3  left-pointing thin
+				section_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
+				component_separators = { left = "\u{E0B1}", right = "\u{E0B3}" },
 			},
 			sections = {
 				lualine_a = { "mode" },

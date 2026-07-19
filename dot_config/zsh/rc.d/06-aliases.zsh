@@ -1,6 +1,10 @@
 # Aliases
 alias reload="exec zsh"
-alias e=$EDITOR
+# A function, not `alias e=$EDITOR`: an alias expands its right-hand side once,
+# at definition time, so it freezes whichever editor $EDITOR held when this file
+# was sourced. This resolves on every call, which matters because
+# 01-environment.zsh sets EDITOR to vim over SSH and nvim locally.
+e() { ${EDITOR:-nvim} "$@" }
 alias c="clear"
 alias h="history -10"
 alias hg="history | grep"
@@ -52,11 +56,9 @@ alias la="eza -la --group-directories-first --git"
 alias lm="eza -ls modified --group-directories-first --reverse --git"
 alias lmr="eza -ls modified --group-directories-first --git"
 
-# Neovim. `v` runs the Lua config under its own NVIM_APPNAME, so it coexists
-# with the old vimscript one on plain `nvim` until it has earned the switch.
-alias v="NVIM_APPNAME=nvim-lua nvim"
-alias vlazy="NVIM_APPNAME=nvim-lua nvim +Lazy"
-alias vhealth="NVIM_APPNAME=nvim-lua nvim +checkhealth"
+# Neovim
+alias lazy="nvim +Lazy"
+alias health="nvim +checkhealth"
 
 # chezmoi
 alias cm="chezmoi"
@@ -78,10 +80,10 @@ alias zshenv="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environ
 alias zshalias="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"
 alias zshrpg="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/07-rpg.zsh"
 alias zshprompt="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/prompt/overrides.zsh"
-alias vimrc="chezmoi edit --apply ~/.vim/general.vim"
-alias vimplug="chezmoi edit --apply ~/.vim/plugins.vim"
-alias vimplugs="chezmoi edit --apply ~/.vim/plugin-settings.vim"
-alias vimui="chezmoi edit --apply ~/.vim/ui.vim"
+alias vimrc="chezmoi edit --apply ~/.config/nvim/init.lua"
+alias vimopts="chezmoi edit --apply ~/.config/nvim/lua/config/options.lua"
+alias vimkeys="chezmoi edit --apply ~/.config/nvim/lua/config/keymaps.lua"
+alias vimplug="chezmoi edit --apply ~/.config/nvim/lua/plugins/ui.lua"
 alias gitconfig="chezmoi edit --apply ~/.gitconfig"
 alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
 
