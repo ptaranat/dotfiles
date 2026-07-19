@@ -169,8 +169,6 @@ cask "alacritty"
 cask "alt-tab"
 # Securely stores and accesses AWS credentials in a development environment
 cask "aws-vault-binary"
-# AI-first code editor, installed manually rather than by cask.
-cask "cursor"
 cask "font-sf-mono"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
@@ -196,8 +194,6 @@ cask "temurin"
 cask "trunk-io"
 # Comic reader
 cask "yacreader"
-# Multiplayer code editor
-cask "zed"
 go "github.com/googleapis/api-linter/cmd/api-linter"
 go "github.com/klauspost/asmfmt/cmd/asmfmt"
 go "github.com/go-delve/delve/cmd/dlv"
