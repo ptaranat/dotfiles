@@ -95,5 +95,3 @@
 	# Like diff3, but omits lines the two sides already agree on, so the
 	# conflict hunk is smaller. Requires git >= 2.35.
 	conflictstyle = zdiff3
-[url "git@github.com:"]
-	insteadOf = https://github.com/
