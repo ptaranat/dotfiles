@@ -17,6 +17,16 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
 	ssh-add ~/.ssh/id_rsa 2>/dev/null
 fi
 
+# Pager. Mouse wheel scrolling has to be asked for: without --mouse, less
+# ignores the wheel entirely and no pager built on it scrolls -- which includes
+# delta, since it shells out to less. An earlier version of this file carried
+# this line commented out, which is why scrolling silently did not work.
+#
+# -R passes through colour escapes but nothing else; plain -r forwards every
+# control character, which can corrupt the display on binary input.
+# -F skips the pager when the output already fits on one screen.
+export LESS='--mouse --wheel-lines=3 -RF'
+
 # Bat theme
 export BAT_THEME=base16
 
