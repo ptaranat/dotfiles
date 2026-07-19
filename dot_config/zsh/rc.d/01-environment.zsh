@@ -5,12 +5,11 @@
 path=(/opt/homebrew/bin(N-/) $path)
 path=($HOME/bin(N-/) $path)
 
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-	export EDITOR='vim'
-else
-	export EDITOR='nvim'
-fi
+# nvim everywhere. This used to fall back to vim over SSH, from when the config
+# was vimscript and worked in both; it is Lua now and vim cannot read it, so
+# the fallback would have meant an unconfigured editor rather than a familiar
+# one.
+export EDITOR='nvim'
 export VISUAL=$EDITOR
 
 if [ -z "$SSH_AUTH_SOCK" ]; then

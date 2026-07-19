@@ -17,17 +17,28 @@
 #
 # Approach adapted from 2KAbhishek/dots2k.
 
-# Global versions, resolved once at startup so the prompt can hide anything
-# matching the machine default and show only what a project overrides.
-# Without this a stray ~/.nvmrc makes every directory under $HOME show node.
+# Global versions, so the prompt can hide anything matching the machine default
+# and show only what a project overrides.
+#
+# Cached to disk rather than shelling out to `mise ls` on every shell start,
+# which measured ~18ms. The cache is rebuilt whenever the mise config is newer
+# than it, which also fixes a real bug: installing a new global tool mid-session
+# used to leave it absent from this map, so it looked like a project override
+# and showed in the prompt everywhere until the shell was restarted.
 typeset -gA _p9k_mise_global
 if (( $+commands[mise] )); then
   () {
-    local tool version src
-    while read -r tool version src; do
+    local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/mise-global"
+    local cfg="${MISE_GLOBAL_CONFIG_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml}"
+    if [[ ! -s $cache || $cfg -nt $cache ]]; then
+      [[ -d ${cache:h} ]] || mkdir -p ${cache:h}
+      mise ls --offline 2>/dev/null |
+        awk '$3 ~ /config\.toml$|\.tool-versions$|\.mise\.toml$/ {print $1, $2}' >| $cache
+    fi
+    local tool version
+    while read -r tool version; do
       [[ -n $tool ]] && _p9k_mise_global[$tool]=$version
-    done < <(mise ls --offline 2>/dev/null |
-             awk '$3 ~ /config\.toml$|\.tool-versions$|\.mise\.toml$/ {print $1, $2, $3}')
+    done < $cache
   }
 fi
 
