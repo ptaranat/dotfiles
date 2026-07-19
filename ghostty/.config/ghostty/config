@@ -1,0 +1,12 @@
+theme = srcery
+
+cursor-style = block
+cursor-style-blink = true
+
+# Ghostty's shell integration sets a blinking bar (\e[5 q) at every prompt,
+# which overrides cursor-style. Turn that off so the block sticks.
+shell-integration-features = no-cursor
+
+custom-shader = shaders/cursor_warp.glsl
+
+keybind = global:cmd+grave_accent=toggle_quick_terminal
