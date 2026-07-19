@@ -1773,6 +1773,37 @@
   # Only project configs match: the walk stops at /, and the global config
   # lives at ~/.config/mise/config.toml rather than ~/.mise.toml, so it is not
   # picked up and the segment stays empty outside mise projects.
+  # Colours match asdf, the built-in segment mise supersedes.
+  typeset -g POWERLEVEL9K_MISE_FOREGROUND=0
+  typeset -g POWERLEVEL9K_MISE_BACKGROUND=6
+
+  # Nerd Font glyphs per tool, written as \u escapes rather than literal
+  # characters. Two reasons: the codepoints are in the private use area and got
+  # silently stripped to empty strings when this file was written with literals
+  # in it, and escapes keep the file pure ASCII and diffable.
+  #
+  # Note these cannot be p10k icon *names* (NODE_ICON and friends): unlike the
+  # built-in segments, `p10k segment -i` emits its argument verbatim, so a name
+  # would print as the literal text "NODE_ICON".
+  #
+  # Tools absent here fall back to their plain name, so nothing renders as tofu.
+  typeset -gA _p9k_mise_icons=(
+    node      $''      nodejs    $''
+    python    $''      py        $''
+    go        $''      golang    $''
+    rust      $''      ruby      $''
+    java      $''      php       $''
+    lua       $''      elixir    $''
+    swift     $''      deno      $''
+    npm       $''      pnpm      $''
+    yarn      $''      bun       $'\U000f06a6'
+    terraform $'\U000f1062'
+  )
+
+  # A busy monorepo can pin a lot of tools; cap the list so the prompt cannot
+  # run away.
+  typeset -g POWERLEVEL9K_MISE_MAX_TOOLS=4
+
   function prompt_mise() {
     local dir=$PWD cfg= f
     local -a idiomatic
@@ -1838,7 +1869,20 @@
     done
 
     (( $#tools )) || return
-    p10k segment -b 0 -f 79 -t "${(j:, :)tools}"
+
+    # One segment for everything. Per-tool colours are not possible here:
+    # p10k resolves a segment's style from its name, so every `p10k segment`
+    # call inside prompt_mise gets POWERLEVEL9K_MISE_* regardless of -b, and
+    # the extra calls left a stray empty segment at the right edge.
+    local -a parts
+    local name ver n=0
+    for line in $tools; do
+      (( n++ < POWERLEVEL9K_MISE_MAX_TOOLS )) || break
+      name=${line%% *}; ver=${line#* }
+      parts+="${_p9k_mise_icons[$name]:-$name} ${ver#v}"
+    done
+    p10k segment -f $POWERLEVEL9K_MISE_FOREGROUND -b $POWERLEVEL9K_MISE_BACKGROUND \
+      -t "${(j: :)parts}"
   }
 
   # Cheap enough (no subprocess) to also run during instant prompt.
