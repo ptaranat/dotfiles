@@ -1,8 +1,8 @@
 #!/bin/sh
 # macOS system preferences.
 #
-# run_onchange_: chezmoi re-runs this only when the file itself changes, so it
-# is not paid on every apply. run_*_after_: it runs after files are written.
+# run_onchange_: chezmoi re-runs this only when the file itself changes, rather
+# than on every apply. run_*_after_: it runs after files are written.
 #
 # Every value here was read off this machine with `defaults read` rather than
 # copied from a list, so applying it reproduces the settings actually in use
@@ -76,11 +76,8 @@ defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 # Search the current folder by default instead of the whole Mac.
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
-# Skip the "are you sure you want to open this" prompt for apps already
-# downloaded and verified.
-defaults write com.apple.LaunchServices LSQuarantine -bool false
-
-# Do not create .DS_Store-style metadata prompts when changing a file extension.
+# Skip Finder's "Are you sure you want to change the extension?" confirmation
+# when renaming a file.
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
 # --- apply ------------------------------------------------------------------
