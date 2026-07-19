@@ -66,6 +66,13 @@ opt.foldlevel = 99
 opt.foldlevelstart = 99
 opt.foldenable = true
 
+-- Ported from the old ui.vim: slightly translucent floats, popup menus and
+-- wildmenu. Without these the completion and float windows render solid,
+-- which is the most visible difference from the old config.
+opt.winblend = 10
+opt.pumblend = 10
+opt.wildoptions = "pum"
+
 opt.completeopt = { "menuone", "noselect", "popup" }
 opt.shortmess:append("I") -- no intro screen
 opt.signcolumn = "yes" -- stop the gutter jumping when diagnostics appear

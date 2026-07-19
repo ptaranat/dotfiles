@@ -7,8 +7,21 @@ return {
 		lazy = false,
 		priority = 1000, -- load before everything else so nothing flashes
 		config = function()
-			vim.g.srcery_italic = 1
-			vim.g.srcery_transparent_background = 0
+			-- Italics off, matching how this looked before.
+			--
+			-- The old config set nothing beyond `colorscheme srcery` and got
+			-- no italics, because that version of the plugin only enabled them
+			-- under a GUI or with $TERM_ITALICS=true (unset here):
+			--
+			--   if has('gui_running') || $TERM_ITALICS ==? 'true'
+			--     let g:srcery_italic=1
+			--   else
+			--     let g:srcery_italic=0
+			--
+			-- Newer srcery dropped that conditional and defaults to 1, so
+			-- comments and keywords started rendering italic. Set explicitly
+			-- rather than relying on either default.
+			vim.g.srcery_italic = 0
 			vim.cmd.colorscheme("srcery")
 		end,
 	},
@@ -19,6 +32,10 @@ return {
 		"nvim-lualine/lualine.nvim",
 		event = "VeryLazy",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
+		-- Section layout mirrors the old lightline config, which was:
+		--   left  [mode, paste] [fugitive, readonly, filename, modified]
+		--   right [ale] [lineinfo] [percent] [charcode, fileformat, filetype]
+		-- Notably the filename was bare, not a path.
 		opts = {
 			options = {
 				theme = "srcery",
@@ -27,11 +44,22 @@ return {
 				component_separators = { left = "", right = "" },
 			},
 			sections = {
-				lualine_b = { "branch", "diff", "diagnostics" },
-				lualine_c = { { "filename", path = 1 } },
+				lualine_a = { "mode" },
+				lualine_b = {
+					"branch",
+					-- Added: +N ~N -N counts for the working tree. lightline's
+					-- fugitive component only showed the branch name.
+					{ "diff", symbols = { added = "+", modified = "~", removed = "-" } },
+					{ "filename", path = 0, symbols = { modified = " +", readonly = " ", newfile = " " } },
+				},
+				lualine_c = {},
 				lualine_x = {
-					-- Which LSP servers are actually attached, which the old
-					-- setup gave no indication of.
+					-- diagnostics stands in for the old ale section, and is
+					-- populated by the LSP rather than a separate linter.
+					"diagnostics",
+					-- Added: which language servers are actually attached.
+					-- The old setup gave no indication, so a server silently
+					-- failing to start looked identical to one working.
 					{
 						function()
 							local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -43,10 +71,19 @@ return {
 							end, clients)
 							return " " .. table.concat(names, ",")
 						end,
+						color = { fg = "#918175" }, -- srcery bright black, deliberately quiet
 					},
-					"encoding",
-					"filetype",
 				},
+				lualine_y = { "location", "progress" },
+				lualine_z = { "fileformat", "filetype" },
+			},
+			inactive_sections = {
+				lualine_a = {},
+				lualine_b = {},
+				lualine_c = { { "filename", path = 0 } },
+				lualine_x = {},
+				lualine_y = {},
+				lualine_z = {},
 			},
 		},
 	},
