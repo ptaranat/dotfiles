@@ -441,7 +441,7 @@ chars = "\u001B|"
 key = "Backslash"
 mods = "Alt|Shift"
 
-[shell]
+[terminal.shell]
 args = ["--login"]
 program = "/bin/zsh"
 
@@ -455,3 +455,5 @@ lines = 40
 [window.position]
 x = 461
 y = 448
+
+[terminal]
