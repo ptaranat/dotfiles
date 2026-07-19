@@ -12,6 +12,10 @@
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
+	# Structural diff, for when a change is buried in reformatting.
+	dft = -c diff.external=difft diff
+	dlog = -c diff.external=difft log -p --ext-diff
+	dshow = -c diff.external=difft show --ext-diff
 [color]
 	ui = auto
 [core]
@@ -29,6 +33,17 @@
 [push]
 	default = current
 	autoSetupRemote = true
+# difftastic: diffs the syntax tree rather than lines, so reformatting and
+# moved code stop showing as churn. Opt-in per command (`git dft`, or
+# `git difftool -t difftastic`) rather than replacing the pager, because delta
+# is better for review and difftastic cannot produce applyable patches.
+[diff "difftastic"]
+	command = difft
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+[difftool]
+	prompt = false
+
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
