@@ -25,7 +25,12 @@ znap source ohmyzsh/ohmyzsh \
 	plugins/jira
 
 znap source aloxaf/fzf-tab
-znap source dominik-schwabe/zsh-fnm
+# fnm is initialised in ~/.zsh/01-environment.zsh instead. Sourcing this as well
+# ran `fnm env` twice per shell, and every run mints its own directory under
+# ~/.local/state/fnm_multishells and prepends it to $PATH. The two runs also
+# disagreed: the plugin resolved the default alias while the explicit eval
+# resolved the version file, so which node you got came down to $PATH order.
+# znap source dominik-schwabe/zsh-fnm
 znap source djui/alias-tips
 znap source marlonrichert/zsh-hist
 znap source z-shell/F-Sy-H
@@ -68,7 +73,7 @@ export NVM_DIR="$HOME/.nvm"
 # [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
 # [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+path=($HOME/.yarn/bin(N-/) $HOME/.config/yarn/global/node_modules/.bin(N-/) $path)
 #compdef gt
 ###-begin-gt-completions-###
 #
