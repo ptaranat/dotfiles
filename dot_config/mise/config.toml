@@ -1,0 +1,43 @@
+# mise: runtime version manager. Replaced fnm here, and pyenv before that.
+#
+# Division of labour with uv: mise owns interpreter/runtime *versions*, uv owns
+# Python packages and virtualenvs. They are complementary, not competing, and
+# mise defers to uv for venv creation when uv is installed.
+
+[tools]
+node = "24"
+python = "3.13"
+# Node package manager, same author as mise. Claims to beat pnpm and bun on
+# warm installs via a content-addressable global store, and reads existing
+# yarn.lock / pnpm-lock.yaml / package-lock.json. Pinned to the major version
+# rather than "latest" so it cannot change under a project mid-work; the
+# lockfile setting below records the exact build.
+aube = "1"
+
+[settings]
+# Write mise.lock next to mise.toml with resolved versions, so a project pins
+# exact builds rather than whatever "24" resolves to on the day.
+lockfile = true
+
+# Auto-create and source the .venv for any project with a uv.lock. uv is by far
+# the most-used tool in this shell's history, so this removes the most common
+# manual step. "create|source" makes it if missing; plain "source" would only
+# activate an existing one.
+python.uv_venv_auto = "create|source"
+
+# Honour .nvmrc / .node-version / .python-version in addition to mise's own
+# config, so repos that predate mise still pin correctly. Opt-in per tool
+# because mise will not read these formats for every tool by default.
+idiomatic_version_file_enable_tools = ["node", "python"]
+
+# Install a missing tool on demand rather than erroring out.
+auto_install = true
+
+# Cache the computed environment. Nested mise invocations get much faster; the
+# cache invalidates automatically when a config file changes.
+env_cache = true
+
+[settings.status]
+# Warn when entering a directory whose config asks for tools that are not
+# installed, instead of silently using the wrong version.
+missing_tools = "always"

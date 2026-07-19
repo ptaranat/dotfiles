@@ -1,0 +1,97 @@
+[user]
+	name = Panat Taranat
+	email = panat.taranat@gmail.com
+	# SSH signing: this is a path to a public key, not a GPG key id. The
+	# previous value was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028,
+	# kept in the backup copy of this file if it is ever needed again.
+	signingkey = ~/.ssh/id_rsa.pub
+[credential]
+	helper = /opt/homebrew/bin/gh auth git-credential
+[alias]
+	graphgpg = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)[gpg:%GK%x20%G?]%C(reset)%n%x20%s%n"
+	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
+	last = log -1 --stat
+	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
+[color]
+	ui = auto
+[core]
+	pager = delta
+[delta]
+	plus-style = "syntax #012800"
+	minus-style = "syntax #340001"
+	syntax-theme = OneHalfDark
+	navigate = true
+	side-by-side = true
+[interactive]
+	diffFilter = delta --color-only
+[pull]
+	ff = only
+[push]
+	default = current
+	autoSetupRemote = true
+[difftool "vimdiff"]
+	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+[gpg]
+	# Sign with SSH rather than GPG. The [gpg] section name and the gpgsign
+	# settings below are historical: git kept the names when it added other
+	# signing formats, so "gpgsign = true" with format = ssh means SSH-signed.
+	format = ssh
+
+[gpg "ssh"]
+	# Needed for local verification. Without it `git log --show-signature`
+	# reports "No principal matched" even for signatures git just created,
+	# because git has no way to know which key is allowed to sign for whom.
+	allowedSignersFile = ~/.config/git/allowed_signers
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[init]
+	defaultBranch = main
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[rebase]
+	autosquash = true
+	# Stash and restore a dirty worktree around a rebase instead of refusing.
+	autoStash = true
+	# When rebasing a branch, also move any other local branches pointing at the
+	# rebased commits. Without this, stacked branches silently end up pointing
+	# at the pre-rebase commits.
+	updateRefs = true
+
+[rerere]
+	# Record how a conflict was resolved and replay it if the same conflict
+	# reappears, which it does constantly during a long rebase.
+	enabled = true
+	autoUpdate = true
+
+[branch]
+	# `git branch` sorted by most recent commit rather than alphabetically.
+	sort = -committerdate
+
+[column]
+	# Multi-column output for branch/tag/status listings when the terminal is
+	# wide enough.
+	ui = auto
+
+[fetch]
+	# Delete local refs for branches deleted on the remote.
+	prune = true
+	pruneTags = true
+
+[diff]
+	# Produces noticeably more readable diffs than the default Myers algorithm,
+	# particularly when a block moves or braces shift.
+	algorithm = histogram
+	# Detect renames and copies.
+	renames = copies
+	# Nicer prefixes than a/ and b/ in the header.
+	mnemonicPrefix = true
+	tool = vimdiff
+[merge]
+	# Like diff3, but omits lines the two sides already agree on, so the
+	# conflict hunk is smaller. Requires git >= 2.35.
+	conflictstyle = zdiff3

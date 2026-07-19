@@ -1,0 +1,7 @@
+# Maps identities to the SSH keys allowed to sign for them, so `git log
+# --show-signature` and `git verify-commit` can validate locally. Without it
+# git reports "No principal matched" even for signatures it created itself.
+#
+# Format: <identity> namespaces="git" <key type> <key>
+# Public keys only; nothing here is secret.
+panat.taranat@gmail.com namespaces="git" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDBGxaYquUSYlwyk+ylIIbdAIuWCRbscT6CP2slSYMBvTI+F9n+4Sfyu4kwATPedgGbBS3IpUfUWEEq3Ju4/B0JRcdwn4sTorb3r6o3sNJ/zxrOZzEt7OU1VqfY4dRmcQBn2FNegO2WH6dqi3B7wrRd3H4UJE7qnOUI7oiXpnJIqd6tm2d+UtRVhvPGYv3wcdStdVGzJ0/KpNCMv5/uaQU2RpDI/e2AqeMx5nuGzKn7JOaZ7G8T8KyjdlP5uQVKw3pCdvrLGSytaibdzvCBK8fW15F0TAYamICsD4P9KIKEDGurJalvETDWjdYsARQ+jrnP+6LuwaTZ0Gdxz36IPDmaDXBayIUSp/3o5iW4Qjbf71Nqzx0/Q96PK9pq4ws20V8d72uceSai3H1hnk6NgOCjyXRQn6maIKRQDVQDzTfK5ckbihVBRKX/qH2+vy851UUTT2tIWu59XNNCIwg22Cxp08AYZx1KpaunuY5rselZYlDjCKo7WTxFqbdGCD/Bex0=
