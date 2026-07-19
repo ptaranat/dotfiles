@@ -51,9 +51,17 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 vim.lsp.config('terraformls', {})
 vim.lsp.enable('terraformls')
+
+vim.lsp.config('gleam', {
+  cmd = { 'gleam', 'lsp' },
+  filetypes = { 'gleam' },
+  root_markers = { 'gleam.toml', '.git' },
+})
+vim.lsp.enable('gleam')
 EOF
 autocmd BufWritePre *tfvars lua vim.lsp.buf.format()
 autocmd BufWritePre *.tf lua vim.lsp.buf.format()
+autocmd BufWritePre *.gleam lua vim.lsp.buf.format()
 endif
 
 " nvim-cmp
