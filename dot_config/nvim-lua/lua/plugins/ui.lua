@@ -23,13 +23,14 @@ return {
 			-- rather than relying on either default.
 			vim.g.srcery_italic = 0
 
-			-- Match the terminal background exactly.
-			--
-			-- Upstream srcery changed g:srcery_black from #1C1B19 to #121110,
-			-- and derives g:srcery_background from it. The ghostty srcery
-			-- theme still uses #1c1b19, so the editor rendered visibly darker
-			-- than the surrounding terminal. Pin it to the terminal's value.
-			vim.g.srcery_background = "#1c1b19"
+			-- No colour overrides. The editor briefly rendered darker than the
+			-- terminal because upstream srcery revised three colours in
+			-- ba34fc5 (2025-08-09, "redesign background shades") -- background
+			-- #1c1b19 -> #121110, white #baa67f -> #c5b088, bright black
+			-- #918175 -> #917e6b -- while the ghostty theme still carried the
+			-- older values. That is a deliberate contrast improvement by the
+			-- author, not drift, so the ghostty theme was updated to match
+			-- rather than pinning the plugin backwards here.
 
 			-- Style floating windows. Off by default upstream, but this config
 			-- is full of floats -- completion, telescope, which-key,
@@ -169,11 +170,18 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
 			local dashboard = require("alpha.themes.dashboard")
+			-- Buttons are labelled with the leader sequence that triggers them
+			-- elsewhere in the config, the way the stock theme does, rather
+			-- than with single letters that only work on this screen. The
+			-- shortcut passed to button() is what alpha binds locally; the
+			-- label is what you would type in a normal buffer.
 			dashboard.section.buttons.val = {
-				dashboard.button("f", "  Find file", "<cmd>Telescope find_files<CR>"),
-				dashboard.button("r", "  Recent files", "<cmd>Telescope oldfiles<CR>"),
-				dashboard.button("g", "  Grep", "<cmd>Telescope live_grep<CR>"),
-				dashboard.button("s", "  Restore session", "<cmd>SessionManager load_last_session<CR>"),
+				dashboard.button("e", "  New file", "<cmd>ene <BAR> startinsert<CR>"),
+				dashboard.button("SPC f f", "  Find file", "<cmd>Telescope find_files<CR>"),
+				dashboard.button("SPC f h", "  Recently opened", "<cmd>Telescope oldfiles<CR>"),
+				dashboard.button("SPC f r", "  Frecent files", "<cmd>Telescope frecency<CR>"),
+				dashboard.button("SPC f g", "  Find word", "<cmd>Telescope live_grep<CR>"),
+				dashboard.button("SPC s l", "  Restore session", "<cmd>SessionManager load_last_session<CR>"),
 				dashboard.button("l", "󰒲  Lazy", "<cmd>Lazy<CR>"),
 				dashboard.button("q", "  Quit", "<cmd>qa<CR>"),
 			}

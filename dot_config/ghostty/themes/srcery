@@ -1,12 +1,28 @@
-palette = 0=#1c1b19
+# Srcery, tracking upstream as of srcery-vim ba34fc5 (2025-08-09,
+# "feat: redesign background shades").
+#
+# That commit darkened the background and rebuilt the grey shades around it.
+# The author's rationale: "The new background was chosen so that the colors pop
+# a bit more, trying out srcery on various monitors it often looked washed out."
+#
+# Three values changed from the previous version of this file, and they are the
+# reason neovim looked darker than the terminal until both were brought into
+# line:
+#
+#   palette 0 / background  #1c1b19 -> #121110
+#   palette 7  (white)      #baa67f -> #c5b088
+#   palette 8  (bright black) #918175 -> #917e6b
+#
+# The other 13 colours are unchanged.
+palette = 0=#121110
 palette = 1=#ef2f27
 palette = 2=#519f50
 palette = 3=#fbb829
 palette = 4=#2c78bf
 palette = 5=#e02c6d
 palette = 6=#0aaeb3
-palette = 7=#baa67f
-palette = 8=#918175
+palette = 7=#c5b088
+palette = 8=#917e6b
 palette = 9=#f75341
 palette = 10=#98bc37
 palette = 11=#fed06e
@@ -14,9 +30,9 @@ palette = 12=#68a8e4
 palette = 13=#ff5c8f
 palette = 14=#2be4d0
 palette = 15=#fce8c3
-background = #1c1b19
+background = #121110
 foreground = #fce8c3
 cursor-color = #fbb829
-cursor-text = #1c1b19
+cursor-text = #121110
 selection-background = #fce8c3
-selection-foreground = #1c1b19
+selection-foreground = #121110
