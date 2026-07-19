@@ -35,7 +35,6 @@ znap source djui/alias-tips
 znap source marlonrichert/zsh-hist
 znap source z-shell/F-Sy-H
 znap eval zoxide "zoxide init --cmd j zsh"
-znap fpath _kubectl-argo-rollouts "kubectl-argo-rollouts completion zsh"
 znap source jeffreytse/zsh-vi-mode
 # Point the plugin at the stowed config under XDG_CONFIG_HOME. It has no XDG
 # support itself: unset, it reads ~/.fzf.zsh, and set, it reads
