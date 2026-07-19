@@ -37,13 +37,20 @@ znap source z-shell/F-Sy-H
 znap eval zoxide "zoxide init --cmd j zsh"
 znap fpath _kubectl-argo-rollouts "kubectl-argo-rollouts completion zsh"
 znap source jeffreytse/zsh-vi-mode
-# Pin FZF_PATH so both sourcings of the plugin agree on one config file. The
-# plugin sets FZF_PATH itself without declaring it local, and picks ~/.fzf.zsh
-# only while it is unset: so the first source reads ~/.fzf.zsh, and the second
-# one below sees the leaked value and reads $FZF_PATH/fzf.zsh instead. Setting
-# it here sends both down the same branch. ~/.fzf.zsh is a symlink to that file
-# so either path still resolves.
-export FZF_PATH="$HOME/.fzf"
+# Point the plugin at the stowed config under XDG_CONFIG_HOME. It has no XDG
+# support itself: unset, it reads ~/.fzf.zsh, and set, it reads
+# $FZF_PATH/fzf.zsh, so this is the only lever available.
+#
+# Setting it also fixes a second problem. The plugin assigns FZF_PATH without
+# declaring it local, and .zshrc sources the plugin twice, once here and once
+# from zvm_after_init_commands so the key bindings survive zsh-vi-mode. Left
+# unset, the first pass read ~/.fzf.zsh while the second saw the leaked value
+# and read somewhere else entirely. Now both passes take the same branch.
+#
+# Caveat: FZF_PATH doubles as the plugin's clone target when fzf is missing, so
+# a machine without it would get a git clone into this directory. fzf comes from
+# brew here, so that path never runs.
+export FZF_PATH="${XDG_CONFIG_HOME:-$HOME/.config}/fzf"
 znap source unixorn/fzf-zsh-plugin
 export ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
 # Don't install fzf as this plugin does
