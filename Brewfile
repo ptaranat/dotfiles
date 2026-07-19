@@ -39,8 +39,6 @@ brew "docker-credential-helper-ecr"
 brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
-# Fast and simple Node.js version manager
-brew "fnm"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # Toolkit for image loading and pixel buffer manipulation
