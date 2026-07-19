@@ -1,10 +1,9 @@
 # Paths. The (N-/) qualifier keeps an entry only when it is an existing
 # directory, so anything uninstalled or moved drops out silently instead of
 # accumulating in $PATH and being searched on every command.
+# ~/.local/bin is added in .zshenv so non-interactive shells get it too.
 path=(/opt/homebrew/bin(N-/) $path)
-path=($HOME/.local/bin(N-/) $path)
 path=($HOME/bin(N-/) $path)
-
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
@@ -12,14 +11,12 @@ if [[ -n $SSH_CONNECTION ]]; then
 else
 	export EDITOR='nvim'
 fi
+export VISUAL=$EDITOR
 
 if [ -z "$SSH_AUTH_SOCK" ]; then
 	eval "$(ssh-agent -s)" > /dev/null
 	ssh-add ~/.ssh/id_rsa 2>/dev/null
 fi
-
-# Scroll in less
-# export LESS='--mouse --wheel-lines=3 -r'
 
 # Bat theme
 export BAT_THEME=base16
@@ -34,8 +31,8 @@ export LANG=en_US.UTF-8
 export FZF_DEFAULT_COMMAND="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*' 2> /dev/null"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-# fnm (node). Sourced only here; see the note in .zshrc about the fnm plugin.
-eval "$(fnm env --version-file-strategy recursive --use-on-cd --shell zsh)"
-
-# AWS
+# Node, Python and friends are managed by mise, activated in .zshrc. It
+# replaced fnm here and pyenv before that. uv is kept for Python packaging:
+# mise handles interpreter versions, uv handles dependencies and venvs, and
+# mise will use uv to build venvs when it finds it.
 export AWS_SDK_LOAD_CONFIG=1

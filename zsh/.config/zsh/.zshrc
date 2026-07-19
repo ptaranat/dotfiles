@@ -1,0 +1,110 @@
+# Interactive shell config. Environment that non-interactive shells also need
+# belongs in .zshenv instead.
+#
+# Layout: this file sets up plugins, prompt and keybindings, then sources
+# rc.d/*.zsh at the end for everything else.
+
+# GPG needs to know which terminal to prompt on. Done here rather than via
+# oh-my-zsh's gpg-agent plugin: that plugin shelled out to gpg-connect-agent on
+# every startup and cost ~730ms, roughly 70% of total shell startup, to
+# accomplish what this one line does. pinentry-mac is configured in
+# ~/.gnupg/gpg-agent.conf.
+export GPG_TTY=$TTY
+
+# --- history -----------------------------------------------------------------
+#
+# Set here rather than in .zshenv on purpose. macOS ships an /etc/zshrc that
+# does:
+#     HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
+#     HISTSIZE=2000
+#     SAVEHIST=1000
+# and zsh sources it for every interactive shell *after* .zshenv, so values set
+# there are silently overwritten. This file is sourced after /etc/zshrc, so it
+# wins. oh-my-zsh's history lib later raises HISTSIZE/SAVEHIST if they are
+# lower, but it leaves a non-empty HISTFILE alone, so the path must be set here.
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+export HISTSIZE=50000
+export SAVEHIST=50000
+[[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
+
+# --- plugins -----------------------------------------------------------------
+
+source "${XDG_DATA_HOME:-$HOME/.local/share}/znap/zsh-snap/znap.zsh"
+zstyle ':znap:*' repos-dir "${XDG_DATA_HOME:-$HOME/.local/share}/znap"
+
+# Several oh-my-zsh plugins (docker, kubectl) cache generated completions under
+# $ZSH_CACHE_DIR. The framework normally sets it; we only source the libs, so
+# without this they write to /completions and fail.
+export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d $ZSH_CACHE_DIR/completions ]] || mkdir -p "$ZSH_CACHE_DIR/completions"
+
+# oh-my-zsh a la carte. Sourcing the libs directly gives us omz's history
+# options, keybindings, completion setup and git helpers without loading the
+# framework itself or its update checker.
+znap source ohmyzsh/ohmyzsh lib/{history,key-bindings,completion,directories,git}
+znap source ohmyzsh/ohmyzsh \
+	plugins/{macos,colored-man-pages} \
+	plugins/{git,gitfast,git-extras} \
+	plugins/{npm,yarn} \
+	plugins/{kubectl,terraform,docker}
+
+znap source zsh-users/zsh-completions
+znap source aloxaf/fzf-tab
+znap source z-shell/F-Sy-H
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+
+# Nags when a typed command has an alias. YSU's default message is a three-line
+# block; this trims it to a single "alias tip: gst" line.
+export YSU_MESSAGE_FORMAT="$(print -P '%F{yellow}')alias tip: %alias$(print -P '%f')"
+export YSU_MESSAGE_POSITION="after"
+znap source MichaelAquilina/zsh-you-should-use
+
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+znap source zsh-users/zsh-autosuggestions
+
+# fzf owns the keybindings (Ctrl-T files, Alt-C cd); fzf-tab owns completion.
+# Ctrl-R is deliberately left to atuin, which binds it below.
+if (( $+commands[fzf] )); then
+	source <(fzf --zsh)
+fi
+
+# --- prompt and shell integrations -------------------------------------------
+#
+# znap eval caches a command's stdout to disk and sources the cache, instead of
+# forking a subshell on every startup. The cache key is the command itself, so
+# it refreshes automatically when the command changes.
+
+znap eval starship 'starship init zsh --print-full-init'
+znap eval zoxide 'zoxide init zsh --cmd j'
+znap eval mise 'mise activate zsh'
+znap eval atuin 'atuin init zsh --disable-up-arrow'
+
+# atuin takes Ctrl-R. Up/down stay on prefix-aware history search, which is
+# why atuin is initialised with --disable-up-arrow.
+znap source zsh-users/zsh-history-substring-search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
+export ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
+znap source jeffreytse/zsh-vi-mode
+
+# --- paste performance -------------------------------------------------------
+# Without this, autosuggestions recompute per character on paste, so pasting a
+# long line is visibly slow.
+pasteinit() {
+	OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
+	zle -N self-insert url-quote-magic
+}
+pastefinish() {
+	zle -N self-insert $OLD_SELF_INSERT
+}
+zstyle :bracketed-paste-magic paste-init pasteinit
+zstyle :bracketed-paste-magic paste-finish pastefinish
+
+# --- local config ------------------------------------------------------------
+# (N) so an empty rc.d is not an error.
+for f in "${ZDOTDIR:-$HOME/.config/zsh}"/rc.d/*.zsh(N); do
+	source "$f"
+done
