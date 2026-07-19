@@ -7,6 +7,12 @@
 [tools]
 node = "24"
 python = "3.13"
+# Node package manager, same author as mise. Claims to beat pnpm and bun on
+# warm installs via a content-addressable global store, and reads existing
+# yarn.lock / pnpm-lock.yaml / package-lock.json. Pinned to the major version
+# rather than "latest" so it cannot change under a project mid-work; the
+# lockfile setting below records the exact build.
+aube = "1"
 
 [settings]
 # Write mise.lock next to mise.toml with resolved versions, so a project pins
