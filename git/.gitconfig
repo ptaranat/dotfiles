@@ -1,7 +1,10 @@
 [user]
 	name = Panat Taranat
 	email = panat.taranat@gmail.com
-	signingkey = CCACDB1344B8B7EC0B4DD439655CBB5895152028
+	# SSH signing: this is a path to a public key, not a GPG key id. The
+	# previous value was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028,
+	# kept in the backup copy of this file if it is ever needed again.
+	signingkey = ~/.ssh/id_rsa.pub
 [credential]
 	helper = /opt/homebrew/bin/gh auth git-credential
 [alias]
@@ -29,7 +32,16 @@
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
-	program = gpg
+	# Sign with SSH rather than GPG. The [gpg] section name and the gpgsign
+	# settings below are historical: git kept the names when it added other
+	# signing formats, so "gpgsign = true" with format = ssh means SSH-signed.
+	format = ssh
+
+[gpg "ssh"]
+	# Needed for local verification. Without it `git log --show-signature`
+	# reports "No principal matched" even for signatures git just created,
+	# because git has no way to know which key is allowed to sign for whom.
+	allowedSignersFile = ~/.config/git/allowed_signers
 [commit]
 	gpgsign = true
 [tag]
