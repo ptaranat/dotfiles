@@ -37,6 +37,13 @@ znap source z-shell/F-Sy-H
 znap eval zoxide "zoxide init --cmd j zsh"
 znap fpath _kubectl-argo-rollouts "kubectl-argo-rollouts completion zsh"
 znap source jeffreytse/zsh-vi-mode
+# Pin FZF_PATH so both sourcings of the plugin agree on one config file. The
+# plugin sets FZF_PATH itself without declaring it local, and picks ~/.fzf.zsh
+# only while it is unset: so the first source reads ~/.fzf.zsh, and the second
+# one below sees the leaked value and reads $FZF_PATH/fzf.zsh instead. Setting
+# it here sends both down the same branch. ~/.fzf.zsh is a symlink to that file
+# so either path still resolves.
+export FZF_PATH="$HOME/.fzf"
 znap source unixorn/fzf-zsh-plugin
 export ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
 # Don't install fzf as this plugin does
