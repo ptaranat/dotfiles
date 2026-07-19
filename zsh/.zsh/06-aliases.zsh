@@ -13,7 +13,7 @@ alias agenda="gcalcli agenda --color-now-marker brightblue"
 alias tfer="terraformer"
 alias blue="_ systemctl restart bluetooth"
 alias memo="bat -p ~/.memo.md"
-alias cc="claude"
+alias cl="claude"
 
 # attach/create a tmux session by name, or fzf-pick one; bare tm on an empty server -> main
 tm() {
