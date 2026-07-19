@@ -1,6 +1,0 @@
-[submodule "work"]
-	path = work
-	url = https://github.com/ptaranat/work
-[submodule "ghostty/.config/ghostty/shaders"]
-	path = ghostty/.config/ghostty/shaders
-	url = git@github.com:sahaj-b/ghostty-cursor-shaders

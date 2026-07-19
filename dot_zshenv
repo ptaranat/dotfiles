@@ -1,0 +1,20 @@
+# The only zsh file that lives in $HOME. Everything else sits under
+# $XDG_CONFIG_HOME/zsh, which this points zsh at.
+#
+# .zshenv is sourced for every zsh invocation (interactive or not), so keep it
+# to environment setup only: no output, no prompts, nothing slow.
+
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
+
+# History is configured in .zshrc, not here. macOS ships an /etc/zshrc that
+# hardcodes HISTFILE, HISTSIZE and SAVEHIST, and zsh sources it for every
+# interactive shell after this file, so anything set here would be clobbered.
+
+# Set here, not in .zshrc, so tools in ~/.local/bin resolve in non-interactive
+# shells too (scripts, ssh commands, editor subprocesses).
+path=($HOME/.local/bin(N-/) $path)
