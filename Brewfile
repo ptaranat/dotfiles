@@ -139,8 +139,6 @@ brew "sesh"
 brew "shellcheck"
 # Easy and Repeatable Kubernetes Development
 brew "skaffold"
-# Organize software neatly under a single directory tree (e.g. /usr/local)
-brew "stow"
 # Easiest, most secure way to use WireGuard and 2FA
 brew "tailscale"
 # Very fast implementation of tldr in Rust
