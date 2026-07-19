@@ -9,10 +9,10 @@ tap "oven-sh/bun"
 tap "sikarugir-app/sikarugir", "https://github.com/Sikarugir-App/homebrew-sikarugir.git"
 tap "stripe/stripe-cli"
 tap "withgraphite/tap"
-# New file format for still image compression
-brew "jpeg-xl"
 # Codec library for encoding and decoding AV1 video streams
 brew "aom"
+# Improved shell history for zsh, bash, fish and nushell
+brew "atuin"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -67,8 +67,6 @@ brew "gnupg"
 brew "go"
 # Language server for the Go language
 brew "gopls"
-# C/C++ and Java libraries for Unicode and globalization
-brew "icu4c@77"
 # OpenType text shaping engine
 brew "harfbuzz"
 # Post-modern modal text editor
@@ -77,8 +75,14 @@ brew "helix"
 brew "helm"
 # User-friendly cURL replacement (command-line HTTP client)
 brew "httpie"
+# Command-line benchmarking tool
+brew "hyperfine"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c@77"
 # Istio configuration command-line utility
 brew "istioctl"
+# New file format for still image compression
+brew "jpeg-xl"
 # Lightweight and flexible command-line JSON processor
 brew "jq"
 # Handy way to save and run project-specific commands
@@ -91,6 +95,8 @@ brew "kubernetes-cli"
 brew "leptonica"
 # Text-based web browser
 brew "lynx"
+# Polyglot runtime manager (asdf rust clone)
+brew "mise"
 # Protocol buffers (Google's data interchange format)
 brew "protobuf"
 # Remote terminal application
@@ -135,6 +141,8 @@ brew "sesh"
 brew "shellcheck"
 # Easy and Repeatable Kubernetes Development
 brew "skaffold"
+# Cross-shell prompt for astronauts
+brew "starship"
 # Organize software neatly under a single directory tree (e.g. /usr/local)
 brew "stow"
 # Easiest, most secure way to use WireGuard and 2FA
@@ -167,7 +175,7 @@ cask "alacritty"
 cask "alt-tab"
 # Securely stores and accesses AWS credentials in a development environment
 cask "aws-vault-binary"
-# AI-first code editor; was installed manually, declared here so a fresh
+# AI-first code editor; installed manually, declared here so a fresh
 # machine has somewhere to put the vscode extensions listed below.
 cask "cursor"
 cask "font-sf-mono"
