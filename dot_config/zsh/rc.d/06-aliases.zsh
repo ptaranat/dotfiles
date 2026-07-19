@@ -1,6 +1,9 @@
 # Aliases
 alias reload="exec zsh"
-alias e=$EDITOR
+# A function, not `alias e=$EDITOR`: an alias expands its right-hand side once,
+# at definition time, so it would freeze whichever editor $EDITOR held when this
+# file was sourced rather than following it.
+e() { ${EDITOR:-nvim} "$@" }
 alias c="clear"
 alias h="history -10"
 alias hg="history | grep"
@@ -30,10 +33,6 @@ tm() {
   tmux "$change" -t "$target" 2>/dev/null || { tmux new-session -d -s "$target" && tmux "$change" -t "$target"; }
 }
 
-# Yarn
-alias yup="yarn up"
-alias ywh="yarn why"
-
 # Git
 alias ghpr="gh pr create -w"
 alias ghc="gh repo clone"
@@ -51,6 +50,10 @@ alias ll="eza -l --group-directories-first --git"
 alias la="eza -la --group-directories-first --git"
 alias lm="eza -ls modified --group-directories-first --reverse --git"
 alias lmr="eza -ls modified --group-directories-first --git"
+
+# Neovim
+alias lazy="nvim +Lazy"
+alias health="nvim +checkhealth"
 
 # chezmoi
 alias cm="chezmoi"
@@ -72,10 +75,10 @@ alias zshenv="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environ
 alias zshalias="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"
 alias zshrpg="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/07-rpg.zsh"
 alias zshprompt="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/prompt/overrides.zsh"
-alias vimrc="chezmoi edit --apply ~/.vim/general.vim"
-alias vimplug="chezmoi edit --apply ~/.vim/plugins.vim"
-alias vimplugs="chezmoi edit --apply ~/.vim/plugin-settings.vim"
-alias vimui="chezmoi edit --apply ~/.vim/ui.vim"
+alias nvimrc="chezmoi edit --apply ~/.config/nvim/init.lua"
+alias nvimopts="chezmoi edit --apply ~/.config/nvim/lua/config/options.lua"
+alias nvimkeys="chezmoi edit --apply ~/.config/nvim/lua/config/keymaps.lua"
+alias nvimplug="chezmoi edit --apply ~/.config/nvim/lua/plugins/ui.lua"
 alias gitconfig="chezmoi edit --apply ~/.gitconfig"
 alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
 

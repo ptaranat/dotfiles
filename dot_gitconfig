@@ -12,6 +12,11 @@
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
+	# Structural diff. See the [diff "difftastic"] section for why each of
+	# these settings is here.
+	dft = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' diff"
+	dlog = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' log -p --ext-diff"
+	dshow = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' show --ext-diff"
 [color]
 	ui = auto
 [core]
@@ -29,6 +34,27 @@
 [push]
 	default = current
 	autoSetupRemote = true
+# difftastic: diffs the syntax tree rather than lines, so reformatting and
+# moved code stop reading as churn. Opt-in per command, never the default:
+# delta stays better for review, and difftastic's output is not an applyable
+# patch.
+#
+# Configured rather than left at defaults, because the defaults are the reason
+# it is usually dismissed as unreadable:
+#
+#   DFT_DISPLAY=inline   the default splits into two columns that wrap
+#                        constantly at normal terminal widths
+#   DFT_BACKGROUND=dark  picks the brighter palette; difftastic offers no
+#                        finer colour control than this
+#   core.pager=less -RF  difftastic emits its own ANSI, which delta cannot
+#                        parse as a unified diff
+[diff "difftastic"]
+	command = difft
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+[difftool]
+	prompt = false
+
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
