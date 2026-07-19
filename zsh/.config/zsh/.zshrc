@@ -4,6 +4,14 @@
 # Layout: this file sets up plugins, prompt and keybindings, then sources
 # rc.d/*.zsh at the end for everything else.
 
+# Powerlevel10k instant prompt. Has to stay at the very top: it replays a
+# cached prompt before the rest of this file runs, so anything above it that
+# writes to the terminal or reads input corrupts the replay. Nothing that
+# prompts for input (passwords, y/n) may go above this block.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+	source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # GPG needs to know which terminal to prompt on. Done here rather than via
 # oh-my-zsh's gpg-agent plugin: that plugin shelled out to gpg-connect-agent on
 # every startup and cost ~730ms, roughly 70% of total shell startup, to
@@ -74,7 +82,15 @@ fi
 # forking a subshell on every startup. The cache key is the command itself, so
 # it refreshes automatically when the command changes.
 
-znap eval starship 'starship init zsh --print-full-init'
+# Prompt. Kept on p10k rather than starship: the ~730ms that made startup slow
+# was oh-my-zsh's gpg-agent plugin, not the prompt, so switching prompts bought
+# nothing. p10k has a compiled gitstatus daemon and the instant-prompt cache
+# above, and does things starship cannot -- notably swapping a segment's
+# background colour on a dirty worktree, and the `p10k configure` wizard.
+# It is in maintenance mode upstream: stable and not expected to break, but no
+# new features or fixes.
+znap source romkatv/powerlevel10k
+
 znap eval zoxide 'zoxide init zsh --cmd j'
 znap eval mise 'mise activate zsh'
 znap eval atuin 'atuin init zsh --disable-up-arrow'
@@ -108,3 +124,9 @@ zstyle :bracketed-paste-magic paste-finish pastefinish
 for f in "${ZDOTDIR:-$HOME/.config/zsh}"/rc.d/*.zsh(N); do
 	source "$f"
 done
+
+# p10k's own settings. Sourced last so it wins over anything the plugins set.
+# It sets POWERLEVEL9K_INSTANT_PROMPT=quiet itself, which is what keeps
+# rc.d/00-banner.zsh's banner from being reported as unexpected console output
+# during initialisation.
+[[ ! -f "${ZDOTDIR:-$HOME/.config/zsh}/.p10k.zsh" ]] || source "${ZDOTDIR:-$HOME/.config/zsh}/.p10k.zsh"
