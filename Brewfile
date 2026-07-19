@@ -105,8 +105,6 @@ brew "neofetch"
 brew "neovim"
 # Build better apps by developing and testing code directly in Kubernetes
 brew "okteto"
-# Create, run, and share large language models (LLMs)
-brew "ollama", restart_service: :changed
 # Development kit for the Java programming language
 brew "openjdk"
 # Framework for layout and rendering of i18n text
