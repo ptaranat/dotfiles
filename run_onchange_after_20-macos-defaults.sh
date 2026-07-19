@@ -41,6 +41,15 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 # Scroll direction: content moves opposite to fingers ("natural" off).
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 
+# Never prefer tabs when opening documents. Left at the macOS default
+# ("fullscreen") an app reuses an existing window rather than making a new one,
+# which under AeroSpace means a new window lands in the workspace where that
+# app's first window was created and macOS switches you there. See
+# https://github.com/nikitabobko/AeroSpace/discussions/1929 -- the underlying
+# issue is unresolved upstream and the maintainer cannot reproduce it, so this
+# is the one suggested mitigation rather than a known fix.
+defaults write NSGlobalDomain AppleWindowTabbingMode -string "manual"
+
 # --- finder -----------------------------------------------------------------
 
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
