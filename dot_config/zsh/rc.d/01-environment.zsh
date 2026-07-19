@@ -5,18 +5,27 @@
 path=(/opt/homebrew/bin(N-/) $path)
 path=($HOME/bin(N-/) $path)
 
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-	export EDITOR='vim'
-else
-	export EDITOR='nvim'
-fi
+# nvim everywhere. This used to fall back to vim over SSH, from when the config
+# was vimscript and worked in both; it is Lua now and vim cannot read it, so
+# the fallback would have meant an unconfigured editor rather than a familiar
+# one.
+export EDITOR='nvim'
 export VISUAL=$EDITOR
 
 if [ -z "$SSH_AUTH_SOCK" ]; then
 	eval "$(ssh-agent -s)" > /dev/null
 	ssh-add ~/.ssh/id_rsa 2>/dev/null
 fi
+
+# Pager. Mouse wheel scrolling has to be asked for: without --mouse, less
+# ignores the wheel entirely and no pager built on it scrolls -- which includes
+# delta, since it shells out to less. An earlier version of this file carried
+# this line commented out, which is why scrolling silently did not work.
+#
+# -R passes through colour escapes but nothing else; plain -r forwards every
+# control character, which can corrupt the display on binary input.
+# -F skips the pager when the output already fits on one screen.
+export LESS='--mouse --wheel-lines=3 -RF'
 
 # Bat theme
 export BAT_THEME=base16

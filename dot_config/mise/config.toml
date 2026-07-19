@@ -7,6 +7,11 @@
 [tools]
 node = "24"
 python = "3.13"
+# pnpm is by far the most-used package manager here, and a project that pins a
+# specific version (guild pins 11.0.9) overrides this one anyway. Having it
+# globally means it resolves outside a project too, which is what lets its
+# shell completions be generated.
+pnpm = "11"
 # Node package manager, same author as mise. Claims to beat pnpm and bun on
 # warm installs via a content-addressable global store, and reads existing
 # yarn.lock / pnpm-lock.yaml / package-lock.json. Pinned to the major version

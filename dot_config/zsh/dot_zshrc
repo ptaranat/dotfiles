@@ -53,7 +53,7 @@ znap source ohmyzsh/ohmyzsh lib/{history,key-bindings,completion,directories,git
 znap source ohmyzsh/ohmyzsh \
 	plugins/{macos,colored-man-pages} \
 	plugins/{git,gitfast,git-extras} \
-	plugins/{npm,yarn} \
+	plugins/npm \
 	plugins/{kubectl,terraform,docker}
 
 znap source zsh-users/zsh-completions

@@ -17,16 +17,16 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 	vcs
 )
 
-# The version-manager segments p10k ships (asdf, pyenv, nodenv, nvm, rbenv,
-# rvm, goenv, jenv, plenv, phpenv, luaenv, scalaenv, fvm, haskell_stack,
-# nodeenv) are all superseded by the single `mise` segment defined in
-# prompt/mise.zsh, so none of them appear here.
+# The version-manager segments p10k ships (asdf, pyenv, nodenv, nvm, rbenv and
+# friends) are all absent: mise replaced those tools, and a custom mise segment
+# proved more trouble than it was worth -- it needed its own colour handling,
+# icon table and cache invalidation, and got the last one wrong three times.
+# `mise current` answers the same question on demand.
 typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	status
 	command_execution_time
 	background_jobs
 	direnv
-	mise
 	virtualenv
 	anaconda
 	perlbrew
