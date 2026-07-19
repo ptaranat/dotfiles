@@ -52,15 +52,32 @@ alias la="eza -la --group-directories-first --git"
 alias lm="eza -ls modified --group-directories-first --reverse --git"
 alias lmr="eza -ls modified --group-directories-first --git"
 
-# Edit configs
-alias zshrc="$EDITOR ${ZDOTDIR:-$HOME/.config/zsh}/.zshrc"
-alias zshenv="$EDITOR ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environment.zsh"
-alias zshalias="$EDITOR ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"
-alias zshrpg="$EDITOR ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/07-rpg.zsh"
-alias vimrc="$EDITOR ~/.vim/general.vim"
-alias vimplug="$EDITOR ~/.vim/plugins.vim"
-alias vimplugs="$EDITOR ~/.vim/plugin-settings.vim"
-alias vimui="$EDITOR ~/.vim/ui.vim"
+# chezmoi
+alias cm="chezmoi"
+alias cma="chezmoi apply"
+alias cmd="chezmoi diff"
+alias cme="chezmoi edit --apply"     # edit the source and write it out in one step
+alias cmu="chezmoi update"           # pull, then apply
+alias cms="chezmoi status"
+alias cmcd='cd "$(chezmoi source-path)"'
+# Pull a change made directly to a deployed file back into the source.
+alias cmadd="chezmoi add"
+
+# Edit configs. These go through `chezmoi edit` rather than opening the
+# deployed file: editing the target directly works until the next
+# `chezmoi apply` silently overwrites it. --apply writes the change straight
+# out, so the two stay in step.
+alias zshrc="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/.zshrc"
+alias zshenv="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environment.zsh"
+alias zshalias="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"
+alias zshrpg="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/07-rpg.zsh"
+alias zshprompt="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/prompt/overrides.zsh"
+alias vimrc="chezmoi edit --apply ~/.vim/general.vim"
+alias vimplug="chezmoi edit --apply ~/.vim/plugins.vim"
+alias vimplugs="chezmoi edit --apply ~/.vim/plugin-settings.vim"
+alias vimui="chezmoi edit --apply ~/.vim/ui.vim"
+alias gitconfig="chezmoi edit --apply ~/.gitconfig"
+alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
 
 # Toys
 alias weather="curl wttr.in"
