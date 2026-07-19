@@ -29,6 +29,7 @@
     dir                     # current directory
     vcs                     # git status
     # =========================[ Line #2 ]=========================
+    newline                 # \n
     # prompt_char           # prompt symbol
   )
 
@@ -42,15 +43,14 @@
     command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
     direnv                  # direnv status (https://direnv.net/)
-    # asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)  # (superseded by mise)
-    mise                    # runtime versions from .mise.toml/.tool-versions
+    asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
     virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
     anaconda                # conda environment (https://conda.io/)
-    # pyenv                   # python environment (https://github.com/pyenv/pyenv)  # (superseded by mise)
-    # goenv                   # go environment (https://github.com/syndbg/goenv)  # (superseded by mise)
-    # nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)  # (superseded by mise)
-    # nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)  # (superseded by mise)
-    # nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)  # (superseded by mise)
+    pyenv                   # python environment (https://github.com/pyenv/pyenv)
+    goenv                   # go environment (https://github.com/syndbg/goenv)
+    nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
+    nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
+    nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
     # node_version          # node.js version
     # go_version            # go version (https://golang.org)
     # rust_version          # rustc version (https://www.rust-lang.org)
@@ -59,16 +59,16 @@
     # laravel_version       # laravel php framework version (https://laravel.com/)
     # java_version          # java version (https://www.java.com/)
     # package               # name@version from package.json (https://docs.npmjs.com/files/package.json)
-    # rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)  # (superseded by mise)
-    # rvm                     # ruby version from rvm (https://rvm.io)  # (superseded by mise)
-    # fvm                     # flutter version management (https://github.com/leoafarias/fvm)  # (superseded by mise)
-    # luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)  # (superseded by mise)
-    # jenv                    # java version from jenv (https://github.com/jenv/jenv)  # (superseded by mise)
-    # plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)  # (superseded by mise)
+    rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
+    rvm                     # ruby version from rvm (https://rvm.io)
+    fvm                     # flutter version management (https://github.com/leoafarias/fvm)
+    luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
+    jenv                    # java version from jenv (https://github.com/jenv/jenv)
+    plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
     perlbrew                # perl version from perlbrew (https://github.com/gugod/App-perlbrew)
-    # phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)  # (superseded by mise)
-    # scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)  # (superseded by mise)
-    # haskell_stack           # haskell version from stack (https://haskellstack.org/)  # (superseded by mise)
+    phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
+    scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
+    haskell_stack           # haskell version from stack (https://haskellstack.org/)
     kubecontext             # current kubernetes context (https://kubernetes.io/)
     terraform               # terraform workspace (https://www.terraform.io)
     # terraform_version     # terraform version (https://www.terraform.io)
@@ -88,7 +88,6 @@
     vim_shell               # vim shell indicator (:sh)
     midnight_commander      # midnight commander shell (https://midnight-commander.org/)
     nix_shell               # nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html)
-    vi_mode                 # vi mode (zsh-vi-mode)
     chezmoi_shell           # chezmoi shell (https://www.chezmoi.io/)
     # vi_mode               # vi mode (you don't need this if you've enabled prompt_char)
     # vpn_ip                # virtual private network indicator
@@ -103,7 +102,7 @@
     # cpu_arch              # CPU architecture
     # time                  # current time
     # =========================[ Line #2 ]=========================
-    # newline               # (removed: single-line prompt)
+    newline
     # ip                    # ip address and bandwidth usage for a specified network interface
     # public_ip             # public IP address
     # proxy                 # system-wide http/https/ftp proxy
@@ -132,7 +131,7 @@
   typeset -g POWERLEVEL9K_ICON_BEFORE_CONTENT=
 
   # Add an empty line before each prompt.
-  typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
+  typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 
   # Connect left prompt lines with these symbols. You'll probably want to use the same color
   # as POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_FOREGROUND below.
@@ -348,10 +347,7 @@
   # parameter. For example, if POWERLEVEL9K_DIR_WORK_NOT_WRITABLE_FOREGROUND is not set, it falls
   # back to POWERLEVEL9K_DIR_FOREGROUND.
   #
-  # Empty rather than unset: with no classes defined p10k falls back to its
-  # default directory styling, which includes a folder icon. Assigning an empty
-  # array suppresses that and leaves a plain path.
-  typeset -g POWERLEVEL9K_DIR_CLASSES=()
+  # typeset -g POWERLEVEL9K_DIR_CLASSES=()
 
   # Custom prefix.
   # typeset -g POWERLEVEL9K_DIR_PREFIX='in '
@@ -435,11 +431,16 @@
       res+=" ${modified}wip"
     fi
 
-          # ⇣42 if behind the remote.
+    if (( VCS_STATUS_COMMITS_AHEAD || VCS_STATUS_COMMITS_BEHIND )); then
+      # ⇣42 if behind the remote.
       (( VCS_STATUS_COMMITS_BEHIND )) && res+=" ${clean}⇣${VCS_STATUS_COMMITS_BEHIND}"
       # ⇡42 if ahead of the remote; no leading space if also behind the remote: ⇣42⇡42.
       (( VCS_STATUS_COMMITS_AHEAD && !VCS_STATUS_COMMITS_BEHIND )) && res+=" "
       (( VCS_STATUS_COMMITS_AHEAD  )) && res+="${clean}⇡${VCS_STATUS_COMMITS_AHEAD}"
+    elif [[ -n $VCS_STATUS_REMOTE_BRANCH ]]; then
+      # Tip: Uncomment the next line to display '=' if up to date with the remote.
+      # res+=" ${clean}="
+    fi
 
     # ⇠42 if behind the push remote.
     (( VCS_STATUS_PUSH_COMMITS_BEHIND )) && res+=" ${clean}⇠${VCS_STATUS_PUSH_COMMITS_BEHIND}"
@@ -493,7 +494,7 @@
   typeset -g POWERLEVEL9K_VCS_{STAGED,UNSTAGED,UNTRACKED,CONFLICTED,COMMITS_AHEAD,COMMITS_BEHIND}_MAX_NUM=-1
 
   # Custom icon.
-  typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION=
+  # typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.
   # typeset -g POWERLEVEL9K_VCS_PREFIX='on '
 
@@ -554,7 +555,7 @@
   # Duration format: 1d 2h 3m 4s.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FORMAT='d h m s'
   # Custom icon.
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION=
+  # typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.
   # typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PREFIX='took '
 
@@ -1360,9 +1361,6 @@
   # Terraform version color.
   typeset -g POWERLEVEL9K_TERRAFORM_VERSION_FOREGROUND=4
   typeset -g POWERLEVEL9K_TERRAFORM_VERSION_BACKGROUND=0
-  # Only show the version while actually running terraform, rather than in
-  # every directory containing .tf files.
-  typeset -g POWERLEVEL9K_TERRAFORM_VERSION_SHOW_ON_COMMAND='terraform|tf|tofu'
   # Custom icon.
   # typeset -g POWERLEVEL9K_TERRAFORM_VERSION_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
@@ -1715,7 +1713,7 @@
   # Show battery in yellow when it's discharging.
   typeset -g POWERLEVEL9K_BATTERY_DISCONNECTED_FOREGROUND=3
   # Battery pictograms going from low to high level of charge.
-  typeset -g POWERLEVEL9K_BATTERY_STAGES='\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'
+  typeset -g POWERLEVEL9K_BATTERY_STAGES=('%K{232}▁' '%K{232}▂' '%K{232}▃' '%K{232}▄' '%K{232}▅' '%K{232}▆' '%K{232}▇' '%K{232}█')
   # Don't show the remaining time to charge/discharge.
   typeset -g POWERLEVEL9K_BATTERY_VERBOSE=false
   typeset -g POWERLEVEL9K_BATTERY_BACKGROUND=0
@@ -1758,102 +1756,9 @@
   # behavior where they contain the end times of their preceding commands.
   typeset -g POWERLEVEL9K_TIME_UPDATE_ON_COMMAND=false
   # Custom icon.
-  typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION=
+  # typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION='⭐'
   # Custom prefix.
   # typeset -g POWERLEVEL9K_TIME_PREFIX='at '
-
-  ###########################[ mise: runtime versions ]###########################
-  # p10k has no built-in mise segment; it predates mise and only ships asdf.
-  # https://github.com/romkatv/powerlevel10k/issues/2212
-  #
-  # Versions are read out of $path rather than by calling mise. mise activation
-  # prepends .../mise/installs/<tool>/<version>/bin, so the active versions are
-  # already sitting in the environment -- no subprocess on any prompt, and it
-  # reflects what mise actually resolved rather than what some config file asks
-  # for. An earlier version parsed .mise.toml/.tool-versions/.nvmrc directly and
-  # was both more code and less accurate.
-  #
-  # Approach adapted from 2KAbhishek/dots2k.
-
-  # Global versions, resolved once at startup so the prompt can hide anything
-  # matching the machine default and show only what a project overrides.
-  # Without this a stray ~/.nvmrc makes every directory under $HOME show node.
-  typeset -gA _p9k_mise_global
-  if (( $+commands[mise] )); then
-    () {
-      local tool version src
-      while read -r tool version src; do
-        [[ -n $tool ]] && _p9k_mise_global[$tool]=$version
-      done < <(mise ls --offline 2>/dev/null |
-               awk '$3 ~ /config\.toml$|\.tool-versions$|\.mise\.toml$/ {print $1, $2, $3}')
-    }
-  fi
-
-  typeset -g POWERLEVEL9K_MISE_MAX_SEGMENTS=2
-  typeset -g POWERLEVEL9K_MISE_HIDE_GLOBAL=true
-
-  # Literal Nerd Font glyphs, written as \u escapes so this file stays ASCII
-  # and the codepoints cannot be mangled in transit.
-  #
-  # These cannot be p10k icon *names*: unlike the built-in segments, which pass
-  # a name to _p9k_prompt_segment for lookup, `p10k segment -i` emits its
-  # argument verbatim, so -i NODE_ICON renders the literal text "NODE_ICON".
-  # Tools absent here fall back to their name rather than rendering as tofu.
-  typeset -gA _p9k_mise_icons=(
-    node      $'\ue718'  python    $'\ue73c'
-    go        $'\ue627'  rust      $'\ue7a8'
-    ruby      $'\ue739'  java      $'\ue738'
-    php       $'\ue73d'  lua       $'\ue620'
-    elixir    $'\ue62d'  swift     $'\ue755'
-    deno      $'\ue628'  npm       $'\ue71e'
-    pnpm      $'\ue71e'  yarn      $'\ue6a7'
-    bun       $'\U000f06a6'
-    terraform $'\U000f1062'
-  )
-
-  # Colours are palette indices 0-7, not 256-colour values. Indices are what
-  # the terminal theme defines, so these follow srcery; a fixed 256-colour like
-  # 34 or 208 ignores the theme and reads as foreign next to the other segments.
-  typeset -g POWERLEVEL9K_MISE_FOREGROUND=0
-  typeset -g POWERLEVEL9K_MISE_BACKGROUND=6
-  typeset -g POWERLEVEL9K_MISE_NODE_BACKGROUND=2
-  typeset -g POWERLEVEL9K_MISE_PYTHON_BACKGROUND=4
-  typeset -g POWERLEVEL9K_MISE_GO_BACKGROUND=6
-  typeset -g POWERLEVEL9K_MISE_RUST_BACKGROUND=1
-  typeset -g POWERLEVEL9K_MISE_RUBY_BACKGROUND=1
-  typeset -g POWERLEVEL9K_MISE_JAVA_BACKGROUND=1
-  typeset -g POWERLEVEL9K_MISE_ERLANG_BACKGROUND=1
-  typeset -g POWERLEVEL9K_MISE_PHP_BACKGROUND=5
-  typeset -g POWERLEVEL9K_MISE_ELIXIR_BACKGROUND=5
-  typeset -g POWERLEVEL9K_MISE_LUA_BACKGROUND=4
-  typeset -g POWERLEVEL9K_MISE_NPM_BACKGROUND=3
-  typeset -g POWERLEVEL9K_MISE_PNPM_BACKGROUND=3
-  typeset -g POWERLEVEL9K_MISE_YARN_BACKGROUND=3
-  typeset -g POWERLEVEL9K_MISE_BUN_BACKGROUND=3
-  typeset -g POWERLEVEL9K_MISE_DENO_BACKGROUND=7
-
-  function prompt_mise() {
-    local dir tool version lower
-    local -A seen
-    local -i count=0
-    for dir in $path; do
-      [[ $dir == *mise/installs/* ]] || continue
-      [[ ${dir:A} =~ "mise/installs/([^/]+)/([^/]+)(/bin)?$" ]] || continue
-      lower=${(L)match[1]}
-      version=$match[2]
-      # mise ships `usage` as an internal dependency; it is not a runtime.
-      [[ $lower == usage ]] && continue
-      [[ -n ${seen[$lower]} ]] && continue
-      [[ $POWERLEVEL9K_MISE_HIDE_GLOBAL == true &&
-         ${_p9k_mise_global[$lower]} == $version ]] && continue
-      (( POWERLEVEL9K_MISE_MAX_SEGMENTS > 0 &&
-         count >= POWERLEVEL9K_MISE_MAX_SEGMENTS )) && break
-      p10k segment -s "${(U)lower}" \
-        -i "${_p9k_mise_icons[$lower]:-$lower}" -t "${version#v}"
-      seen[$lower]=1
-      (( count++ ))
-    done
-  }
 
   # Example of a user-defined prompt segment. Function prompt_example will be called on every
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
@@ -1896,7 +1801,7 @@
   #   - always:   Trim down prompt when accepting a command line.
   #   - same-dir: Trim down prompt when accepting a command line unless this is the first command
   #               typed after changing current working directory.
-  typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
+  typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=off
 
   # Instant prompt mode.
   #
@@ -1908,7 +1813,7 @@
   #   - verbose: Enable instant prompt and print a warning when detecting console output during
   #              zsh initialization. Choose this if you've never tried instant prompt, haven't
   #              seen the warning, or if you are unsure what this all means.
-  typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+  typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose
 
   # Hot reload allows you to change POWERLEVEL9K options after Powerlevel10k has been initialized.
   # For example, you can type POWERLEVEL9K_BACKGROUND=red and see your prompt turn red. Hot reload

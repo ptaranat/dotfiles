@@ -125,8 +125,12 @@ for f in "${ZDOTDIR:-$HOME/.config/zsh}"/rc.d/*.zsh(N); do
 	source "$f"
 done
 
-# p10k's own settings. Sourced last so it wins over anything the plugins set.
-# It sets POWERLEVEL9K_INSTANT_PROMPT=quiet itself, which is what keeps
+# p10k's settings, sourced last so they win over anything the plugins set.
+# prompt/init.zsh loads the vendored template, then the local overrides, then
+# the mise segment. See the comments there for how to take a p10k update.
+#
+# INSTANT_PROMPT=quiet is set in prompt/overrides.zsh, which is what keeps
 # rc.d/00-banner.zsh's banner from being reported as unexpected console output
 # during initialisation.
-[[ ! -f "${ZDOTDIR:-$HOME/.config/zsh}/.p10k.zsh" ]] || source "${ZDOTDIR:-$HOME/.config/zsh}/.p10k.zsh"
+[[ ! -r "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh" ]] ||
+	source "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh"
