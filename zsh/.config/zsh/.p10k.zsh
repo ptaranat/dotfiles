@@ -1763,130 +1763,97 @@
   # typeset -g POWERLEVEL9K_TIME_PREFIX='at '
 
   ###########################[ mise: runtime versions ]###########################
-  # p10k has no built-in mise segment (it predates mise; the closest is asdf).
+  # p10k has no built-in mise segment; it predates mise and only ships asdf.
+  # https://github.com/romkatv/powerlevel10k/issues/2212
   #
-  # This parses the nearest mise config directly in zsh instead of calling
-  # `mise current`, which measures at ~15ms -- more than p10k's entire budget
-  # for a prompt, and paid on every single one. Reading the file is effectively
-  # free and shows what the project pins, which is the useful part anyway.
+  # Versions are read out of $path rather than by calling mise. mise activation
+  # prepends .../mise/installs/<tool>/<version>/bin, so the active versions are
+  # already sitting in the environment -- no subprocess on any prompt, and it
+  # reflects what mise actually resolved rather than what some config file asks
+  # for. An earlier version parsed .mise.toml/.tool-versions/.nvmrc directly and
+  # was both more code and less accurate.
   #
-  # Only project configs match: the walk stops at /, and the global config
-  # lives at ~/.config/mise/config.toml rather than ~/.mise.toml, so it is not
-  # picked up and the segment stays empty outside mise projects.
-  # Colours match asdf, the built-in segment mise supersedes.
-  typeset -g POWERLEVEL9K_MISE_FOREGROUND=0
-  typeset -g POWERLEVEL9K_MISE_BACKGROUND=6
+  # Approach adapted from 2KAbhishek/dots2k.
 
-  # Nerd Font glyphs per tool, written as \u escapes rather than literal
-  # characters. Two reasons: the codepoints are in the private use area and got
-  # silently stripped to empty strings when this file was written with literals
-  # in it, and escapes keep the file pure ASCII and diffable.
+  # Global versions, resolved once at startup so the prompt can hide anything
+  # matching the machine default and show only what a project overrides.
+  # Without this a stray ~/.nvmrc makes every directory under $HOME show node.
+  typeset -gA _p9k_mise_global
+  if (( $+commands[mise] )); then
+    () {
+      local tool version src
+      while read -r tool version src; do
+        [[ -n $tool ]] && _p9k_mise_global[$tool]=$version
+      done < <(mise ls --offline 2>/dev/null |
+               awk '$3 ~ /config\.toml$|\.tool-versions$|\.mise\.toml$/ {print $1, $2, $3}')
+    }
+  fi
+
+  typeset -g POWERLEVEL9K_MISE_MAX_SEGMENTS=2
+  typeset -g POWERLEVEL9K_MISE_HIDE_GLOBAL=true
+
+  # Literal Nerd Font glyphs, written as \u escapes so this file stays ASCII
+  # and the codepoints cannot be mangled in transit.
   #
-  # Note these cannot be p10k icon *names* (NODE_ICON and friends): unlike the
-  # built-in segments, `p10k segment -i` emits its argument verbatim, so a name
-  # would print as the literal text "NODE_ICON".
-  #
-  # Tools absent here fall back to their plain name, so nothing renders as tofu.
+  # These cannot be p10k icon *names*: unlike the built-in segments, which pass
+  # a name to _p9k_prompt_segment for lookup, `p10k segment -i` emits its
+  # argument verbatim, so -i NODE_ICON renders the literal text "NODE_ICON".
+  # Tools absent here fall back to their name rather than rendering as tofu.
   typeset -gA _p9k_mise_icons=(
-    node      $''      nodejs    $''
-    python    $''      py        $''
-    go        $''      golang    $''
-    rust      $''      ruby      $''
-    java      $''      php       $''
-    lua       $''      elixir    $''
-    swift     $''      deno      $''
-    npm       $''      pnpm      $''
-    yarn      $''      bun       $'\U000f06a6'
+    node      $'\ue718'  python    $'\ue73c'
+    go        $'\ue627'  rust      $'\ue7a8'
+    ruby      $'\ue739'  java      $'\ue738'
+    php       $'\ue73d'  lua       $'\ue620'
+    elixir    $'\ue62d'  swift     $'\ue755'
+    deno      $'\ue628'  npm       $'\ue71e'
+    pnpm      $'\ue71e'  yarn      $'\ue6a7'
+    bun       $'\U000f06a6'
     terraform $'\U000f1062'
   )
 
-  # A busy monorepo can pin a lot of tools; cap the list so the prompt cannot
-  # run away.
-  typeset -g POWERLEVEL9K_MISE_MAX_TOOLS=4
+  # Colours are palette indices 0-7, not 256-colour values. Indices are what
+  # the terminal theme defines, so these follow srcery; a fixed 256-colour like
+  # 34 or 208 ignores the theme and reads as foreign next to the other segments.
+  typeset -g POWERLEVEL9K_MISE_FOREGROUND=0
+  typeset -g POWERLEVEL9K_MISE_BACKGROUND=6
+  typeset -g POWERLEVEL9K_MISE_NODE_BACKGROUND=2
+  typeset -g POWERLEVEL9K_MISE_PYTHON_BACKGROUND=4
+  typeset -g POWERLEVEL9K_MISE_GO_BACKGROUND=6
+  typeset -g POWERLEVEL9K_MISE_RUST_BACKGROUND=1
+  typeset -g POWERLEVEL9K_MISE_RUBY_BACKGROUND=1
+  typeset -g POWERLEVEL9K_MISE_JAVA_BACKGROUND=1
+  typeset -g POWERLEVEL9K_MISE_ERLANG_BACKGROUND=1
+  typeset -g POWERLEVEL9K_MISE_PHP_BACKGROUND=5
+  typeset -g POWERLEVEL9K_MISE_ELIXIR_BACKGROUND=5
+  typeset -g POWERLEVEL9K_MISE_LUA_BACKGROUND=4
+  typeset -g POWERLEVEL9K_MISE_NPM_BACKGROUND=3
+  typeset -g POWERLEVEL9K_MISE_PNPM_BACKGROUND=3
+  typeset -g POWERLEVEL9K_MISE_YARN_BACKGROUND=3
+  typeset -g POWERLEVEL9K_MISE_BUN_BACKGROUND=3
+  typeset -g POWERLEVEL9K_MISE_DENO_BACKGROUND=7
 
   function prompt_mise() {
-    local dir=$PWD cfg= f
-    local -a idiomatic
-    # Walk up to the nearest directory holding any config mise would read, and
-    # take every such file at that one level. .nvmrc and friends are included
-    # because idiomatic_version_file_enable_tools is on for node and python, so
-    # mise honours them -- and a project may well pin node in .nvmrc (which CI
-    # also reads) while using mise.toml only for tools .nvmrc cannot express.
-    # Without them the segment would under-report what is actually active.
-    while [[ $dir != / && -n $dir ]]; do
-      for f in .mise.toml mise.toml .config/mise.toml .tool-versions; do
-        [[ -r $dir/$f ]] && cfg=$dir/$f
-      done
-      for f in .nvmrc .node-version .python-version; do
-        [[ -r $dir/$f ]] && idiomatic+=$dir/$f
-      done
-      [[ -n $cfg || $#idiomatic -gt 0 ]] && break
-      dir=${dir:h}
+    local dir tool version lower
+    local -A seen
+    local -i count=0
+    for dir in $path; do
+      [[ $dir == *mise/installs/* ]] || continue
+      [[ ${dir:A} =~ "mise/installs/([^/]+)/([^/]+)(/bin)?$" ]] || continue
+      lower=${(L)match[1]}
+      version=$match[2]
+      # mise ships `usage` as an internal dependency; it is not a runtime.
+      [[ $lower == usage ]] && continue
+      [[ -n ${seen[$lower]} ]] && continue
+      [[ $POWERLEVEL9K_MISE_HIDE_GLOBAL == true &&
+         ${_p9k_mise_global[$lower]} == $version ]] && continue
+      (( POWERLEVEL9K_MISE_MAX_SEGMENTS > 0 &&
+         count >= POWERLEVEL9K_MISE_MAX_SEGMENTS )) && break
+      p10k segment -s "${(U)lower}" \
+        -i "${_p9k_mise_icons[$lower]:-$lower}" -t "${version#v}"
+      seen[$lower]=1
+      (( count++ ))
     done
-    [[ -n $cfg || $#idiomatic -gt 0 ]] || return
-
-    local -a tools
-    local line k v in_tools=0
-    if [[ -n $cfg && $cfg == *.toml ]]; then
-      while IFS= read -r line; do
-        # '#' must be escaped: p10k enables EXTENDED_GLOB, under which a bare
-        # '#' is a pattern operator and '#*' is not a valid pattern at all.
-        line=${line%%\#*}
-        if [[ $line == \[*\]* ]]; then
-          [[ $line == \[tools\]* ]] && in_tools=1 || in_tools=0
-          continue
-        fi
-        (( in_tools )) || continue
-        [[ $line == *=* ]] || continue
-        k=${line%%=*}; v=${line#*=}
-        k=${k//[[:space:]\"\']/}; v=${v//[[:space:]\"\'\[\]]/}
-        [[ -n $k && -n $v ]] && tools+="$k ${v%%,*}"
-      done < $cfg
-    elif [[ -n $cfg ]]; then
-      # .tool-versions: "<name> <version>" per line
-      while IFS= read -r line; do
-        # '#' must be escaped: p10k enables EXTENDED_GLOB, under which a bare
-        # '#' is a pattern operator and '#*' is not a valid pattern at all.
-        line=${line%%\#*}
-        [[ -n ${line//[[:space:]]/} ]] || continue
-        tools+="${line%%[[:space:]]*} ${${line#*[[:space:]]}##[[:space:]]#}"
-      done < $cfg
-    fi
-
-    # Single-version files: the tool is implied by the filename, and the
-    # contents are just a version, optionally with a leading v.
-    for f in $idiomatic; do
-      read -r line < $f 2>/dev/null || continue
-      line=${line//[[:space:]]/}
-      [[ -n $line ]] || continue
-      case ${f:t} in
-        .nvmrc|.node-version) k=node ;;
-        .python-version)      k=python ;;
-        *)                    continue ;;
-      esac
-      # Skip if the toml already named this tool, so it is not listed twice.
-      [[ ${tools[(I)$k *]} -eq 0 ]] && tools+="$k ${line#v}"
-    done
-
-    (( $#tools )) || return
-
-    # One segment for everything. Per-tool colours are not possible here:
-    # p10k resolves a segment's style from its name, so every `p10k segment`
-    # call inside prompt_mise gets POWERLEVEL9K_MISE_* regardless of -b, and
-    # the extra calls left a stray empty segment at the right edge.
-    local -a parts
-    local name ver n=0
-    for line in $tools; do
-      (( n++ < POWERLEVEL9K_MISE_MAX_TOOLS )) || break
-      name=${line%% *}; ver=${line#* }
-      parts+="${_p9k_mise_icons[$name]:-$name} ${ver#v}"
-    done
-    p10k segment -f $POWERLEVEL9K_MISE_FOREGROUND -b $POWERLEVEL9K_MISE_BACKGROUND \
-      -t "${(j: :)parts}"
   }
-
-  # Cheap enough (no subprocess) to also run during instant prompt.
-  function instant_prompt_mise() { prompt_mise }
 
   # Example of a user-defined prompt segment. Function prompt_example will be called on every
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or
