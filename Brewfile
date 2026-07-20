@@ -149,8 +149,8 @@ brew "tflint"
 brew "tilt"
 # Terminal multiplexer
 brew "tmux"
-# Parser generator tool
-brew "tree-sitter-cli"
+# tree-sitter-cli moved to mise (dot_config/mise/config.toml): this file is
+# only installed on macOS, and nvim needs the CLI on Linux too.
 # Extremely fast Python package installer and resolver, written in Rust
 brew "uv"
 # Pager/text based browser
