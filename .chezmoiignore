@@ -3,3 +3,25 @@ Brewfile
 .github/
 *.zwc
 .vim/undo/
+
+{{ if ne .chezmoi.os "darwin" }}
+# macOS-only. aerospace is a macOS window manager outright; ghostty and
+# alacritty are cross-platform but are not the terminal on the WSL box, and
+# leaving ghostty in would also make .chezmoiexternal clone its shader repo.
+# Flip any of these back by removing the line if the tool gets installed.
+.config/aerospace
+.config/ghostty
+.config/alacritty
+
+# Scripts are matched on their target name, so the run_onchange_after_ prefix
+# and any .tmpl suffix are stripped here. Naming the source file instead
+# silently fails to match and the script still runs.
+
+# Writes macOS system defaults. On Linux the `defaults` command does not exist,
+# so this fails on every apply.
+20-macos-defaults.sh
+
+# Brewfile-driven, and Homebrew is not how the Linux box installs packages.
+# A Linux counterpart belongs here once apt vs linuxbrew is settled.
+10-packages.sh
+{{ end }}
