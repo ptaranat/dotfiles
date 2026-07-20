@@ -14,13 +14,6 @@
 	# which would change an absolute path but not this.
 	helper = !gh auth git-credential
 {{- end }}
-
-# Machine-local overrides, untracked and absent on most machines. Holds the
-# per-directory work identity so no employer name or address lands in this
-# public repo. git skips an include it cannot read, so a missing file is fine.
-# Must sit after [user], not before: last value wins.
-[include]
-	path = ~/.gitconfig-local
 [alias]
 	graphgpg = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)[gpg:%GK%x20%G?]%C(reset)%n%x20%s%n"
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
@@ -135,3 +128,14 @@
 	# Like diff3, but omits lines the two sides already agree on, so the
 	# conflict hunk is smaller. Requires git >= 2.35.
 	conflictstyle = zdiff3
+
+# Machine-local overrides. Untracked and absent on most machines; git skips an
+# include it cannot read, so a missing file is fine.
+#
+# Last in the file on purpose. git takes the last value it sees, so an include
+# placed higher up can only override the sections above it -- put it after
+# [user] alone and it cannot override allowedSignersFile or anything else set
+# later. This is where the work identity and its signing key live, so that no
+# employer name or address lands in this public repo.
+[include]
+	path = ~/.gitconfig-local
