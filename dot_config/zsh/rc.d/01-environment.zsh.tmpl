@@ -1,12 +1,11 @@
 # Paths. The (N-/) qualifier keeps an entry only when it is an existing
 # directory, so anything uninstalled or moved drops out silently instead of
 # accumulating in $PATH and being searched on every command.
-# ~/.local/bin is added in .zshenv so non-interactive shells get it too.
-{{ if eq .chezmoi.os "darwin" -}}
-path=(/opt/homebrew/bin(N-/) $path)
-{{- else -}}
-path=(/home/linuxbrew/.linuxbrew/bin(N-/) $path)
-{{- end }}
+# ~/.local/bin and Homebrew are added in .zshenv so non-interactive shells get
+# them too, and so that `mise activate` in .zshrc lands in front of Homebrew
+# rather than behind it. Do not move the Homebrew prepend back here: this file
+# is sourced after mise activates, so it would shadow every mise-managed
+# runtime that also exists in Homebrew.
 path=($HOME/bin(N-/) $path)
 
 # nvim everywhere. This used to fall back to vim over SSH, from when the config

@@ -18,3 +18,16 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 # Set here, not in .zshrc, so tools in ~/.local/bin resolve in non-interactive
 # shells too (scripts, ssh commands, editor subprocesses).
 path=($HOME/.local/bin(N-/) $path)
+
+# Homebrew goes here rather than in rc.d/01-environment.zsh, and the ordering
+# is the whole point. rc.d is sourced at the *end* of .zshrc, well after
+# `mise activate`, so a prepend there lands in front of mise and shadows every
+# runtime mise is supposed to own. On the WSL box that meant linuxbrew's node
+# beating mise's, silently, with `mise ls` reporting tools as missing.
+#
+# .zshenv runs before .zshrc entirely, so mise prepends after this and wins.
+{{ if eq .chezmoi.os "darwin" -}}
+path=(/opt/homebrew/bin(N-/) $path)
+{{- else -}}
+path=(/home/linuxbrew/.linuxbrew/bin(N-/) $path)
+{{- end }}
