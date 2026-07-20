@@ -1,9 +1,6 @@
-# Paths. The (N-/) qualifier keeps an entry only when it is an existing
-# directory, so anything uninstalled or moved drops out silently instead of
-# accumulating in $PATH and being searched on every command.
-# ~/.local/bin is added in .zshenv so non-interactive shells get it too.
-path=(/opt/homebrew/bin(N-/) $path)
-path=($HOME/bin(N-/) $path)
+# Paths. Homebrew, $HOME/bin and ~/.local/bin are all set in .zshenv instead,
+# so non-interactive shells get them too and so anything sourced earlier in
+# .zshrc (e.g. the atuin znap eval) can find them.
 
 # nvim everywhere. This used to fall back to vim over SSH, from when the config
 # was vimscript and worked in both; it is Lua now and vim cannot read it, so

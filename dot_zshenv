@@ -18,3 +18,13 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 # Set here, not in .zshrc, so tools in ~/.local/bin resolve in non-interactive
 # shells too (scripts, ssh commands, editor subprocesses).
 path=($HOME/.local/bin(N-/) $path)
+
+# Homebrew (bin and sbin) and $HOME/bin. Also set here rather than in
+# rc.d/01-environment.zsh:
+# .zshrc's `znap eval atuin '...'` runs before rc.d is sourced, so atuin (and
+# anything else Homebrew-installed used earlier in .zshrc) was not yet on PATH
+# at that point. Order below matches the old rc.d/01-environment.zsh so the
+# final PATH priority is unchanged.
+path=(/opt/homebrew/bin(N-/) $path)
+path=(/opt/homebrew/sbin(N-/) $path)
+path=($HOME/bin(N-/) $path)

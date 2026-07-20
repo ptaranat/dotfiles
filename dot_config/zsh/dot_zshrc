@@ -141,3 +141,6 @@ done
 # during initialisation.
 [[ ! -r "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh" ]] ||
 	source "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh"
+
+# opencode
+path=($HOME/.opencode/bin(N-/) $path)
