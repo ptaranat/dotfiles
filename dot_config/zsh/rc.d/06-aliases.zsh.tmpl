@@ -133,7 +133,8 @@ function note() {
 	fi
 }
 
-# Markedit
+{{ if eq .chezmoi.os "darwin" -}}
+# Markedit. macOS only: `open -a` has no Linux equivalent.
 markedit() {
 	if [ -t 0 ]; then
 		open -a Markedit "$@"
@@ -143,3 +144,15 @@ markedit() {
 		open -a Markedit "$f"
 	fi
 }
+{{- else -}}
+# --- WSL ---------------------------------------------------------------------
+# Bridges to the Windows side. Each shells out across /mnt/c, so they are only
+# worth it where no Linux equivalent exists.
+
+# pbcopy is muscle memory from macOS; clip.exe is the Windows clipboard.
+# One-way only -- there is no pbpaste counterpart that behaves well here.
+alias pbcopy='/mnt/c/Windows/System32/clip.exe'
+
+# Neovide runs as a Windows GUI against this WSL instance.
+alias neovide="/c/Users/Panat/bin/neovide.exe --wsl --geometry=200x60"
+{{- end }}

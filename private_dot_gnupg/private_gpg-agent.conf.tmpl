@@ -1,0 +1,16 @@
+allow-loopback-pinentry
+{{ if eq .chezmoi.os "darwin" -}}
+pinentry-program /opt/homebrew/bin/pinentry-mac
+{{- else -}}
+# pinentry-curses rather than a GUI pinentry: the Linux box is WSL, reached
+# through a terminal, and a graphical prompt has no display to appear on.
+# This path is load-bearing beyond git signing -- `pass` is gpg-backed and
+# aws-vault reads its credentials from pass, so a wrong pinentry here breaks
+# the AWS workflow, not just commit signing.
+pinentry-program /usr/bin/pinentry-curses
+{{- end }}
+default-cache-ttl 84000
+max-cache-ttl 84000
+{{ if eq .chezmoi.os "darwin" -}}
+enable-ssh-support
+{{- end }}
