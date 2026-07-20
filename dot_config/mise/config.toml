@@ -18,6 +18,11 @@ pnpm = "11"
 # rather than "latest" so it cannot change under a project mid-work; the
 # lockfile setting below records the exact build.
 aube = "1"
+# nvim-treesitter's `main` branch shells out to this CLI for every parser it
+# builds -- without it :TSInstall fails with ENOENT and no parser compiles.
+# It lives here rather than in the Brewfile because 10-packages.sh is
+# Darwin-only, so a Brewfile entry would never reach the WSL box.
+tree-sitter = "0.26"
 
 [settings]
 # Write mise.lock next to mise.toml with resolved versions, so a project pins
