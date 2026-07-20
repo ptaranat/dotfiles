@@ -1,4 +1,4 @@
-_RAND=$(gshuf -i1-5 -n1)
+_RAND=$(( RANDOM % 5 + 1 ))
 
 case $_RAND in
 1)

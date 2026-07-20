@@ -11,11 +11,19 @@
     url = "git@github.com:ptaranat/work.git"
     refreshPeriod = "168h"
 
+{{ if eq .chezmoi.os "darwin" -}}
 # Ghostty cursor shaders.
+#
+# Gated here, not via .chezmoiignore. Externals are fetched regardless of what
+# .chezmoiignore lists: ignoring .config/ghostty does not stop this clone, and
+# `chezmoi ignored` printing the path is not evidence that it will be skipped.
+# On the WSL box this cloned 288K of shaders for a terminal that is not
+# installed.
 [".config/ghostty/shaders"]
     type = "git-repo"
     url = "https://github.com/sahaj-b/ghostty-cursor-shaders.git"
     refreshPeriod = "720h"
+{{ end -}}
 
 # znap, the zsh plugin manager. .zshrc sources znap.zsh from here, so without
 # it a fresh machine gets a shell with no plugins and no prompt. This was
