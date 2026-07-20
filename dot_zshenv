@@ -28,3 +28,21 @@ path=($HOME/.local/bin(N-/) $path)
 path=(/opt/homebrew/bin(N-/) $path)
 path=(/opt/homebrew/sbin(N-/) $path)
 path=($HOME/bin(N-/) $path)
+
+# OrbStack (docker, docker-compose, kubectl, orb) and the JetBrains Toolbox
+# scripts. Both installers appended themselves to ~/.zprofile, which stopped
+# being read the moment .zshenv started setting ZDOTDIR: zsh takes .zprofile,
+# .zshrc and .zlogin from $ZDOTDIR, so the copy in $HOME is never sourced, not
+# even for login shells. They live here rather than in a $ZDOTDIR/.zprofile so
+# non-interactive shells (scripts, editor subprocesses, agent tooling) can find
+# docker too. Appended, not prepended, to match what the installers set up.
+path=($path $HOME/.orbstack/bin(N-/))
+path=($path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"(N-/))
+
+# OrbStack's completions. Its init.zsh sets only this and the PATH line above,
+# so sourcing the file itself would add nothing. Kept here beside OrbStack's
+# PATH rather than in .zshrc: it is a plain fpath array append, none of the
+# "no output, no prompts, nothing slow" this file avoids, and splitting one
+# tool's setup across two files to spare non-interactive shells one array
+# entry is not worth it.
+fpath+=($HOME/.orbstack/shell/completions/zsh(N-/))
