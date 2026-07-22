@@ -50,8 +50,12 @@ export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 # options, keybindings, completion setup and git helpers without loading the
 # framework itself or its update checker.
 znap source ohmyzsh/ohmyzsh lib/{history,key-bindings,completion,directories,git}
+# The macos plugin has no OS guard of its own. On Linux it still defines ofd,
+# quick-look, man-preview, showfiles and spotify, all of which shell out to
+# `open` and `osascript` and can only fail. Gated here rather than upstream.
 znap source ohmyzsh/ohmyzsh \
-	plugins/{macos,colored-man-pages} \
+{{ if eq .chezmoi.os "darwin" }}	plugins/macos \
+{{ end }}	plugins/colored-man-pages \
 	plugins/{git,gitfast,git-extras} \
 	plugins/npm \
 	plugins/{kubectl,terraform,docker}
