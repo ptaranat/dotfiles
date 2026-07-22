@@ -99,3 +99,73 @@ xin() {
 	shift
 	(cd "$dir" && "$@")
 }
+
+# Compare a tool's apt candidate against its brew formula and print the swap.
+#
+# Prints rather than runs. An auto-applying version of this is exactly how
+# `brew reinstall node` cascaded through llhttp and broke eza and bat; the
+# whole point is to see the plan before it touches a working machine.
+#
+# Read the result as "is the newer version worth it", not "newer wins". Debian
+# stable freezes at release and brew tracks upstream, so brew drifts ahead of
+# apt on everything over the life of a release. Taking every gap rebuilds the
+# 22GB prefix. Take the ones that buy something: nvim's 0.11 LSP API, gh's
+# credential helper, justfile syntax.
+_pkgv_norm() { print -r -- "${${1#*:}%%[-~]*}" }
+
+pkgv() {
+	if (( ! $# )); then
+		print -u2 "usage: pkgv <tool> [apt-name] [brew-formula]"
+		return 1
+	fi
+
+	# Tools whose apt package, brew formula and binary are not all the same
+	# word. Guessing any of the three wrong reports "not available" rather
+	# than a version, which reads as a missing tool instead of a bad lookup.
+	local -A _apt=(rg ripgrep fd fd-find tldr tealdeer)
+	local -A _brew=(rg ripgrep fd-find fd tldr tealdeer)
+	local -A _bin=(ripgrep rg fd-find fd tealdeer tldr)
+
+	local tool=$1
+	local apt_name=${2:-${_apt[$tool]:-$tool}}
+	local formula=${3:-${_brew[$tool]:-$tool}}
+	local binary=${_bin[$tool]:-$tool}
+	local apt_raw brew_raw apt_v brew_v winner
+
+	if (( $+commands[apt-cache] )); then
+		apt_raw=$(apt-cache policy "$apt_name" 2>/dev/null | awk '/Candidate:/{print $2}')
+		[[ $apt_raw == "(none)" ]] && apt_raw=
+	fi
+	if (( $+commands[brew] )); then
+		brew_raw=$(brew info --json=v2 "$formula" 2>/dev/null |
+			jq -r '.formulae[0].versions.stable // empty' 2>/dev/null)
+	fi
+
+	apt_v=$(_pkgv_norm "$apt_raw")
+	brew_v=$(_pkgv_norm "$brew_raw")
+	printf '%-8s apt %-12s brew %-12s' "$tool" "${apt_v:--}" "${brew_v:--}"
+
+	if [[ -z $apt_v && -z $brew_v ]]; then
+		print -- " (neither)"; return 1
+	elif [[ -z $brew_v ]]; then
+		print -- " -> apt only"; return 0
+	elif [[ -z $apt_v ]]; then
+		print -- " -> brew only"; return 0
+	elif [[ $apt_v == "$brew_v" ]]; then
+		print -- " -> tie, prefer apt"
+	elif [[ $(printf '%s\n%s\n' "$apt_v" "$brew_v" | sort -V | tail -1) == "$brew_v" ]]; then
+		print -- " -> BREW newer"; winner=brew
+	else
+		print -- " -> APT newer"; winner=apt
+	fi
+
+	local current=${commands[$binary]}
+	case $winner in
+	brew) print -- "    brew install $formula"
+		[[ $current == /usr/* ]] && print -- "    # apt copy stays as the floor; brew shadows it on PATH" ;;
+	apt)  print -- "    sudo apt-get install -y --no-upgrade $apt_name"
+		[[ $current == *linuxbrew* ]] && print -- "    brew uninstall $formula   # check \`brew uses --installed $formula\` first" ;;
+	esac
+	[[ -n $current ]] && print -- "    now: $current"
+	return 0
+}
