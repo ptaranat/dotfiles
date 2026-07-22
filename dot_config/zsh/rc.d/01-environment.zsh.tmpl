@@ -43,6 +43,15 @@ export LANG=en_US.UTF-8
 export FZF_DEFAULT_COMMAND="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*' 2> /dev/null"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
+# Ctrl-T previews. The old setup got these from unixorn/fzf-zsh-plugin, which
+# .zshrc dropped in favour of `source <(fzf --zsh)`. That binds the widgets but
+# ships no options, so Ctrl-T came back as a bare list with no preview pane.
+#
+# --line-range keeps bat from rendering a whole large file for a preview that
+# only shows the first screenful anyway.
+export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range=:200 {} 2>/dev/null || eza -1 --color=always --icons --group-directories-first {} 2>/dev/null' --preview-window 'right:55%:wrap'"
+export FZF_ALT_C_OPTS="--preview 'eza -1 --color=always --icons --group-directories-first {} 2>/dev/null | head -50'"
+
 # Node, Python and friends are managed by mise, activated in .zshrc. It
 # replaced fnm here and pyenv before that. uv is kept for Python packaging:
 # mise handles interpreter versions, uv handles dependencies and venvs, and
