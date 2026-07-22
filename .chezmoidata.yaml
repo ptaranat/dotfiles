@@ -81,6 +81,10 @@ packages:
       # apt 1.40.0 against brew 1.57.0, seventeen minor versions of justfile
       # syntax. The widest apt-vs-brew gap of anything on this box.
       - just
+      # apt 0.60.3 against brew 0.74.1. `fzf --zsh` needs >= 0.48 to emit the
+      # keybindings at all, so apt's does work -- this is fourteen versions of
+      # widget and preview behaviour, not a functional floor.
+      - fzf
 
   # Not in apt at all, and not worth a brew install either. Each has a
   # first-party installer or a single release binary.
