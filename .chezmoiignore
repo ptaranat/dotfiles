@@ -21,7 +21,13 @@ Brewfile
 # so this fails on every apply.
 20-macos-defaults.sh
 
-# Brewfile-driven, and Homebrew is not how the Linux box installs packages.
-# A Linux counterpart belongs here once apt vs linuxbrew is settled.
+# Brewfile-driven. The Linux counterpart is 11-packages-linux.sh, which reads
+# the apt lists in .chezmoidata.yaml; the two are a matched pair and exactly
+# one of them runs per machine.
 10-packages.sh
+{{ end }}
+
+{{ if eq .chezmoi.os "darwin" }}
+# apt-driven, and the other half of the pair above.
+11-packages-linux.sh
 {{ end }}
