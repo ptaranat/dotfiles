@@ -108,6 +108,16 @@ bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
 export ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
+
+# zsh-vi-mode resets keybindings on init, clobbering the binds set above.
+function zvm_after_init() {
+	bindkey '^R' atuin-search
+	bindkey '^[[A' history-substring-search-up
+	bindkey '^[[B' history-substring-search-down
+	bindkey -M vicmd 'k' history-substring-search-up
+	bindkey -M vicmd 'j' history-substring-search-down
+}
+
 znap source jeffreytse/zsh-vi-mode
 
 # --- paste performance -------------------------------------------------------
