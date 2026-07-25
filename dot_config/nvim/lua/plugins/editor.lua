@@ -129,6 +129,44 @@ return {
 				clear_suggestion = "<C-]>",
 				accept_word = "<C-j>",
 			},
+			-- Never suggest by filetype (secrets/config formats).
+			ignore_filetypes = {
+				dotenv = true,
+				gitignore = true,
+			},
+			-- Never suggest in sensitive files, matched by path/name so it
+			-- catches things regardless of detected filetype. Returning true
+			-- disables Supermaven for that buffer.
+			condition = function()
+				local name = vim.fn.expand("%:t")
+				local path = vim.fn.expand("%:p")
+				local blocked = {
+					"%.env$", -- .env
+					"%.env%.", -- .env.local, .env.production, ...
+					"^%.env", -- .env, .envrc
+					"%.envrc$",
+					"secret", -- secrets.*, *.secret.*
+					"credential",
+					"%.pem$",
+					"%.key$",
+					"id_rsa",
+					"id_ed25519",
+					"%.tfvars$", -- terraform vars
+					"%.netrc$",
+					"%.npmrc$",
+					"%.pgpass$",
+					"known_hosts",
+					"authorized_keys",
+					"kubeconfig",
+					"%.htpasswd$",
+				}
+				for _, pat in ipairs(blocked) do
+					if name:match(pat) or path:match(pat) then
+						return true
+					end
+				end
+				return false
+			end,
 		},
 	},
 }
