@@ -33,3 +33,12 @@
     type = "git-repo"
     url = "https://github.com/marlonrichert/zsh-snap.git"
     refreshPeriod = "168h"
+
+# tpm, the tmux plugin manager. .tmux.conf ends with `run '~/.tmux/plugins/tpm/tpm'`,
+# which fails silently when the clone is absent: tmux starts, the theme and every
+# other plugin are skipped, and the status bar falls back to the stock green one.
+# The plugins tpm manages still need `tpm/bin/install_plugins` once per machine.
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm.git"
+    refreshPeriod = "168h"
