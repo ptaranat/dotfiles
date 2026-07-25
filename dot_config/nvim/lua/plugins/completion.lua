@@ -13,15 +13,19 @@ return {
 		dependencies = { "rafamadriz/friendly-snippets" },
 		opts = {
 			keymap = {
-				-- Mirrors the old nvim-cmp mapping so the muscle memory holds:
-				-- Tab/S-Tab cycle, C-Space opens, CR confirms, C-e aborts,
+				-- Decoupled so the keys used for plain editing are never stolen
+				-- by the auto-popup: Tab only jumps snippets/indents, Enter only
+				-- makes a newline unless an item was deliberately selected. Menu
+				-- navigation is explicit on C-n/C-p; C-Space toggles, C-e aborts,
 				-- C-d/C-f scroll the docs.
 				preset = "none",
 				["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
 				["<C-e>"] = { "hide", "fallback" },
 				["<CR>"] = { "accept", "fallback" },
-				["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
-				["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+				["<C-n>"] = { "select_next", "fallback" },
+				["<C-p>"] = { "select_prev", "fallback" },
+				["<Tab>"] = { "snippet_forward", "fallback" },
+				["<S-Tab>"] = { "snippet_backward", "fallback" },
 				["<C-d>"] = { "scroll_documentation_up", "fallback" },
 				["<C-f>"] = { "scroll_documentation_down", "fallback" },
 			},
@@ -29,6 +33,8 @@ return {
 			completion = {
 				documentation = { auto_show = true, auto_show_delay_ms = 200 },
 				ghost_text = { enabled = false }, -- supermaven owns the inline text
+				-- Nothing preselected, so <CR> only accepts after C-n/C-p.
+				list = { selection = { preselect = false, auto_insert = false } },
 			},
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer" },
