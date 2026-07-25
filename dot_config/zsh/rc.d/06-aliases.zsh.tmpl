@@ -80,7 +80,21 @@ alias nvimopts="chezmoi edit --apply ~/.config/nvim/lua/config/options.lua"
 alias nvimkeys="chezmoi edit --apply ~/.config/nvim/lua/config/keymaps.lua"
 alias nvimplug="chezmoi edit --apply ~/.config/nvim/lua/plugins/ui.lua"
 alias gitconfig="chezmoi edit --apply ~/.gitconfig"
+alias tmuxconf="chezmoi edit --apply ~/.tmux.conf"
 alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
+
+# Fuzzy-pick any managed file to edit. The named aliases above only cover the
+# files that were worth naming, which is exactly how completion.lua and
+# editor.lua drifted: no shortcut existed, so they got edited in place and
+# diverged from source until the next apply tried to overwrite them. This
+# reaches everything chezmoi manages, including files added after this line
+# was written.
+#
+# Assigned to a variable rather than piped, so cancelling out of fzf leaves an
+# empty selection and the `&&` short-circuits instead of invoking the editor
+# with no path.
+alias cmf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
+alias nvimconf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | rg "/nvim/" | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
 
 # Toys
 alias weather="curl wttr.in"
