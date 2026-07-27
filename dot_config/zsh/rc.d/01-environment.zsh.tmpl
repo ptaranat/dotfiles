@@ -60,9 +60,14 @@ export AWS_SDK_LOAD_CONFIG=1
 # kernel probe. If a plain Linux box ever joins, tighten this to check
 # .chezmoi.kernel.osrelease for "microsoft".
 #
-# There is no Linux browser to hand off to; xdg-open would fail. Point at the
-# Windows Chrome so anything calling $BROWSER opens on the desktop.
-export BROWSER="/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
+# wslview hands the URL to Windows, which opens whatever is set as the default
+# browser there. Naming a browser here instead gives two handlers that disagree:
+# wslu's xdg-open goes to the Windows default while $BROWSER went to Chrome, so
+# anything that tries $BROWSER and then falls back to xdg-open opened both.
+#
+# The comment that used to sit here said xdg-open would fail for want of a Linux
+# browser. It does not. wslu provides /usr/local/bin/xdg-open and it works.
+export BROWSER=wslview
 
 # aws-vault reads credentials from pass, which is gpg-backed. Set here so the
 # backend is explicit rather than depending on aws-vault's autodetection.
