@@ -1,25 +1,16 @@
 #!/bin/sh
-# Shell completions that no package manager installs for us.
-#
-# Most tools here need nothing: Homebrew drops official completions into
-# $(brew --prefix)/share/zsh/site-functions, which is already on fpath, so bun,
-# mise, chezmoi, atuin, uv and gh all work with no configuration. Do not
-# hand-roll completions for anything installed by brew -- check that directory
-# first.
-#
-# pnpm is the exception, because it comes from mise rather than brew and mise
-# does not install shell completions. It can generate its own, so this writes
-# that output once into the user site-functions directory rather than
-# regenerating it on every shell start.
+# Shell completions no package manager installs for us. Brew-installed tools
+# need nothing: their completions land in $(brew --prefix)/share/zsh/site-functions,
+# already on fpath. Check there before hand-rolling anything. pnpm is the
+# exception, coming from mise, which installs no completions.
 
 set -eu
 
 DEST="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
 mkdir -p "$DEST"
 
-# mise activates by manipulating PATH from a shell hook, so its tools are not
-# reachable from the plain sh chezmoi runs scripts in. The shim directory is,
-# and each shim re-execs mise with the right version.
+# mise activates via a shell hook, so its tools are not on PATH in the plain sh
+# chezmoi uses. The shim directory is, and each shim re-execs mise.
 PNPM=""
 if command -v pnpm >/dev/null 2>&1; then
 	PNPM="pnpm"

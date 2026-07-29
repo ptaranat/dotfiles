@@ -1,8 +1,6 @@
-# The only zsh file that lives in $HOME. Everything else sits under
-# $XDG_CONFIG_HOME/zsh, which this points zsh at.
-#
-# .zshenv is sourced for every zsh invocation (interactive or not), so keep it
-# to environment setup only: no output, no prompts, nothing slow.
+# The only zsh file in $HOME; it points zsh at $XDG_CONFIG_HOME/zsh for the rest.
+# Sourced for every zsh invocation, so keep it to environment setup only:
+# no output, no prompts, nothing slow.
 
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -11,38 +9,24 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
-# History is configured in .zshrc, not here. macOS ships an /etc/zshrc that
-# hardcodes HISTFILE, HISTSIZE and SAVEHIST, and zsh sources it for every
-# interactive shell after this file, so anything set here would be clobbered.
+# History lives in .zshrc: macOS ships an /etc/zshrc that hardcodes HISTFILE,
+# HISTSIZE and SAVEHIST and is sourced after this file, clobbering anything set here.
 
-# Set here, not in .zshrc, so tools in ~/.local/bin resolve in non-interactive
-# shells too (scripts, ssh commands, editor subprocesses).
+# Set here, not .zshrc, so these resolve in non-interactive shells too.
 path=($HOME/.local/bin(N-/) $path)
 
-# Homebrew (bin and sbin) and $HOME/bin. Also set here rather than in
-# rc.d/01-environment.zsh:
-# .zshrc's `znap eval atuin '...'` runs before rc.d is sourced, so atuin (and
-# anything else Homebrew-installed used earlier in .zshrc) was not yet on PATH
-# at that point. Order below matches the old rc.d/01-environment.zsh so the
-# final PATH priority is unchanged.
+# Homebrew and $HOME/bin. Here rather than rc.d/01-environment.zsh because
+# .zshrc's `znap eval atuin` runs before rc.d is sourced. Order matches the old
+# rc.d file so final PATH priority is unchanged.
 path=(/opt/homebrew/bin(N-/) $path)
 path=(/opt/homebrew/sbin(N-/) $path)
 path=($HOME/bin(N-/) $path)
 
-# OrbStack (docker, docker-compose, kubectl, orb) and the JetBrains Toolbox
-# scripts. Both installers appended themselves to ~/.zprofile, which stopped
-# being read the moment .zshenv started setting ZDOTDIR: zsh takes .zprofile,
-# .zshrc and .zlogin from $ZDOTDIR, so the copy in $HOME is never sourced, not
-# even for login shells. They live here rather than in a $ZDOTDIR/.zprofile so
-# non-interactive shells (scripts, editor subprocesses, agent tooling) can find
-# docker too. Appended, not prepended, to match what the installers set up.
+# OrbStack and JetBrains Toolbox. Both installers appended to ~/.zprofile, which
+# stopped being read once ZDOTDIR was set, since zsh takes .zprofile from there.
+# Appended, not prepended, to match what the installers set up.
 path=($path $HOME/.orbstack/bin(N-/))
 path=($path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"(N-/))
 
-# OrbStack's completions. Its init.zsh sets only this and the PATH line above,
-# so sourcing the file itself would add nothing. Kept here beside OrbStack's
-# PATH rather than in .zshrc: it is a plain fpath array append, none of the
-# "no output, no prompts, nothing slow" this file avoids, and splitting one
-# tool's setup across two files to spare non-interactive shells one array
-# entry is not worth it.
+# OrbStack's completions. Its init.zsh sets only this and the PATH line above.
 fpath+=($HOME/.orbstack/shell/completions/zsh(N-/))

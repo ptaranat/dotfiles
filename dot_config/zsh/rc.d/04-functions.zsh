@@ -34,12 +34,8 @@ review() {
 		--header "changed vs $base -- enter to edit, esc to quit"
 }
 
-# Run a command over only the files that changed, rather than the whole repo.
-#
-# $1 selects which set: "diff" is everything on this branch versus its base,
-# "modified" is the dirty worktree. The distinction matters -- linting a whole
-# monorepo is slow, and the two questions ("what did I write" vs "what have I
-# not committed") have different answers.
+# Run a command over only the changed files. $1 picks the set: "diff" is this
+# branch versus its base, "modified" is the dirty worktree.
 _git_run_on_files() {
 	local mode=$1 pattern=$2
 	shift 2

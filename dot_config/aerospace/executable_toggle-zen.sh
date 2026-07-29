@@ -1,18 +1,15 @@
 #!/usr/bin/env sh
 # Toggle AeroSpace outer gaps between normal and "zen" (wallpaper-visible) sizes.
+# AeroSpace has no runtime gaps command, so this rewrites the config;
+# auto-reload-config picks it up, hence no reload-config call.
 #
-# AeroSpace has no runtime gaps command, so the only way to change gaps is to
-# rewrite the config. auto-reload-config picks up the write on its own, which
-# is why this script never calls reload-config.
-#
-# Note: this edits a git-tracked file, so the working tree shows as dirty
-# while zen mode is active. Toggle back before committing.
+# Edits a git-tracked file, so the tree shows dirty while zen is active.
 
 set -eu
 
 CONFIG="${HOME}/.config/aerospace/aerospace.toml"
 
-NORMAL_OUTER=12
+NORMAL_OUTER=6
 ZEN_OUTER=120
 
 [ -f "$CONFIG" ] || { echo "config not found: $CONFIG" >&2; exit 1; }

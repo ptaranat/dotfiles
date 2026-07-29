@@ -1,48 +1,32 @@
-# mise: runtime version manager. Replaced fnm here, and pyenv before that.
-#
-# Division of labour with uv: mise owns interpreter/runtime *versions*, uv owns
-# Python packages and virtualenvs. They are complementary, not competing, and
-# mise defers to uv for venv creation when uv is installed.
+# mise: runtime version manager. mise owns interpreter versions, uv owns Python
+# packages and venvs; mise defers to uv for venv creation when uv is installed.
 
 [tools]
 node = "24"
 python = "3.13"
-# pnpm is by far the most-used package manager here, and a project that pins a
-# specific version (guild pins 11.0.9) overrides this one anyway. Having it
-# globally means it resolves outside a project too, which is what lets its
-# shell completions be generated.
+# Global so it resolves outside a project and completions can be generated;
+# projects pinning their own version still win.
 pnpm = "11"
-# Node package manager, same author as mise. Claims to beat pnpm and bun on
-# warm installs via a content-addressable global store, and reads existing
-# yarn.lock / pnpm-lock.yaml / package-lock.json. Pinned to the major version
-# rather than "latest" so it cannot change under a project mid-work; the
-# lockfile setting below records the exact build.
+# Pinned to major, not "latest", so it cannot change under a project mid-work.
 aube = "1"
+# For luarocks; nvim bundles its own LuaJIT.
+lua = "5.4"
 
 [settings]
-# Write mise.lock next to mise.toml with resolved versions, so a project pins
-# exact builds rather than whatever "24" resolves to on the day.
+# Write mise.lock so projects pin exact builds, not whatever "24" resolves to today.
 lockfile = true
 
-# Auto-create and source the .venv for any project with a uv.lock. uv is by far
-# the most-used tool in this shell's history, so this removes the most common
-# manual step. "create|source" makes it if missing; plain "source" would only
-# activate an existing one.
+# Auto-create and source .venv for any project with a uv.lock.
 python.uv_venv_auto = "create|source"
 
-# Honour .nvmrc / .node-version / .python-version in addition to mise's own
-# config, so repos that predate mise still pin correctly. Opt-in per tool
-# because mise will not read these formats for every tool by default.
+# Also honour .nvmrc / .node-version / .python-version. Opt-in per tool.
 idiomatic_version_file_enable_tools = ["node", "python"]
 
-# Install a missing tool on demand rather than erroring out.
 auto_install = true
 
-# Cache the computed environment. Nested mise invocations get much faster; the
-# cache invalidates automatically when a config file changes.
+# Speeds up nested mise invocations; invalidates when a config file changes.
 env_cache = true
 
 [settings.status]
-# Warn when entering a directory whose config asks for tools that are not
-# installed, instead of silently using the wrong version.
+# Warn on missing tools instead of silently using the wrong version.
 missing_tools = "always"

@@ -1,22 +1,9 @@
 #!/bin/sh
-# macOS system preferences.
+# macOS system preferences. Every value was read off this machine with
+# `defaults read`; anything left at the macOS default is deliberately absent.
 #
-# run_onchange_: chezmoi re-runs this only when the file itself changes, rather
-# than on every apply. run_*_after_: it runs after files are written.
-#
-# Every value here was read off this machine with `defaults read` rather than
-# copied from a list, so applying it reproduces the settings actually in use
-# rather than someone else's taste. Anything left at the macOS default is
-# deliberately absent: writing a value identical to the default just adds a key
-# to be maintained.
-#
-# To capture a new setting: change it in System Settings, find the key with
-#   defaults read > /tmp/before && <change it> && defaults read > /tmp/after
-#   diff /tmp/before /tmp/after
-# then add the corresponding `defaults write` line here.
-#
-# Verify with `defaults read <domain> <key>`; revert any single line with
-# `defaults delete <domain> <key>`.
+# To capture a new setting, diff `defaults read` before and after changing it in
+# System Settings. Revert one with `defaults delete <domain> <key>`.
 
 set -eu
 
@@ -41,13 +28,9 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 # Scroll direction: content moves opposite to fingers ("natural" off).
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 
-# Never prefer tabs when opening documents. Left at the macOS default
-# ("fullscreen") an app reuses an existing window rather than making a new one,
-# which under AeroSpace means a new window lands in the workspace where that
-# app's first window was created and macOS switches you there. See
-# https://github.com/nikitabobko/AeroSpace/discussions/1929 -- the underlying
-# issue is unresolved upstream and the maintainer cannot reproduce it, so this
-# is the one suggested mitigation rather than a known fix.
+# Never prefer tabs. At the default an app reuses an existing window, so under
+# AeroSpace a new window lands in another workspace and macOS switches you there.
+# Mitigation for https://github.com/nikitabobko/AeroSpace/discussions/1929.
 defaults write NSGlobalDomain AppleWindowTabbingMode -string "manual"
 
 # --- finder -----------------------------------------------------------------
@@ -63,36 +46,31 @@ defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock tilesize -int 55
 
 # --- settings not previously configured -------------------------------------
-# These were at macOS defaults on this machine. They are grouped separately so
-# it stays obvious which lines reproduce the existing setup and which change it.
+# Grouped separately so it stays obvious which lines reproduce the existing
+# setup and which change it.
 
-# Keep .DS_Store off network shares and USB volumes, so they stop turning up in
-# repositories and on other people's drives.
+# Keep .DS_Store off network shares and USB volumes.
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
 defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
 
-# Screenshots as PNG into a dedicated folder rather than scattered on the
-# desktop, and without the drop shadow around window captures.
+# Screenshots as PNG into a dedicated folder, without the window drop shadow.
 mkdir -p "${HOME}/Pictures/Screenshots"
 defaults write com.apple.screencapture location -string "${HOME}/Pictures/Screenshots"
 defaults write com.apple.screencapture type -string "png"
 defaults write com.apple.screencapture disable-shadow -bool true
 
-# Show the full POSIX path in the Finder title bar, which makes it obvious
-# which of several similarly-named directories is open.
+# Full POSIX path in the Finder title bar.
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
 # Search the current folder by default instead of the whole Mac.
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
-# Skip Finder's "Are you sure you want to change the extension?" confirmation
-# when renaming a file.
+# Skip the "are you sure you want to change the extension?" confirmation.
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
 # --- apply ------------------------------------------------------------------
-# Most of the above needs the owning process restarted to take effect. Finder
-# and Dock restart transparently; the keyboard settings apply to newly launched
-# applications, so a logout is needed for them to reach everything.
+# Finder and Dock restart transparently; keyboard settings only reach already
+# running apps after a logout.
 
 for app in Finder Dock; do
 	killall "$app" >/dev/null 2>&1 || true

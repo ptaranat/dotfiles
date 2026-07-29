@@ -1,11 +1,8 @@
-# Repositories chezmoi clones and keeps updated, replacing what were git
-# submodules. A submodule pins a SHA that has to be committed here and needs
-# --recurse-submodules on clone; these are fetched on apply and refreshed on
-# their own schedule instead.
+# Repos chezmoi clones and keeps updated, replacing former git submodules:
+# fetched on apply rather than pinned to a SHA committed here.
 
-# Private work config: aliases and functions that should not sit in a public
-# repo. .zshrc globs $ZDOTDIR/work/*.zsh after rc.d, so it can override the
-# public config, and a machine without access to this repo just skips it.
+# Private work config, kept out of this public repo. .zshrc globs
+# $ZDOTDIR/work/*.zsh after rc.d so it can override; machines without access skip it.
 [".config/zsh/work"]
     type = "git-repo"
     url = "git@github.com:ptaranat/work.git"
@@ -17,10 +14,8 @@
     url = "https://github.com/sahaj-b/ghostty-cursor-shaders.git"
     refreshPeriod = "720h"
 
-# znap, the zsh plugin manager. .zshrc sources znap.zsh from here, so without
-# it a fresh machine gets a shell with no plugins and no prompt. This was
-# previously cloned by hand -- exactly the sort of undocumented setup step this
-# migration exists to remove.
+# znap, the zsh plugin manager. .zshrc sources znap.zsh from here, so without it
+# a fresh machine gets no plugins and no prompt.
 [".local/share/znap/zsh-snap"]
     type = "git-repo"
     url = "https://github.com/marlonrichert/zsh-snap.git"

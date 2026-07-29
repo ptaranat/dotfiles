@@ -1,18 +1,8 @@
-# Powerlevel10k prompt, assembled from three files.
-#
-# The split exists so p10k can be upgraded without losing local changes. The
-# generated config is ~1800 lines; hand-editing it means every regeneration
-# produces an unreadable diff and personal settings get clobbered silently.
-#
-#   p10k.zsh       stock p10k-rainbow, vendored verbatim -- never edit this.
-#                  To take an upstream update, copy the new template over it:
-#                    cp ~/.local/share/znap/romkatv/powerlevel10k/config/p10k-rainbow.zsh \
-#                       $ZDOTDIR/prompt/p10k.zsh
-#   overrides.zsh  every local customisation
-#
-# Order matters: later files win, so overrides must follow p10k.zsh.
-# The instant-prompt block itself lives at the top of .zshrc, where it has to
-# be, rather than here.
+# Powerlevel10k, split so it can be upgraded without losing local changes.
+# p10k.zsh is stock p10k-rainbow, vendored verbatim: never edit it, re-copy
+# from znap/romkatv/powerlevel10k/config/p10k-rainbow.zsh to update.
+# overrides.zsh holds every customisation and must load second, since later
+# files win. The instant-prompt block lives at the top of .zshrc by necessity.
 
 local _prompt_dir=${ZDOTDIR:-$HOME/.config/zsh}/prompt
 

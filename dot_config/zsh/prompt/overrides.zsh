@@ -1,15 +1,9 @@
-# Local powerlevel10k customisations.
-#
-# prompt/p10k.zsh is the stock p10k-rainbow template, vendored verbatim and
-# never hand-edited, so it can be replaced wholesale when p10k updates and the
-# diff stays reviewable. Everything personal lives here instead.
-#
-# Sourced after it, so these assignments win.
+# Local powerlevel10k customisations. p10k.zsh is the stock template, vendored
+# verbatim; everything personal lives here and is sourced after it, so it wins.
 
 # --- prompt shape ------------------------------------------------------------
 
-# Single line: no `newline` element on either side, and no blank line between
-# prompts.
+# Single line: no `newline` element either side, no blank line between prompts.
 typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
 
 typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
@@ -17,11 +11,8 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 	vcs
 )
 
-# The version-manager segments p10k ships (asdf, pyenv, nodenv, nvm, rbenv and
-# friends) are all absent: mise replaced those tools, and a custom mise segment
-# proved more trouble than it was worth -- it needed its own colour handling,
-# icon table and cache invalidation, and got the last one wrong three times.
-# `mise current` answers the same question on demand.
+# p10k's version-manager segments (asdf, pyenv, nvm, rbenv) are all absent since
+# mise replaced those tools. `mise current` answers the same question on demand.
 typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	status
 	command_execution_time
@@ -58,19 +49,17 @@ typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 
 # --- behaviour ---------------------------------------------------------------
 
-# Collapse previous prompts to just the prompt character, keeping scrollback
-# readable when reading back through a long session.
+# Collapse previous prompts to the prompt character, keeping scrollback readable.
 typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
 
-# quiet, not verbose: rc.d/00-banner.zsh prints a banner on every start, and
-# verbose would report that as unexpected console output every single time.
+# quiet, not verbose: 00-banner.zsh prints on every start, which verbose would
+# report as unexpected console output every time.
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 # --- appearance --------------------------------------------------------------
 
-# Empty rather than unset. With no classes defined p10k falls back to its
-# default directory styling, which includes a folder icon; an empty array
-# suppresses that and leaves a plain path.
+# Empty rather than unset: with no classes p10k falls back to styling that
+# includes a folder icon.
 typeset -g POWERLEVEL9K_DIR_CLASSES=()
 
 # Drop the icons from these segments; the content is self-explanatory.
@@ -78,22 +67,19 @@ typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION=
 typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION=
 typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION=
 
-# Nerd Font battery glyphs in place of the stock block characters. The vendored
-# template declares this as an array; a scalar string of glyphs is equivalent to
-# p10k but zsh refuses the retype, so drop the array first.
+# Nerd Font battery glyphs. The template declares this as an array and zsh
+# refuses the retype to a scalar, so drop the array first.
 unset POWERLEVEL9K_BATTERY_STAGES
 typeset -g POWERLEVEL9K_BATTERY_STAGES=$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'
 
-# Only show the terraform version while actually running terraform, rather than
-# in every directory containing .tf files.
+# Only while running terraform, not in every directory holding .tf files.
 typeset -g POWERLEVEL9K_TERRAFORM_VERSION_SHOW_ON_COMMAND='terraform|tf|tofu'
 
 # --- git formatter -----------------------------------------------------------
 
-# Redefined rather than patched into the vendored file. The only change from
-# stock is that ahead/behind counts are shown unconditionally: stock wraps them
-# in `if (( AHEAD || BEHIND ))` with an `elif [[ -n $VCS_STATUS_REMOTE_BRANCH ]]`
-# branch that can print the remote branch name instead, which is noise here.
+# Redefined rather than patched into the vendored file. Only change from stock:
+# ahead/behind counts show unconditionally, instead of falling back to printing
+# the remote branch name.
 function my_git_formatter() {
 	emulate -L zsh
 
@@ -146,29 +132,21 @@ function my_git_formatter() {
 		res+="${meta}:${clean}${(V)VCS_STATUS_REMOTE_BRANCH//\%/%%}"
 	fi
 
-	# Display ahead/behind counts whenever they are non-zero.
-	# ⇣42 if behind the remote.
+	# Counts: ⇣behind ⇡ahead (remote), ⇠behind ⇢ahead (push remote), *stashes,
+	# ~conflicts, +staged, !unstaged, ?untracked, plus the action for an
+	# in-progress merge or rebase.
 	(( VCS_STATUS_COMMITS_BEHIND )) && res+=" ${clean}⇣${VCS_STATUS_COMMITS_BEHIND}"
-	# ⇡42 if ahead of the remote; no leading space if also behind.
 	(( VCS_STATUS_COMMITS_AHEAD && !VCS_STATUS_COMMITS_BEHIND )) && res+=" "
 	(( VCS_STATUS_COMMITS_AHEAD  )) && res+="${clean}⇡${VCS_STATUS_COMMITS_AHEAD}"
 
-	# ⇠42 if behind the push remote.
 	(( VCS_STATUS_PUSH_COMMITS_BEHIND )) && res+=" ${clean}⇠${VCS_STATUS_PUSH_COMMITS_BEHIND}"
 	(( VCS_STATUS_PUSH_COMMITS_AHEAD && !VCS_STATUS_PUSH_COMMITS_BEHIND )) && res+=" "
-	# ⇢42 if ahead of the push remote.
 	(( VCS_STATUS_PUSH_COMMITS_AHEAD  )) && res+="${clean}⇢${VCS_STATUS_PUSH_COMMITS_AHEAD}"
-	# *42 if have stashes.
 	(( VCS_STATUS_STASHES        )) && res+=" ${clean}*${VCS_STATUS_STASHES}"
-	# 'merge' if the repo is in an unusual state.
 	[[ -n $VCS_STATUS_ACTION     ]] && res+=" ${conflicted}${VCS_STATUS_ACTION}"
-	# ~42 if have merge conflicts.
 	(( VCS_STATUS_NUM_CONFLICTED )) && res+=" ${conflicted}~${VCS_STATUS_NUM_CONFLICTED}"
-	# +42 if have staged changes.
 	(( VCS_STATUS_NUM_STAGED     )) && res+=" ${modified}+${VCS_STATUS_NUM_STAGED}"
-	# !42 if have unstaged changes.
 	(( VCS_STATUS_NUM_UNSTAGED   )) && res+=" ${modified}!${VCS_STATUS_NUM_UNSTAGED}"
-	# ?42 if have untracked files.
 	(( VCS_STATUS_NUM_UNTRACKED  )) && res+=" ${untracked}?${VCS_STATUS_NUM_UNTRACKED}"
 
 	typeset -g my_git_format=$res
