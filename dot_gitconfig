@@ -1,9 +1,7 @@
 [user]
 	name = Panat Taranat
 	email = panat.taranat@gmail.com
-	# SSH signing: this is a path to a public key, not a GPG key id. The
-	# previous value was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028,
-	# kept in the backup copy of this file if it is ever needed again.
+	# A path to a public key, not a GPG key id; see [gpg] format = ssh below.
 	signingkey = ~/.ssh/id_rsa.pub
 [credential]
 	helper = /opt/homebrew/bin/gh auth git-credential
@@ -12,8 +10,7 @@
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
-	# Structural diff. See the [diff "difftastic"] section for why each of
-	# these settings is here.
+	# Structural diff; see [diff "difftastic"] for why the env vars are set.
 	dft = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' diff"
 	dlog = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' log -p --ext-diff"
 	dshow = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' show --ext-diff"
@@ -34,20 +31,11 @@
 [push]
 	default = current
 	autoSetupRemote = true
-# difftastic: diffs the syntax tree rather than lines, so reformatting and
-# moved code stop reading as churn. Opt-in per command, never the default:
-# delta stays better for review, and difftastic's output is not an applyable
-# patch.
-#
-# Configured rather than left at defaults, because the defaults are the reason
-# it is usually dismissed as unreadable:
-#
-#   DFT_DISPLAY=inline   the default splits into two columns that wrap
-#                        constantly at normal terminal widths
-#   DFT_BACKGROUND=dark  picks the brighter palette; difftastic offers no
-#                        finer colour control than this
-#   core.pager=less -RF  difftastic emits its own ANSI, which delta cannot
-#                        parse as a unified diff
+# difftastic diffs the syntax tree, so reformatting stops reading as churn.
+# Opt-in per command: delta stays better for review, and difftastic output is not
+# an applyable patch. The alias env vars above are needed because the defaults
+# wrap badly (DFT_DISPLAY=inline), pick the dim palette (DFT_BACKGROUND=dark),
+# and emit ANSI that delta cannot parse (core.pager=less -RF).
 [diff "difftastic"]
 	command = difft
 [difftool "difftastic"]
@@ -58,15 +46,13 @@
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
-	# Sign with SSH rather than GPG. The [gpg] section name and the gpgsign
-	# settings below are historical: git kept the names when it added other
-	# signing formats, so "gpgsign = true" with format = ssh means SSH-signed.
+	# "gpgsign = true" with format = ssh means SSH-signed; git kept the old
+	# section and setting names when it added other signing formats.
 	format = ssh
 
 [gpg "ssh"]
-	# Needed for local verification. Without it `git log --show-signature`
-	# reports "No principal matched" even for signatures git just created,
-	# because git has no way to know which key is allowed to sign for whom.
+	# Without this, `git log --show-signature` reports "No principal matched"
+	# even for signatures git just created.
 	allowedSignersFile = ~/.config/git/allowed_signers
 [commit]
 	gpgsign = true
@@ -81,43 +67,40 @@
 	required = true
 [rebase]
 	autosquash = true
-	# Stash and restore a dirty worktree around a rebase instead of refusing.
+	# Stash and restore a dirty worktree instead of refusing to rebase.
 	autoStash = true
-	# When rebasing a branch, also move any other local branches pointing at the
-	# rebased commits. Without this, stacked branches silently end up pointing
-	# at the pre-rebase commits.
+	# Move stacked branches too, so they do not silently point at pre-rebase commits.
 	updateRefs = true
 
 [rerere]
-	# Record how a conflict was resolved and replay it if the same conflict
-	# reappears, which it does constantly during a long rebase.
+	# Replay conflict resolutions, which recur constantly during a long rebase.
 	enabled = true
 	autoUpdate = true
 
 [branch]
-	# `git branch` sorted by most recent commit rather than alphabetically.
 	sort = -committerdate
 
 [column]
-	# Multi-column output for branch/tag/status listings when the terminal is
-	# wide enough.
 	ui = auto
 
 [fetch]
-	# Delete local refs for branches deleted on the remote.
 	prune = true
 	pruneTags = true
 
 [diff]
-	# Produces noticeably more readable diffs than the default Myers algorithm,
-	# particularly when a block moves or braces shift.
+	# More readable than Myers when a block moves or braces shift.
 	algorithm = histogram
-	# Detect renames and copies.
 	renames = copies
-	# Nicer prefixes than a/ and b/ in the header.
 	mnemonicPrefix = true
 	tool = vimdiff
 [merge]
-	# Like diff3, but omits lines the two sides already agree on, so the
-	# conflict hunk is smaller. Requires git >= 2.35.
+	# diff3 without the lines both sides agree on. Requires git >= 2.35.
 	conflictstyle = zdiff3
+# Written by `gh auth login`. The empty `helper =` resets the inherited list so
+# gh's helper is the only one for these hosts; gh rewrites this if removed.
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential

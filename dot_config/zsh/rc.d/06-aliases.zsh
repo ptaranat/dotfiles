@@ -1,8 +1,7 @@
 # Aliases
 alias reload="exec zsh"
-# A function, not `alias e=$EDITOR`: an alias expands its right-hand side once,
-# at definition time, so it would freeze whichever editor $EDITOR held when this
-# file was sourced rather than following it.
+# A function, not an alias: an alias would freeze whichever editor $EDITOR held
+# when this file was sourced.
 e() { ${EDITOR:-nvim} "$@" }
 alias c="clear"
 alias h="history -10"
@@ -66,10 +65,8 @@ alias cmcd='cd "$(chezmoi source-path)"'
 # Pull a change made directly to a deployed file back into the source.
 alias cmadd="chezmoi add"
 
-# Edit configs. These go through `chezmoi edit` rather than opening the
-# deployed file: editing the target directly works until the next
-# `chezmoi apply` silently overwrites it. --apply writes the change straight
-# out, so the two stay in step.
+# Via `chezmoi edit` because editing a deployed file directly works only until
+# the next apply overwrites it. --apply keeps source and target in step.
 alias zshrc="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/.zshrc"
 alias zshenv="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environment.zsh"
 alias zshalias="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"

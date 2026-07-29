@@ -1,12 +1,7 @@
-# fzf-tab: previews while tab-completing.
-#
-# fzf-tab replaces the completion menu with fzf, and these zstyles decide what
-# shows in the preview pane for each command. Without them you get the menu but
-# no preview, which is most of the value.
-#
-# The group-based dispatch below matters for git: zsh tags completion candidates
-# with a group name ("modified file", "recent commit object name", and so on),
-# and $group is how the preview tells a branch from a file from a commit.
+# fzf-tab: previews while tab-completing. These zstyles decide what shows in the
+# preview pane per command. zsh tags candidates with a group name ("modified
+# file", "recent commit object name"), which is what the git dispatch below
+# keys off via $group.
 
 # Preview panes need colour from tools that would otherwise detect a pipe.
 zstyle ':fzf-tab:*' fzf-flags --height=60% --layout=reverse --border

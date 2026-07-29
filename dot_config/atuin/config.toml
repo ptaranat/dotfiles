@@ -1,20 +1,14 @@
-# Atuin: SQLite-backed shell history, bound to Ctrl-R.
-#
-# Sync is off by default. To enable it across machines:
-#   atuin register -u <user> -e <email>   (or: atuin login -u <user>)
-#   atuin sync
-# History is end-to-end encrypted with a key at ~/.local/share/atuin/key --
-# back that up, it is the only way to decrypt synced history.
+# Atuin: SQLite-backed shell history, bound to Ctrl-R. To sync across machines,
+# `atuin register` then `atuin sync`. Synced history is encrypted with the key at
+# ~/.local/share/atuin/key; back it up, it is the only way to decrypt.
 auto_sync = false
 update_check = false
 
-# "global" searches all history regardless of directory; "host" or "directory"
-# narrow it. Global matches the old Ctrl-R behaviour most closely.
+# Global matches the old Ctrl-R behaviour most closely.
 search_mode = "fuzzy"
 filter_mode = "global"
 
-# But when you hold Ctrl-R down a second time it cycles filter modes, and
-# starting from the current directory is usually what you want in a repo.
+# Holding Ctrl-R cycles filter modes; start from the current directory.
 filter_mode_shell_up_key_binding = "directory"
 
 # Compact inline UI rather than taking over the whole terminal.

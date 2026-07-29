@@ -1,13 +1,9 @@
 #!/bin/sh
-# Install everything in the Brewfile.
+# Install everything in the Brewfile. Runs before the other numbered scripts so
+# tools exist before anything uses them (30-completions needs pnpm).
 #
-# Runs before the other numbered scripts so tools exist before anything tries
-# to use them (30-completions needs pnpm present to generate its completions).
-#
-# The hash below is what makes run_onchange_ work here. chezmoi re-runs this
-# script when its *rendered content* changes, and the script itself rarely
-# changes -- so without embedding a hash of the Brewfile, editing the Brewfile
-# would never trigger a reinstall.
+# The hash is what makes run_onchange_ fire: chezmoi re-runs on rendered-content
+# change, and this script itself rarely changes.
 #
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
 
@@ -24,16 +20,8 @@ BREWFILE="{{ .chezmoi.sourceDir }}/Brewfile"
 
 echo "==> installing packages from Brewfile"
 
-# --no-upgrade is deliberate and important.
-#
-# `brew bundle` installs *and upgrades* by default. That is how a routine
-# apply replaced the tmux binary underneath a running server: the sessions
-# stayed listable but could not be attached, and `brew cleanup` then removed
-# the old binary so there was no way back. Upgrading is a decision to make
-# deliberately, when nothing important is mid-flight -- not a side effect of
-# syncing dotfiles.
-#
-# To upgrade, run it by hand and check what is running first:
+# --no-upgrade: `brew bundle` upgrades by default, which once replaced the tmux
+# binary under a running server. Upgrade by hand when nothing is mid-flight:
 #     brew bundle --file="$(chezmoi source-path)/Brewfile"
 brew bundle --file="$BREWFILE" --no-upgrade
 
