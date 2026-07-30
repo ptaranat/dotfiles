@@ -67,6 +67,11 @@ export AWS_SDK_LOAD_CONFIG=1
 #
 # The comment that used to sit here said xdg-open would fail for want of a Linux
 # browser. It does not. wslu provides /usr/local/bin/xdg-open and it works.
+#
+# Claude Code reads $BROWSER too, and opens URLs itself on top of whatever the
+# terminal does with the same link, so a working value here means every link
+# opens in two tabs. It gets BROWSER=/bin/true via the env block in
+# ~/.claude/settings.json, which is outside this repo.
 export BROWSER=wslview
 
 # aws-vault reads credentials from pass, which is gpg-backed. Set here so the
