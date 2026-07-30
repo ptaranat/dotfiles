@@ -23,6 +23,15 @@ aube = "1"
 # It lives here rather than in the Brewfile because 10-packages.sh is
 # Darwin-only, so a Brewfile entry would never reach the WSL box.
 tree-sitter = "0.26"
+# Entire: records Claude Code sessions as git checkpoint refs, piloted in guild.
+# Installed through mise's go backend rather than `go install`, because go here
+# comes from linuxbrew and is not a mise tool, so $GOPATH/bin (~/go/bin) is on
+# no PATH at all -- a plain `go install` produces a binary nothing can find.
+# Every Entire git hook is guarded by `command -v entire`, so an unresolvable
+# binary means the hooks silently no-op and the tool looks broken rather than
+# absent. Pinned to a major version so a background update cannot change the
+# on-disk checkpoint format mid-pilot.
+"go:github.com/entireio/cli/cmd/entire" = "0"
 
 [settings]
 # Write mise.lock next to mise.toml with resolved versions, so a project pins
