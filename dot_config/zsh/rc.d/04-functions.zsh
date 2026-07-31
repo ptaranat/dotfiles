@@ -169,3 +169,22 @@ pkgv() {
 	[[ -n $current ]] && print -- "    now: $current"
 	return 0
 }
+
+# Browse the 404 installed figlet/toilet fonts with a live preview instead of
+# guessing names off a flat list. `fonts` samples with a placeholder word,
+# `fonts NETDECKER` previews your own text. Enter renders the pick full size and
+# echoes the command that made it.
+fonts() {
+	local dir=${FIGLET_FONTDIR:-/usr/share/figlet}
+	local text=${*:-Spellbook}
+	local font
+
+	font=$(print -rl -- $dir/*.(flf|tlf)(:t:r) | sort -f |
+		fzf --prompt='font> ' --height=90% --layout=reverse --border \
+			--preview-window='right:70%:wrap' \
+			--preview="toilet -t -d ${(q)dir} -f {} ${(q)text} 2>&1 | head -24") || return
+	[[ -n $font ]] || return
+
+	toilet -t -d $dir -f "$font" "$text"
+	print -r -- "# toilet -t -f ${(q)font} ${(q)text}"
+}
