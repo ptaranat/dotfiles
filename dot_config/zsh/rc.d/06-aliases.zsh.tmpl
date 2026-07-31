@@ -18,18 +18,31 @@ alias memo="bat -p ~/.memo.md"
 alias cl="claude"
 
 # attach/create a tmux session by name, or fzf-pick one; bare tm on an empty server -> main
+#
+# When `tm` is the thing that starts the server, continuum auto-restores in the
+# background and resurrect finishes by switching the client to whichever
+# session was active when the layout was saved. That drops you into a session
+# you did not ask for a second or two after you attached to the one you did.
+# @tm-target hands the requested name to the post-restore hook in ~/.tmux.conf,
+# which switches back. It is only set when this call started the server, so a
+# manual prefix + C-r later restores to its own saved active session as usual.
 tm() {
-  local change target="$1"
+  local change target="$1" server_was_up=1
+  [[ -n "$(tmux list-sessions 2>/dev/null)" ]] || server_was_up=0
   [[ -n "$TMUX" ]] && change=switch-client || change=attach-session
   if [[ -z "$target" ]]; then
-    if [[ -n "$(tmux list-sessions 2>/dev/null)" ]]; then
+    if (( server_was_up )); then
       target=$(tmux list-sessions -F '#{session_name}' | fzf --exit-0) || return  # esc cancels
       [[ -z "$target" ]] && return
     else
       target=main
     fi
   fi
-  tmux "$change" -t "$target" 2>/dev/null || { tmux new-session -d -s "$target" && tmux "$change" -t "$target"; }
+  tmux "$change" -t "$target" 2>/dev/null || {
+    tmux new-session -d -s "$target" || return
+    (( server_was_up )) || tmux set-option -g @tm-target "$target"
+    tmux "$change" -t "$target"
+  }
 }
 
 # Git
