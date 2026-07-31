@@ -12,6 +12,12 @@ python = "3.13"
 # globally means it resolves outside a project too, which is what lets its
 # shell completions be generated.
 pnpm = "11"
+# Replaces a standalone ~/.bun install that sat on no PATH at all, so the bun
+# binary and both globally-installed bun CLIs (omp, dw) were unreachable from
+# every shell. Global rather than per-project because those CLIs start with
+# `#!/usr/bin/env bun` and mise resolves tools by current directory: a project
+# pin would make them work inside one repo and fail from anywhere else.
+bun = "1.3"
 # Node package manager, same author as mise. Claims to beat pnpm and bun on
 # warm installs via a content-addressable global store, and reads existing
 # yarn.lock / pnpm-lock.yaml / package-lock.json. Pinned to the major version

@@ -31,6 +31,16 @@ path=($HOME/.local/bin(N-/) $path)
 # for the one-off case.
 export GOBIN="$HOME/.local/bin"
 
+# `bun install -g` writes bin shims to $BUN_INSTALL/bin, defaulting to ~/.bun.
+# That directory was on no PATH here, so omp and dw sat unreachable in exactly
+# the way $GOPATH/bin did above. bun itself now comes from mise; ~/.bun keeps
+# only the global packages, which is why this is a plain path entry and not a
+# runtime prepend. Left at the default location rather than moved under
+# $XDG_DATA_HOME: BUN_INSTALL would then have to be set for every context that
+# ever runs bun, and anything missing it would silently rebuild ~/.bun and
+# split the globals across two directories.
+path=($path $HOME/.bun/bin(N-/))
+
 # Homebrew goes here rather than in rc.d/01-environment.zsh, and the ordering
 # is the whole point. rc.d is sourced at the *end* of .zshrc, well after
 # `mise activate`, so a prepend there lands in front of mise and shadows every
