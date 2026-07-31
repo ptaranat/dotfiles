@@ -2,12 +2,17 @@ allow-loopback-pinentry
 {{ if eq .chezmoi.os "darwin" -}}
 pinentry-program /opt/homebrew/bin/pinentry-mac
 {{- else -}}
-# pinentry-curses rather than a GUI pinentry: the Linux box is WSL, reached
-# through a terminal, and a graphical prompt has no display to appear on.
+# Native Windows pinentry (Gpg4win pinentry-qt 1.2.0) over WSL interop, via the
+# wrapper at ~/.local/bin/pinentry-wsl. Supersedes pinentry-curses, which was
+# chosen on the assumption that a graphical prompt had no display to appear on.
+# It does: WSL interop launches the Windows binary directly, so this needs
+# neither WSLg nor X410 running.
 # This path is load-bearing beyond git signing -- `pass` is gpg-backed and
 # aws-vault reads its credentials from pass, so a wrong pinentry here breaks
 # the AWS workflow, not just commit signing.
-pinentry-program /usr/bin/pinentry-curses
+# Revert: swap the line below for `pinentry-program /usr/bin/pinentry-curses`
+# and run `gpgconf --kill gpg-agent`.
+pinentry-program {{ .chezmoi.homeDir }}/.local/bin/pinentry-wsl
 {{- end }}
 default-cache-ttl 84000
 max-cache-ttl 84000
