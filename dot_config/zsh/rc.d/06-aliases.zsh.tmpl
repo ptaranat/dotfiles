@@ -76,7 +76,47 @@ alias cmu="chezmoi update"           # pull, then apply
 alias cms="chezmoi status"
 alias cmcd='cd "$(chezmoi source-path)"'
 # Pull a change made directly to a deployed file back into the source.
-alias cmadd="chezmoi add"
+#
+# A function rather than `alias cmadd="chezmoi add"`, because plain add
+# regenerates the source file from the *rendered* target. On a template that
+# flattens it: every branch for the other OS is discarded, silently and without
+# a diff to notice. That is why the pinentry-wsl change to ~/.gnupg/gpg-agent.conf
+# could not simply be added back and sat as drift for four days instead. Nine of
+# the managed files are templates, including both zsh rc.d files, so this is the
+# common case rather than the exotic one.
+cmadd() {
+	local f src rc=0
+	(( $# )) || { print -u2 "cmadd: need a path"; return 1 }
+	for f in "$@"; do
+		if ! src=$(chezmoi source-path "$f" 2>/dev/null); then
+			print -u2 "cmadd: not managed by chezmoi: $f"
+			rc=1
+		elif [[ "$src" == *.tmpl ]]; then
+			print -u2 "cmadd: $f is a template, adding it would flatten its conditionals."
+			print -u2 "       hand-merge instead: \$EDITOR $src"
+			rc=1
+		fi
+	done
+	(( rc )) && return $rc
+	chezmoi add "$@"
+}
+
+# Warn when a deployed file has been edited in place. chezmoi reverts those on
+# the next apply without asking if it is run with --force, and even interactively
+# the prompt is easy to wave through. The gap between making such an edit and
+# noticing it is where changes get lost, so close the gap: this runs on every
+# interactive shell and costs about 30ms across the whole tree.
+if command -v chezmoi >/dev/null 2>&1; then
+	() {
+		local drift
+		drift=$(chezmoi status 2>/dev/null) || return
+		[[ -n "$drift" ]] || return
+		print -u2 "chezmoi: deployed files differ from source, apply would revert them:"
+		print -u2 "$drift"
+		print -u2 "  keep the deployed version: cmadd <path>"
+		print -u2 "  discard it:                chezmoi apply <path>"
+	}
+fi
 
 # Edit configs. These go through `chezmoi edit` rather than opening the
 # deployed file: editing the target directly works until the next
