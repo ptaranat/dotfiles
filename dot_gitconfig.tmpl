@@ -9,7 +9,7 @@
 	# be rotated without touching anything that authenticates. Before that it
 	# was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028, kept in the
 	# backup copy of this file if it is ever needed again.
-	signingkey = ~/.ssh/git-sign.pub
+	signingkey = ~/.ssh/id_ed25519_signing.pub
 [credential]
 {{- if eq .chezmoi.os "darwin" }}
 	helper = /opt/homebrew/bin/gh auth git-credential
