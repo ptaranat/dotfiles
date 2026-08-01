@@ -17,7 +17,12 @@ export VISUAL=$EDITOR
 
 if [ -z "$SSH_AUTH_SOCK" ]; then
 	eval "$(ssh-agent -s)" > /dev/null
-	ssh-add ~/.ssh/id_rsa 2>/dev/null
+	# git-sign is the commit signing key and is passphrase-protected, so
+	# leaving it out of the agent makes every commit stop and ask. Missing
+	# files are skipped: not every machine has both keys.
+	for key in ~/.ssh/id_rsa ~/.ssh/git-sign; do
+		[ -f "$key" ] && ssh-add "$key" 2>/dev/null
+	done
 fi
 
 # Pager. Mouse wheel scrolling has to be asked for: without --mouse, less

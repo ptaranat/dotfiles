@@ -1,14 +1,19 @@
 [user]
 	name = Panat Taranat
 	email = panat@taranat.com
-	# SSH signing: this is a path to a public key, not a GPG key id. The
-	# previous value was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028,
-	# kept in the backup copy of this file if it is ever needed again.
-	signingkey = ~/.ssh/id_rsa.pub
+	# SSH signing: this is a path to a public key, not a GPG key id. Git
+	# expands the tilde here, so keep it relative rather than hardcoding
+	# /home/panat, which would not resolve on the mac.
+	#
+	# A dedicated signing key rather than the general-purpose id_rsa, so it can
+	# be rotated without touching anything that authenticates. Before that it
+	# was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028, kept in the
+	# backup copy of this file if it is ever needed again.
+	signingkey = ~/.ssh/git-sign.pub
 [credential]
-{{ if eq .chezmoi.os "darwin" -}}
+{{- if eq .chezmoi.os "darwin" }}
 	helper = /opt/homebrew/bin/gh auth git-credential
-{{- else -}}
+{{- else }}
 	# `!` runs this through a shell, so gh is resolved on PATH rather than at a
 	# fixed prefix. Deliberate: the Linux box may move gh from linuxbrew to apt,
 	# which would change an absolute path but not this.
