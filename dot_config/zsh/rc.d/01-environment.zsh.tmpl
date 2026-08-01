@@ -15,14 +15,22 @@ path=($HOME/bin(N-/) $path)
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 
-if [ -z "$SSH_AUTH_SOCK" ]; then
-	eval "$(ssh-agent -s)" > /dev/null
-	# git-sign is the commit signing key and is passphrase-protected, so
-	# leaving it out of the agent makes every commit stop and ask. Missing
-	# files are skipped: not every machine has both keys.
-	for key in ~/.ssh/id_rsa ~/.ssh/git-sign; do
-		[ -f "$key" ] && ssh-add "$key" 2>/dev/null
-	done
+# One agent per machine, reached over a fixed socket. Keying off an unset
+# SSH_AUTH_SOCK instead meant a fresh agent per login shell: a key unlocked in
+# one terminal was invisible in the next, and the orphans accumulated all day.
+export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+ssh-add -l > /dev/null 2>&1
+if [ $? -eq 2 ]; then
+	# 2 is "could not open a connection", so the socket is either absent or
+	# left over from a previous boot with nothing behind it.
+	rm -f "$SSH_AUTH_SOCK"
+	ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
+	# Loaded eagerly because ssh-keygen does not read AddKeysToAgent from
+	# ssh_config when it signs a commit. Without this, signing falls back to
+	# ssh-askpass, which fails outright anywhere there is no terminal to
+	# prompt on. id_rsa is left out: ssh itself does honour AddKeysToAgent,
+	# so it loads on first use and costs no prompt on boots without a push.
+	[ -f ~/.ssh/id_ed25519_signing ] && ssh-add ~/.ssh/id_ed25519_signing
 fi
 
 # Pager. Mouse wheel scrolling has to be asked for: without --mouse, less
