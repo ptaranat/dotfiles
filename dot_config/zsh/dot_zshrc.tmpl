@@ -62,8 +62,11 @@ znap source ohmyzsh/ohmyzsh \
 
 znap source zsh-users/zsh-completions
 znap source aloxaf/fzf-tab
+# F-Sy-H, not zsh-users/zsh-syntax-highlighting. It kept the upstream
+# _zsh_highlight_* internals but not the configuration: ZSH_HIGHLIGHT_HIGHLIGHTERS
+# belongs to the other project and F-Sy-H ignores it, so setting it here did
+# nothing. F-Sy-H has no equivalent knob for selecting highlighters.
 znap source z-shell/F-Sy-H
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
 
 # Nags when a typed command has an alias. YSU's default message is a three-line
 # block; this trims it to a single "alias tip: gst" line.
@@ -72,6 +75,12 @@ export YSU_MESSAGE_POSITION="after"
 znap source MichaelAquilina/zsh-you-should-use
 
 ZSH_AUTOSUGGEST_STRATEGY=(history)
+# Without this, autosuggestions re-wraps every zle widget on every prompt, which
+# is most of the cost of pasting a long line. With it, binding happens once at
+# load, so anything that redefines widgets later has to ask for a rebind:
+# zsh-vi-mode does exactly that, and calls _zsh_autosuggest_bind_widgets from
+# zvm_after_init below.
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 znap source zsh-users/zsh-autosuggestions
 
 # fzf owns the keybindings (Ctrl-T files, Alt-C cd); fzf-tab owns completion.
@@ -116,22 +125,26 @@ function zvm_after_init() {
 	bindkey '^[[B' history-substring-search-down
 	bindkey -M vicmd 'k' history-substring-search-up
 	bindkey -M vicmd 'j' history-substring-search-down
+
+	# zvm redefines widgets after autosuggestions bound them, and
+	# ZSH_AUTOSUGGEST_MANUAL_REBIND means nothing re-binds them automatically.
+	# Without this line suggestions stop updating as you type.
+	(( $+functions[_zsh_autosuggest_bind_widgets] )) && _zsh_autosuggest_bind_widgets
 }
 
 znap source jeffreytse/zsh-vi-mode
 
 # --- paste performance -------------------------------------------------------
-# Without this, autosuggestions recompute per character on paste, so pasting a
-# long line is visibly slow.
-pasteinit() {
-	OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
-	zle -N self-insert url-quote-magic
-}
-pastefinish() {
-	zle -N self-insert $OLD_SELF_INSERT
-}
-zstyle :bracketed-paste-magic paste-init pasteinit
-zstyle :bracketed-paste-magic paste-finish pastefinish
+# There used to be a bracketed-paste-magic block here. It never ran: the zstyles
+# were set but nothing autoloaded the function or bound it with
+# `zle -N bracketed-paste bracketed-paste-magic`, so zsh kept using its native
+# widget throughout. That turned out to be the faster arrangement and is now the
+# deliberate one. bracketed-paste-magic replays a paste through self-insert one
+# character at a time to do url quoting; the native widget inserts the whole
+# chunk in a single operation. Do not wire it up as a performance fix.
+#
+# The real cost was autosuggestions rebinding widgets every prompt, handled by
+# ZSH_AUTOSUGGEST_MANUAL_REBIND above.
 
 # --- local config ------------------------------------------------------------
 # (N) so an empty directory is not an error.
