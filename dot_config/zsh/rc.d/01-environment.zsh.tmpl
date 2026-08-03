@@ -19,19 +19,42 @@ export VISUAL=$EDITOR
 # SSH_AUTH_SOCK instead meant a fresh agent per login shell: a key unlocked in
 # one terminal was invisible in the next, and the orphans accumulated all day.
 export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
+
+# ssh reaches for a graphical ssh-askpass whenever it needs a passphrase and
+# has no terminal to ask on. Nothing on this box provides one, so that path
+# only ever produces "exec(ssh-askpass): No such file or directory". Declining
+# it turns that into a plain "no passphrase given".
+export SSH_ASKPASS_REQUIRE=never
+
 ssh-add -l > /dev/null 2>&1
-if [ $? -eq 2 ]; then
+agent_state=$?
+
+if (( agent_state == 2 )); then
 	# 2 is "could not open a connection", so the socket is either absent or
 	# left over from a previous boot with nothing behind it.
 	rm -f "$SSH_AUTH_SOCK"
 	ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
-	# Loaded eagerly because ssh-keygen does not read AddKeysToAgent from
-	# ssh_config when it signs a commit. Without this, signing falls back to
-	# ssh-askpass, which fails outright anywhere there is no terminal to
-	# prompt on. id_rsa is left out: ssh itself does honour AddKeysToAgent,
-	# so it loads on first use and costs no prompt on boots without a push.
-	[ -f ~/.ssh/id_ed25519_signing ] && ssh-add ~/.ssh/id_ed25519_signing
 fi
+
+# 1 is "agent has no identities", and it is reachable without going through the
+# branch above: ssh-add -D, or an agent left running by a shell that died
+# before it added anything. Loading only on agent creation meant every shell
+# after that one saw a live socket, skipped the add, and left signing broken
+# for the rest of the boot -- so this is checked on its own.
+#
+# Loaded eagerly because ssh-keygen does not read AddKeysToAgent from
+# ssh_config when it signs a commit. The signing key deliberately carries no
+# passphrase: while the agent holds it, anything running as this user can sign
+# through the socket without knowing one, so encrypting it only guarded against
+# the file being stolen for offline use, and that cost a prompt on every WSL
+# restart. A forged signature is revocable by pulling the key from GitHub's
+# allowed signers; id_rsa grants push access, so it stays encrypted and is left
+# out here. ssh honours AddKeysToAgent for it, so it loads on first use and
+# prompts once per boot, only on boots with a push.
+if (( agent_state != 0 )) && [[ -f ~/.ssh/id_ed25519_signing ]]; then
+	ssh-add ~/.ssh/id_ed25519_signing
+fi
+unset agent_state
 
 # Pager. Mouse wheel scrolling has to be asked for: without --mouse, less
 # ignores the wheel entirely and no pager built on it scrolls -- which includes
