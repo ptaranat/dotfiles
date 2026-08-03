@@ -1,0 +1,7 @@
+# Pin the mode mask instead of inheriting the login umask. pam gives this box
+# 002 (user-private-group), so chezmoi computed 775/664 for every managed file
+# while the deployed copies -- applied under a 022 umask -- were 755/644. That
+# showed up as 47 "modified" entries whose diffs were mode lines and nothing
+# else, and applying them would only have moved the mismatch to whichever
+# machine ran with the other umask next.
+umask = 0o022
