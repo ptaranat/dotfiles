@@ -51,8 +51,11 @@ fi
 # allowed signers; id_rsa grants push access, so it stays encrypted and is left
 # out here. ssh honours AddKeysToAgent for it, so it loads on first use and
 # prompts once per boot, only on boots with a push.
+#
+# -q because ssh-add announces "Identity added:" on stderr on success, which
+# lands in the first shell of every boot with nothing to do about it.
 if (( agent_state != 0 )) && [[ -f ~/.ssh/id_ed25519_signing ]]; then
-	ssh-add ~/.ssh/id_ed25519_signing
+	ssh-add -q ~/.ssh/id_ed25519_signing
 fi
 unset agent_state
 
