@@ -53,3 +53,16 @@ path=(/opt/homebrew/bin(N-/) $path)
 {{- else -}}
 path=(/home/linuxbrew/.linuxbrew/bin(N-/) $path)
 {{- end }}
+
+# rustup's installer appends `. "$HOME/.cargo/env"` to this file, which sources
+# a shell script on every zsh invocation to do one path prepend. Written out
+# here instead, in the same form as every other entry above, so reinstalling
+# rustup cannot reintroduce a line chezmoi would then report as drift.
+#
+# This does not outrank Homebrew despite sitting after the prepend above:
+# /etc/profile.d/brew.sh re-prepends linuxbrew for every login shell, well
+# after .zshenv, so brew lands ahead of this. Harmless today because rustup is
+# the only rustc and cargo on this box; the Brewfile's `brew "rust"` is a
+# leftover that was never installed. Installing it would shadow rustup, and the
+# fix then is to drop it from the Brewfile, not to reorder here.
+path=($HOME/.cargo/bin(N-/) $path)
