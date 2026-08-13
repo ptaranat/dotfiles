@@ -19,6 +19,10 @@ Brewfile
 
 {{ if eq .chezmoi.os "darwin" }}
 11-packages-linux.sh
+
+# Reaches into /mnt/c for Gpg4win and has no meaning off WSL. The mac names
+# pinentry-mac directly in gpg-agent.conf and needs no dispatcher.
+.local/bin/pinentry-wsl
 {{ end }}
 
 {{ if not (and .work .workemail) }}

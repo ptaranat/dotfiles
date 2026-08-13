@@ -2,6 +2,7 @@ allow-loopback-pinentry
 {{ if eq .chezmoi.os "darwin" -}}
 pinentry-program /opt/homebrew/bin/pinentry-mac
 {{- else -}}
+# Dispatcher: Gpg4win dialog locally, pinentry-curses over ssh.
 # pass and aws-vault depend on this pinentry, not just git signing.
 pinentry-program {{ .chezmoi.homeDir }}/.local/bin/pinentry-wsl
 {{- end }}

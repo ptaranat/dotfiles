@@ -1,0 +1,50 @@
+#!/bin/sh
+# pinentry dispatcher for the WSL box, named in ~/.gnupg/gpg-agent.conf.
+#
+# Which pinentry is right depends on where the person typing is sitting, not on
+# which machine gpg runs on. At the PC, Gpg4win's dialog reached over WSL
+# interop is the better prompt and needs neither WSLg nor X410. Over ssh from
+# Termius that same dialog opens on a desktop nobody is looking at, so gpg waits
+# forever and the key cannot be unlocked at all.
+#
+# gpg-agent cannot decide this itself: pinentry-program is read once at agent
+# startup and one agent serves every session. What it does do is copy
+# PINENTRY_USER_DATA out of the environment of whichever gpg client asked for
+# the passphrase into this script's environment, freshly per invocation
+# (verified: it arrives here alongside GPG_TTY, TERM and DISPLAY). .zshenv sets
+# it from $SSH_CONNECTION, so a local shell and a remote shell can disagree
+# while sharing one long-lived agent, with no agent restart to switch.
+#
+# Only the explicit value "curses" forces the terminal prompt. Anything else,
+# including unset, keeps the Windows dialog, so callers that never source
+# .zshenv behave exactly as they did before this dispatch existed.
+#
+# If a remote session does end up with the invisible dialog (attaching to a tmux
+# session that was created locally is the way that happens, since those panes
+# keep the environment they were born with), gpg just sits there:
+# `gpgconf --kill gpg-agent` clears it, and `gpg --pinentry-mode loopback`
+# prompts on the terminal instead, allow-loopback-pinentry being set already.
+#
+# This path is load-bearing well beyond git signing. `pass` is gpg-backed and
+# aws-vault reads its credentials out of pass, so a wrong pinentry here takes
+# out the AWS workflow too.
+
+case "$PINENTRY_USER_DATA" in
+curses) exec /usr/bin/pinentry-curses "$@" ;;
+esac
+
+# Falls through to pinentry-curses if no Windows binary is found, so a Gpg4win
+# upgrade or uninstall degrades to a working terminal prompt instead of breaking
+# everything listed above. Gpg4win's own pinentry comes first; GnuPG's vanilla
+# Windows installer ships only pinentry-basic.exe, which is a plainer dialog but
+# still a visible one.
+for p in \
+	"/mnt/c/Program Files/Gpg4win/bin/pinentry.exe" \
+	"/mnt/c/Program Files/Gpg4win/bin/pinentry-qt.exe" \
+	"/mnt/c/Program Files (x86)/Gpg4win/bin/pinentry.exe" \
+	"/mnt/c/Program Files (x86)/Gpg4win/bin/pinentry-qt.exe" \
+	"/mnt/c/Program Files/GnuPG/bin/pinentry-basic.exe"; do
+	[ -x "$p" ] && exec "$p" "$@"
+done
+
+exec /usr/bin/pinentry-curses "$@"
