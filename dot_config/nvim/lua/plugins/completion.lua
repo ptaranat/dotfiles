@@ -20,7 +20,7 @@ return {
 			appearance = { nerd_font_variant = "mono" },
 			completion = {
 				documentation = { auto_show = true, auto_show_delay_ms = 200 },
-				ghost_text = { enabled = false }, -- supermaven owns the inline text
+				ghost_text = { enabled = false }, -- no inline text to mistake for AI
 				-- no preselect, so <CR> only accepts after C-n/C-p
 				list = { selection = { preselect = false, auto_insert = false } },
 			},
