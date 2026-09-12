@@ -30,3 +30,18 @@ env_cache = true
 [settings.status]
 # Warn on missing tools instead of silently using the wrong version.
 missing_tools = "always"
+
+[settings.ruby]
+compile = false
+
+# `mise run docs-publish` from any directory: build the Obsidian vault into
+# the tailnet docs site and push it to kurokami. Lives in dungeonbooks/quartz.
+[tasks.docs-publish]
+description = "Build the Dungeon Books vault site and publish it to kurokami"
+dir = "~/projects/dungeonbooks/quartz"
+run = "mise exec -- ./docs-publish"
+
+[tasks.docs-publish-dry]
+description = "Build the vault site and show what would change on kurokami"
+dir = "~/projects/dungeonbooks/quartz"
+run = "mise exec -- ./docs-publish --dry-run"
