@@ -15,6 +15,10 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 # hardcodes HISTFILE, HISTSIZE and SAVEHIST, and zsh sources it for every
 # interactive shell after this file, so anything set here would be clobbered.
 
+# The (N-/) qualifier on every entry below keeps it only when it is an existing
+# directory, so anything uninstalled or moved drops out silently instead of
+# accumulating in $PATH and being searched on every command.
+#
 # Set here, not in .zshrc, so tools in ~/.local/bin resolve in non-interactive
 # shells too (scripts, ssh commands, editor subprocesses).
 path=($HOME/.local/bin(N-/) $path)
@@ -49,9 +53,9 @@ path=($path $HOME/.bun/bin(N-/))
 #
 # .zshenv runs before .zshrc entirely, so mise prepends after this and wins.
 {{ if eq .chezmoi.os "darwin" -}}
-path=(/opt/homebrew/bin(N-/) $path)
+path=(/opt/homebrew/bin(N-/) /opt/homebrew/sbin(N-/) $path)
 {{- else -}}
-path=(/home/linuxbrew/.linuxbrew/bin(N-/) $path)
+path=(/home/linuxbrew/.linuxbrew/bin(N-/) /home/linuxbrew/.linuxbrew/sbin(N-/) $path)
 {{- end }}
 
 # rustup's installer appends `. "$HOME/.cargo/env"` to this file, which sources
@@ -66,3 +70,17 @@ path=(/home/linuxbrew/.linuxbrew/bin(N-/) $path)
 # leftover that was never installed. Installing it would shadow rustup, and the
 # fix then is to drop it from the Brewfile, not to reorder here.
 path=($HOME/.cargo/bin(N-/) $path)
+
+# Moved out of rc.d/01-environment.zsh. rc.d is sourced at the end of .zshrc,
+# so anything added there is invisible to non-interactive shells (scripts, ssh
+# commands, editor subprocesses) and to the parts of .zshrc that run earlier.
+# ~/bin holds hermit, which is exactly the kind of thing a script expects to
+# find. This now sits behind mise rather than in front of it, which changes
+# nothing today: mise manages no tool of the same name.
+path=($HOME/bin(N-/) $path)
+
+# opencode's installer appends this to whichever zsh rc file it finds, and it
+# landed in the deployed ~/.config/zsh/.zshrc rather than anything tracked
+# here. Written out in the source so `chezmoi apply` stops reverting it and
+# dropping opencode off PATH.
+path=($HOME/.opencode/bin(N-/) $path)
