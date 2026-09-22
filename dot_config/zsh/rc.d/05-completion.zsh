@@ -1,12 +1,6 @@
-# fzf-tab: previews while tab-completing.
-#
-# fzf-tab replaces the completion menu with fzf, and these zstyles decide what
-# shows in the preview pane for each command. Without them you get the menu but
-# no preview, which is most of the value.
-#
-# The group-based dispatch below matters for git: zsh tags completion candidates
-# with a group name ("modified file", "recent commit object name", and so on),
-# and $group is how the preview tells a branch from a file from a commit.
+# fzf-tab replaces the completion menu with fzf; these zstyles decide what the
+# preview pane shows, which is most of the value. zsh tags candidates with a
+# group name, and $group is how the git preview tells a branch from a commit.
 
 # Preview panes need colour from tools that would otherwise detect a pipe.
 zstyle ':fzf-tab:*' fzf-flags --height=60% --layout=reverse --border
@@ -29,8 +23,7 @@ for _cmd in bat cat nvim vim nano rm cp mv; do
 done
 unset _cmd
 
-# git: the payload depends on what kind of candidate is under the cursor, so
-# branch on the completion group. delta renders the diffs.
+# git: branch on the completion group, since the payload differs per candidate.
 zstyle ':fzf-tab:complete:git-(add|diff|restore|checkout|switch|stash):*' fzf-preview \
 	'case "$group" in
 	"modified file") git diff --color=always -- $word | delta 2>/dev/null || git diff --color=always -- $word ;;
@@ -62,11 +55,11 @@ zstyle ':fzf-tab:complete:mise:*' fzf-preview \
 zstyle ':fzf-tab:complete:brew-(install|info|uninstall|reinstall):*' fzf-preview \
 	'brew info $word 2>/dev/null | head -40'
 
-# Completion behaviour: case-insensitive, then partial-word, then substring.
+# Case-insensitive, then partial-word, then substring.
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 # Colour the completion list the same way ls does.
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-# Group results under their category headings, which is what $group keys off.
+# Group under category headings, which is what $group keys off.
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '[%d]'
 # Do not offer files already on the command line.

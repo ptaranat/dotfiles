@@ -1,12 +1,8 @@
 #!/bin/sh
-# Install apt packages on the Linux box. The macOS counterpart is
-# 10-packages.sh, which reads the Brewfile; .chezmoiignore gates each script to
-# its own OS so only one of the pair ever runs.
-#
-# The hash below is what makes run_onchange_ work. chezmoi re-runs this script
-# when its *rendered content* changes, and the script text itself almost never
-# changes -- so without embedding a hash of the package list, editing
-# .chezmoidata.yaml would trigger nothing at all.
+# apt packages for the Linux box; 10-packages.sh is the macOS counterpart, and
+# .chezmoiignore gates each to its own OS. The hash below is what makes
+# run_onchange_ work: chezmoi re-runs on rendered-content change, and this
+# script's text never changes, so editing .chezmoidata.yaml would do nothing.
 #
 # packages hash: {{ list .packages.apt.core .packages.apt.tools | toJson | sha256sum }}
 
@@ -20,31 +16,21 @@ command -v apt-get >/dev/null 2>&1 || {
 
 echo "==> installing apt packages"
 
-# --no-upgrade is deliberate and load-bearing.
+# --no-upgrade is deliberate and the part that matters here.
 #
-# `apt-get install` on a package that is already installed will upgrade it if a
-# newer candidate exists, so the plain form is not the safe operation its name
-# suggests. Measured on this box, the plain form wanted to upgrade curl and its
-# whole libcurl stack out of trixie-backports -- 10 packages nobody asked for,
-# as a side effect of syncing dotfiles.
-#
-# That is the same mistake `brew bundle`'s default made on the macOS box, where
-# it replaced the tmux binary underneath a running server and left the sessions
-# listable but unattachable. --no-upgrade is the apt spelling of the
-# --no-upgrade already passed to brew bundle in 10-packages.sh.
-#
-# To upgrade, run it by hand once you have checked what is running:
+# `apt-get install` upgrades an already-installed package if a newer candidate
+# exists, so the plain form is not the safe operation it sounds like: measured
+# here it wanted to pull curl and the whole libcurl stack out of backports as a
+# side effect of syncing dotfiles. Same mistake `brew bundle`'s default made on
+# the mac, replacing tmux under a running server. Upgrade by hand instead:
 #     sudo apt-get update && sudo apt-get upgrade
 sudo apt-get update -qq
 sudo apt-get install -y --no-upgrade --no-install-recommends \
 	{{ concat .packages.apt.core .packages.apt.tools | sortAlpha | join " \\\n\t" }}
 
-# Debian ships two of these under names that collide with older packages, so
-# the binaries are fdfind and batcat rather than fd and bat. The zsh config
-# calls them by their upstream names. ~/.local/bin is prepended in .zshenv.
-#
-# These are no-ops on a box where linuxbrew still provides fd and bat, since
-# linuxbrew sits ahead of ~/.local/bin on PATH. They matter on a fresh machine.
+# Debian ships these as fdfind and batcat to avoid older name collisions, but
+# the zsh config calls them fd and bat. No-ops where linuxbrew already provides
+# them (it sits ahead of ~/.local/bin); they matter on a fresh machine.
 mkdir -p "$HOME/.local/bin"
 for pair in fdfind:fd batcat:bat; do
 	src="${pair%%:*}"

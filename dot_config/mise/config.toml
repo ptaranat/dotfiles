@@ -1,70 +1,49 @@
-# mise: runtime version manager. Replaced fnm here, and pyenv before that.
-#
-# Division of labour with uv: mise owns interpreter/runtime *versions*, uv owns
-# Python packages and virtualenvs. They are complementary, not competing, and
-# mise defers to uv for venv creation when uv is installed.
+# mise: runtime version manager, replacing fnm and pyenv. It owns runtime
+# *versions*; uv owns Python packages and venvs, and mise defers to it.
 
 [tools]
 node = "24"
 python = "3.13"
-# pnpm is by far the most-used package manager here, and a project that pins a
-# specific version (guild pins 11.0.9) overrides this one anyway. Having it
-# globally means it resolves outside a project too, which is what lets its
-# shell completions be generated.
+# Global so it resolves outside a project, which is what lets completions be
+# generated. A project pinning its own version overrides this anyway.
 pnpm = "11"
-# Replaces a standalone ~/.bun install that sat on no PATH at all, so the bun
-# binary and both globally-installed bun CLIs (omp, dw) were unreachable from
-# every shell. Global rather than per-project because those CLIs start with
-# `#!/usr/bin/env bun` and mise resolves tools by current directory: a project
-# pin would make them work inside one repo and fail from anywhere else.
+# Replaces a standalone ~/.bun that sat on no PATH. Global, not per-project,
+# because its CLIs are `#!/usr/bin/env bun` and mise resolves by directory, so
+# a pin would make them work in one repo and fail everywhere else.
 bun = "1.3"
-# Node package manager, same author as mise. Claims to beat pnpm and bun on
-# warm installs via a content-addressable global store, and reads existing
-# yarn.lock / pnpm-lock.yaml / package-lock.json. Pinned to the major version
-# rather than "latest" so it cannot change under a project mid-work; the
-# lockfile setting below records the exact build.
+# Node package manager, same author as mise; reads existing lockfiles. Pinned
+# to a major so it cannot change under a project mid-work.
 aube = "1"
-# nvim-treesitter's `main` branch shells out to this CLI for every parser it
-# builds -- without it :TSInstall fails with ENOENT and no parser compiles.
-# It lives here rather than in the Brewfile because 10-packages.sh is
-# Darwin-only, so a Brewfile entry would never reach the WSL box.
+# nvim-treesitter's main branch shells out to this for every parser; without
+# it :TSInstall fails with ENOENT. Here rather than the Brewfile, which is
+# Darwin-only and would never reach the WSL box.
 tree-sitter = "0.26"
-# Entire: records Claude Code sessions as git checkpoint refs, piloted in guild.
-# Installed through mise's go backend rather than `go install`, because go here
-# comes from linuxbrew and is not a mise tool, so $GOPATH/bin (~/go/bin) is on
-# no PATH at all -- a plain `go install` produces a binary nothing can find.
-# Every Entire git hook is guarded by `command -v entire`, so an unresolvable
-# binary means the hooks silently no-op and the tool looks broken rather than
-# absent. Pinned to a major version so a background update cannot change the
-# on-disk checkpoint format mid-pilot.
+# Entire: records Claude Code sessions as git checkpoint refs. Via mise's go
+# backend, not `go install`: go comes from brew here, so $GOPATH/bin is on no
+# PATH and the binary would be unfindable. Its hooks are guarded by
+# `command -v entire` and would silently no-op. Pinned so a background update
+# cannot change the on-disk checkpoint format mid-pilot.
 "go:github.com/entireio/cli/cmd/entire" = "0"
 
 [settings]
-# Write mise.lock next to mise.toml with resolved versions, so a project pins
-# exact builds rather than whatever "24" resolves to on the day.
+# Resolved versions in mise.lock, so a project pins builds rather than "24".
 lockfile = true
 
-# Auto-create and source the .venv for any project with a uv.lock. uv is by far
-# the most-used tool in this shell's history, so this removes the most common
-# manual step. "create|source" makes it if missing; plain "source" would only
-# activate an existing one.
+# Auto-create and source .venv for any project with a uv.lock. "create|source"
+# makes it if missing; plain "source" would only activate an existing one.
 python.uv_venv_auto = "create|source"
 
-# Honour .nvmrc / .node-version / .python-version in addition to mise's own
-# config, so repos that predate mise still pin correctly. Opt-in per tool
-# because mise will not read these formats for every tool by default.
+# Honour .nvmrc and friends so repos predating mise still pin. Opt-in per tool.
 idiomatic_version_file_enable_tools = ["node", "python"]
 
 # Install a missing tool on demand rather than erroring out.
 auto_install = true
 
-# Cache the computed environment. Nested mise invocations get much faster; the
-# cache invalidates automatically when a config file changes.
+# Cache the computed environment; invalidated when a config file changes.
 env_cache = true
 
 [settings.status]
-# Warn when entering a directory whose config asks for tools that are not
-# installed, instead of silently using the wrong version.
+# Warn on missing tools instead of silently using the wrong version.
 missing_tools = "always"
 
 [settings.ruby]

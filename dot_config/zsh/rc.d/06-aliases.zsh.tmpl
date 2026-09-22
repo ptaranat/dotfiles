@@ -1,8 +1,6 @@
-# Aliases
 alias reload="exec zsh"
-# A function, not `alias e=$EDITOR`: an alias expands its right-hand side once,
-# at definition time, so it would freeze whichever editor $EDITOR held when this
-# file was sourced rather than following it.
+# A function, not an alias: an alias would freeze whichever editor $EDITOR held
+# when this file was sourced.
 e() { ${EDITOR:-nvim} "$@" }
 alias c="clear"
 alias h="history -10"
@@ -19,13 +17,10 @@ alias cl="claude"
 
 # attach/create a tmux session by name, or fzf-pick one; bare tm on an empty server -> main
 #
-# When `tm` is the thing that starts the server, continuum auto-restores in the
-# background and resurrect finishes by switching the client to whichever
-# session was active when the layout was saved. That drops you into a session
-# you did not ask for a second or two after you attached to the one you did.
-# @tm-target hands the requested name to the post-restore hook in ~/.tmux.conf,
-# which switches back. It is only set when this call started the server, so a
-# manual prefix + C-r later restores to its own saved active session as usual.
+# When `tm` starts the server, resurrect finishes by switching to whatever
+# session was active at save time, yanking you out of the one you asked for.
+# @tm-target tells the post-restore hook in ~/.tmux.conf to switch back, and is
+# set only when this call started the server.
 tm() {
   local change target="$1" server_was_up=1
   [[ -n "$(tmux list-sessions 2>/dev/null)" ]] || server_was_up=0
@@ -50,12 +45,10 @@ alias ghpr="gh pr create -w"
 alias ghc="gh repo clone"
 alias grum="git rebase upstream/main"
 
-# Overrides
 alias cp="cp -i"
 alias mv="mv -i"
 alias rmrf="rm -rf"
 
-# Replace ls with eza
 alias ls="eza"
 alias l="eza --group-directories-first"
 alias ll="eza -l --group-directories-first --git"
@@ -63,7 +56,6 @@ alias la="eza -la --group-directories-first --git"
 alias lm="eza -ls modified --group-directories-first --reverse --git"
 alias lmr="eza -ls modified --group-directories-first --git"
 
-# Neovim
 alias lazy="nvim +Lazy"
 alias health="nvim +checkhealth"
 
@@ -77,13 +69,9 @@ alias cms="chezmoi status"
 alias cmcd='cd "$(chezmoi source-path)"'
 # Pull a change made directly to a deployed file back into the source.
 #
-# A function rather than `alias cmadd="chezmoi add"`, because plain add
-# regenerates the source file from the *rendered* target. On a template that
-# flattens it: every branch for the other OS is discarded, silently and without
-# a diff to notice. That is why the pinentry-wsl change to ~/.gnupg/gpg-agent.conf
-# could not simply be added back and sat as drift for four days instead. Nine of
-# the managed files are templates, including both zsh rc.d files, so this is the
-# common case rather than the exotic one.
+# A function, not plain `chezmoi add`: add regenerates the source from the
+# *rendered* target, so on a template it silently discards every branch for the
+# other OS. Nine managed files are templates, so this is the common case.
 cmadd() {
 	local f src rc=0
 	(( $# )) || { print -u2 "cmadd: need a path"; return 1 }
@@ -101,11 +89,8 @@ cmadd() {
 	chezmoi add "$@"
 }
 
-# Warn when a deployed file has been edited in place. chezmoi reverts those on
-# the next apply without asking if it is run with --force, and even interactively
-# the prompt is easy to wave through. The gap between making such an edit and
-# noticing it is where changes get lost, so close the gap: this runs on every
-# interactive shell and costs about 30ms across the whole tree.
+# Warn when a deployed file was edited in place; the next apply reverts those,
+# silently under --force. ~30ms across the tree, on every interactive shell.
 if command -v chezmoi >/dev/null 2>&1; then
 	() {
 		local drift
@@ -118,10 +103,8 @@ if command -v chezmoi >/dev/null 2>&1; then
 	}
 fi
 
-# Edit configs. These go through `chezmoi edit` rather than opening the
-# deployed file: editing the target directly works until the next
-# `chezmoi apply` silently overwrites it. --apply writes the change straight
-# out, so the two stay in step.
+# Via `chezmoi edit`, not the deployed file, which the next apply overwrites.
+# --apply writes the change straight out so the two stay in step.
 alias zshrc="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/.zshrc"
 alias zshenv="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environment.zsh"
 alias zshalias="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"
@@ -135,16 +118,9 @@ alias gitconfig="chezmoi edit --apply ~/.gitconfig"
 alias tmuxconf="chezmoi edit --apply ~/.tmux.conf"
 alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
 
-# Fuzzy-pick any managed file to edit. The named aliases above only cover the
-# files that were worth naming, which is exactly how completion.lua and
-# editor.lua drifted: no shortcut existed, so they got edited in place and
-# diverged from source until the next apply tried to overwrite them. This
-# reaches everything chezmoi manages, including files added after this line
-# was written.
-#
-# Assigned to a variable rather than piped, so cancelling out of fzf leaves an
-# empty selection and the `&&` short-circuits instead of invoking the editor
-# with no path.
+# Fuzzy-pick any managed file. The named aliases above cover only what was
+# worth naming, which is how completion.lua and editor.lua drifted. Assigned to
+# a variable rather than piped, so cancelling fzf short-circuits the `&&`.
 alias cmf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
 alias nvimconf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | rg "/nvim/" | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
 
@@ -157,19 +133,14 @@ alias disks='echo "╓───── m o u n t . p o i n t s"; \
 			echo "╙────────────────────────────────────── ─ ─ "; \
 			df -h;'
 
-# Recursively convert line endings to Unix
 alias fixdos="find . -type f -print0 | xargs -0 dos2unix"
 
-# Update cargo packages using cargo-update
 alias cargoupdate="cargo install-update -a"
 
-# Kubectl-argo-rollouts
 alias kar="kubectl-argo-rollouts"
 
-# Files
 alias -s md="glow -p"
 
-# Search for aliases
 function what() {
 	if [ "$1" != "" ]
 	then
@@ -179,7 +150,6 @@ function what() {
 	fi
 }
 
-# Make folder then cd
 function mcd() {
 	if [ "$1" != "" ]
 	then
@@ -202,13 +172,9 @@ markedit() {
 }
 {{- else -}}
 # --- WSL ---------------------------------------------------------------------
-# Bridges to the Windows side. Each shells out across /mnt/c, so they are only
-# worth it where no Linux equivalent exists.
-
-# pbcopy is muscle memory from macOS; clip.exe is the Windows clipboard.
-# One-way only -- there is no pbpaste counterpart that behaves well here.
+# Bridges to the Windows side, each shelling out across /mnt/c. Only where no
+# Linux equivalent exists. pbcopy is one-way: no pbpaste counterpart behaves.
 alias pbcopy='/mnt/c/Windows/System32/clip.exe'
 
-# Neovide runs as a Windows GUI against this WSL instance.
 alias neovide="/c/Users/Panat/bin/neovide.exe --wsl --geometry=200x60"
 {{- end }}
