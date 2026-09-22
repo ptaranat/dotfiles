@@ -84,3 +84,28 @@ path=($HOME/bin(N-/) $path)
 # here. Written out in the source so `chezmoi apply` stops reverting it and
 # dropping opencode off PATH.
 path=($HOME/.opencode/bin(N-/) $path)
+
+# OrbStack and the JetBrains Toolbox scripts. Both installers appended
+# themselves to ~/.zprofile, which stopped being read the moment this file
+# started setting ZDOTDIR: zsh takes .zprofile, .zshrc and .zlogin from
+# $ZDOTDIR, so the copy in $HOME is never sourced, not even for login shells.
+#
+# What that actually stranded is the Toolbox scripts (goland, datagrip,
+# rider), which resolve nowhere else. OrbStack's own binaries are reachable
+# regardless, because its installer also symlinks docker, kubectl, orb and
+# orbctl into /usr/local/bin; the entry below is there so this does not depend
+# on symlinks written outside chezmoi's control, and (N-/) makes it free when
+# the directory is absent.
+#
+# Both live here rather than in a $ZDOTDIR/.zprofile so non-interactive shells
+# (scripts, editor subprocesses, agent tooling) get them too. Appended, not
+# prepended, to match what the installers set up: notably this leaves
+# Homebrew's versioned kubectl ahead of the copy OrbStack bundles.
+path=($path $HOME/.orbstack/bin(N-/))
+path=($path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"(N-/))
+
+# OrbStack's completions, which nothing else provides. Its init.zsh sets only
+# this and the PATH entry above, so sourcing that file would add nothing. Kept
+# here beside OrbStack's PATH rather than in .zshrc: it is a plain fpath
+# append, none of the "no output, no prompts, nothing slow" this file avoids.
+fpath+=($HOME/.orbstack/shell/completions/zsh(N-/))
