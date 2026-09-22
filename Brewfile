@@ -82,5 +82,7 @@ cask "hiddenbar"
 cask "linearmouse"
 # Replacement for Docker Desktop
 cask "orbstack"
+# Launcher and Spotlight replacement
+cask "raycast"
 # Team communication and collaboration software
 cask "slack"
