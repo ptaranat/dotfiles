@@ -1,22 +1,15 @@
 [user]
 	name = Panat Taranat
 	email = panat@taranat.com
-	# SSH signing: this is a path to a public key, not a GPG key id. Git
-	# expands the tilde here, so keep it relative rather than hardcoding
-	# /home/panat, which would not resolve on the mac.
-	#
-	# A dedicated signing key rather than the general-purpose id_rsa, so it can
-	# be rotated without touching anything that authenticates. Before that it
-	# was the GPG key CCACDB1344B8B7EC0B4DD439655CBB5895152028, kept in the
-	# backup copy of this file if it is ever needed again.
+	# A public key path, not a GPG key id. Keep the tilde: a hardcoded
+	# /home/panat would not resolve on the mac. Dedicated rather than id_rsa so
+	# it can be rotated without touching anything that authenticates.
 	signingkey = ~/.ssh/id_ed25519_signing.pub
 [credential]
 {{- if eq .chezmoi.os "darwin" }}
 	helper = /opt/homebrew/bin/gh auth git-credential
 {{- else }}
-	# `!` runs this through a shell, so gh is resolved on PATH rather than at a
-	# fixed prefix. Deliberate: the Linux box may move gh from linuxbrew to apt,
-	# which would change an absolute path but not this.
+	# `!` shells out, so gh resolves on PATH rather than at a fixed prefix.
 	helper = !gh auth git-credential
 {{- end }}
 [alias]
@@ -24,8 +17,7 @@
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
-	# Structural diff. See the [diff "difftastic"] section for why each of
-	# these settings is here.
+	# Structural diff; see the [diff "difftastic"] section below.
 	dft = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' diff"
 	dlog = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' log -p --ext-diff"
 	dshow = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' show --ext-diff"
@@ -46,20 +38,11 @@
 [push]
 	default = current
 	autoSetupRemote = true
-# difftastic: diffs the syntax tree rather than lines, so reformatting and
-# moved code stop reading as churn. Opt-in per command, never the default:
-# delta stays better for review, and difftastic's output is not an applyable
-# patch.
-#
-# Configured rather than left at defaults, because the defaults are the reason
-# it is usually dismissed as unreadable:
-#
-#   DFT_DISPLAY=inline   the default splits into two columns that wrap
-#                        constantly at normal terminal widths
-#   DFT_BACKGROUND=dark  picks the brighter palette; difftastic offers no
-#                        finer colour control than this
-#   core.pager=less -RF  difftastic emits its own ANSI, which delta cannot
-#                        parse as a unified diff
+# difftastic diffs the syntax tree, so reformatting and moved code stop reading
+# as churn. Opt-in only: delta is better for review and this is not an applyable
+# patch. The defaults are why it reads as unreadable, hence: inline (the split
+# view wraps at normal widths), dark (its only palette knob), and plain less
+# (it emits its own ANSI, which delta cannot parse).
 [diff "difftastic"]
 	command = difft
 [difftool "difftastic"]
@@ -70,15 +53,13 @@
 [difftool "vimdiff"]
 	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [gpg]
-	# Sign with SSH rather than GPG. The [gpg] section name and the gpgsign
-	# settings below are historical: git kept the names when it added other
-	# signing formats, so "gpgsign = true" with format = ssh means SSH-signed.
+	# The [gpg] name and gpgsign keys are historical; with format = ssh this
+	# means SSH-signed.
 	format = ssh
 
 [gpg "ssh"]
-	# Needed for local verification. Without it `git log --show-signature`
-	# reports "No principal matched" even for signatures git just created,
-	# because git has no way to know which key is allowed to sign for whom.
+	# Without this `git log --show-signature` reports "No principal matched"
+	# even for signatures git just made.
 	allowedSignersFile = ~/.config/git/allowed_signers
 [commit]
 	gpgsign = true
@@ -95,14 +76,11 @@
 	autosquash = true
 	# Stash and restore a dirty worktree around a rebase instead of refusing.
 	autoStash = true
-	# When rebasing a branch, also move any other local branches pointing at the
-	# rebased commits. Without this, stacked branches silently end up pointing
-	# at the pre-rebase commits.
+	# Move stacked branches too, instead of stranding them on pre-rebase commits.
 	updateRefs = true
 
 [rerere]
-	# Record how a conflict was resolved and replay it if the same conflict
-	# reappears, which it does constantly during a long rebase.
+	# Replay recorded conflict resolutions, which recur constantly in a rebase.
 	enabled = true
 	autoUpdate = true
 
@@ -111,8 +89,7 @@
 	sort = -committerdate
 
 [column]
-	# Multi-column output for branch/tag/status listings when the terminal is
-	# wide enough.
+	# Multi-column listings when the terminal is wide enough.
 	ui = auto
 
 [fetch]
@@ -121,8 +98,7 @@
 	pruneTags = true
 
 [diff]
-	# Produces noticeably more readable diffs than the default Myers algorithm,
-	# particularly when a block moves or braces shift.
+	# More readable than Myers when a block moves or braces shift.
 	algorithm = histogram
 	# Detect renames and copies.
 	renames = copies
@@ -130,17 +106,12 @@
 	mnemonicPrefix = true
 	tool = vimdiff
 [merge]
-	# Like diff3, but omits lines the two sides already agree on, so the
-	# conflict hunk is smaller. Requires git >= 2.35.
+	# diff3 without the lines both sides agree on. Needs git >= 2.35.
 	conflictstyle = zdiff3
 
-# Machine-local overrides. Untracked and absent on most machines; git skips an
-# include it cannot read, so a missing file is fine.
-#
-# Last in the file on purpose. git takes the last value it sees, so an include
-# placed higher up can only override the sections above it -- put it after
-# [user] alone and it cannot override allowedSignersFile or anything else set
-# later. This is where the work identity and its signing key live, so that no
-# employer name or address lands in this public repo.
+# Machine-local overrides; git skips an include it cannot read. Last in the
+# file on purpose, since git takes the last value it sees and this has to be
+# able to override allowedSignersFile. The work identity lives here so no
+# employer name lands in this public repo.
 [include]
 	path = ~/.gitconfig-local

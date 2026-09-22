@@ -1,7 +1,6 @@
 # Git workflow helpers, adapted from 2KAbhishek/dots2k.
 
-# The branch this one diverged from, from the remote's own HEAD rather than a
-# hardcoded "main". Repos that still use master, or use develop, work unchanged.
+# From the remote's own HEAD, not a hardcoded "main", so master/develop work.
 _git_base_branch() {
 	local base
 	base=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null)
@@ -9,8 +8,7 @@ _git_base_branch() {
 		print -r -- "origin/${base##*/}"
 		return
 	fi
-	# origin/HEAD is often unset on a fresh clone; ask the remote directly, then
-	# fall back to whichever conventional name exists.
+	# origin/HEAD is often unset on a fresh clone, so ask the remote first.
 	base=$(git ls-remote --symref origin HEAD 2>/dev/null | awk '/^ref:/ {print $2; exit}')
 	if [[ -n $base ]]; then
 		print -r -- "origin/${base##*/}"
@@ -34,12 +32,8 @@ review() {
 		--header "changed vs $base -- enter to edit, esc to quit"
 }
 
-# Run a command over only the files that changed, rather than the whole repo.
-#
-# $1 selects which set: "diff" is everything on this branch versus its base,
-# "modified" is the dirty worktree. The distinction matters -- linting a whole
-# monorepo is slow, and the two questions ("what did I write" vs "what have I
-# not committed") have different answers.
+# Run a command over only the changed files. $1 picks the set: "diff" is the
+# branch versus its base, "modified" is the dirty worktree.
 _git_run_on_files() {
 	local mode=$1 pattern=$2
 	shift 2
@@ -53,7 +47,7 @@ _git_run_on_files() {
 	esac
 
 	files=(${(M)files:#*${~pattern}*})
-	# Only pass files that still exist; a rename leaves the old path in the list.
+	# A rename leaves the old path in the list, so skip what is gone.
 	files=(${(@)files:#""})
 	local -a existing
 	local f
@@ -101,16 +95,12 @@ xin() {
 }
 
 # Compare a tool's apt candidate against its brew formula and print the swap.
+# Prints rather than runs: an auto-applying version is how `brew reinstall
+# node` cascaded through llhttp and broke eza and bat.
 #
-# Prints rather than runs. An auto-applying version of this is exactly how
-# `brew reinstall node` cascaded through llhttp and broke eza and bat; the
-# whole point is to see the plan before it touches a working machine.
-#
-# Read the result as "is the newer version worth it", not "newer wins". Debian
-# stable freezes at release and brew tracks upstream, so brew drifts ahead of
-# apt on everything over the life of a release. Taking every gap rebuilds the
-# 22GB prefix. Take the ones that buy something: nvim's 0.11 LSP API, gh's
-# credential helper, justfile syntax.
+# Read it as "is the newer version worth it", not "newer wins". Debian freezes
+# at release and brew tracks upstream, so brew drifts ahead of everything over
+# time; taking every gap rebuilds the 22GB prefix.
 _pkgv_norm() { print -r -- "${${1#*:}%%[-~]*}" }
 
 pkgv() {
@@ -119,9 +109,8 @@ pkgv() {
 		return 1
 	fi
 
-	# Tools whose apt package, brew formula and binary are not all the same
-	# word. Guessing any of the three wrong reports "not available" rather
-	# than a version, which reads as a missing tool instead of a bad lookup.
+	# Where apt package, brew formula and binary are not the same word. A wrong
+	# guess reports "not available", which reads as missing rather than mislooked.
 	local -A _apt=(rg ripgrep fd fd-find tldr tealdeer)
 	local -A _brew=(rg ripgrep fd-find fd tldr tealdeer)
 	local -A _bin=(ripgrep rg fd-find fd tealdeer tldr)
@@ -170,10 +159,8 @@ pkgv() {
 	return 0
 }
 
-# Browse the 404 installed figlet/toilet fonts with a live preview instead of
-# guessing names off a flat list. `fonts` samples with a placeholder word,
-# `fonts NETDECKER` previews your own text. Enter renders the pick full size and
-# echoes the command that made it.
+# Browse the installed figlet/toilet fonts with a live preview. `fonts` uses a
+# placeholder word, `fonts NETDECKER` your own text; enter renders it full size.
 fonts() {
 	local dir=${FIGLET_FONTDIR:-/usr/share/figlet}
 	local text=${*:-Spellbook}

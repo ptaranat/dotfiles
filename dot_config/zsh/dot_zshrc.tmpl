@@ -1,35 +1,18 @@
-# Interactive shell config. Environment that non-interactive shells also need
-# belongs in .zshenv instead.
-#
-# Layout: this file sets up plugins, prompt and keybindings, then sources
-# rc.d/*.zsh at the end for everything else.
+# Interactive shell config; non-interactive environment goes in .zshenv.
+# Plugins, prompt and keybindings here, then rc.d/*.zsh at the end.
 
-# Powerlevel10k instant prompt. Has to stay at the very top: it replays a
-# cached prompt before the rest of this file runs, so anything above it that
-# writes to the terminal or reads input corrupts the replay. Nothing that
-# prompts for input (passwords, y/n) may go above this block.
+# p10k instant prompt. Must stay at the very top: it replays a cached prompt
+# before the rest of this file runs, so anything above it that writes output or
+# reads input corrupts the replay.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
 	source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# GPG needs to know which terminal to prompt on. Done here rather than via
-# oh-my-zsh's gpg-agent plugin: that plugin shelled out to gpg-connect-agent on
-# every startup and cost ~730ms, roughly 70% of total shell startup, to
-# accomplish what this one line does. pinentry-mac is configured in
-# ~/.gnupg/gpg-agent.conf.
+# Replaces omz's gpg-agent plugin, which cost ~730ms of startup for this.
 export GPG_TTY=$TTY
 
 # --- history -----------------------------------------------------------------
-#
-# Set here rather than in .zshenv on purpose. macOS ships an /etc/zshrc that
-# does:
-#     HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history
-#     HISTSIZE=2000
-#     SAVEHIST=1000
-# and zsh sources it for every interactive shell *after* .zshenv, so values set
-# there are silently overwritten. This file is sourced after /etc/zshrc, so it
-# wins. oh-my-zsh's history lib later raises HISTSIZE/SAVEHIST if they are
-# lower, but it leaves a non-empty HISTFILE alone, so the path must be set here.
+# Not in .zshenv: macOS's /etc/zshrc hardcodes these and is sourced after it.
 export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 export HISTSIZE=50000
 export SAVEHIST=50000
@@ -40,19 +23,14 @@ export SAVEHIST=50000
 source "${XDG_DATA_HOME:-$HOME/.local/share}/znap/zsh-snap/znap.zsh"
 zstyle ':znap:*' repos-dir "${XDG_DATA_HOME:-$HOME/.local/share}/znap"
 
-# Several oh-my-zsh plugins (docker, kubectl) cache generated completions under
-# $ZSH_CACHE_DIR. The framework normally sets it; we only source the libs, so
-# without this they write to /completions and fail.
+# omz plugins cache completions here. The framework normally sets it; we source
+# only the libs, so without this they write to /completions and fail.
 export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 [[ -d $ZSH_CACHE_DIR/completions ]] || mkdir -p "$ZSH_CACHE_DIR/completions"
 
-# oh-my-zsh a la carte. Sourcing the libs directly gives us omz's history
-# options, keybindings, completion setup and git helpers without loading the
-# framework itself or its update checker.
+# omz a la carte: its libs without the framework or its update checker.
 znap source ohmyzsh/ohmyzsh lib/{history,key-bindings,completion,directories,git}
-# The macos plugin has no OS guard of its own. On Linux it still defines ofd,
-# quick-look, man-preview, showfiles and spotify, all of which shell out to
-# `open` and `osascript` and can only fail. Gated here rather than upstream.
+# The macos plugin has no OS guard of its own and only fails on Linux.
 znap source ohmyzsh/ohmyzsh \
 {{ if eq .chezmoi.os "darwin" }}	plugins/macos \
 {{ end }}	plugins/colored-man-pages \
@@ -62,54 +40,40 @@ znap source ohmyzsh/ohmyzsh \
 
 znap source zsh-users/zsh-completions
 znap source aloxaf/fzf-tab
-# F-Sy-H, not zsh-users/zsh-syntax-highlighting. It kept the upstream
-# _zsh_highlight_* internals but not the configuration: ZSH_HIGHLIGHT_HIGHLIGHTERS
-# belongs to the other project and F-Sy-H ignores it, so setting it here did
-# nothing. F-Sy-H has no equivalent knob for selecting highlighters.
+# F-Sy-H ignores ZSH_HIGHLIGHT_HIGHLIGHTERS (that is the other project's knob)
+# and has no equivalent, so highlighter selection is not configurable here.
 znap source z-shell/F-Sy-H
 
-# Nags when a typed command has an alias. YSU's default message is a three-line
-# block; this trims it to a single "alias tip: gst" line.
+# Nags when a typed command has an alias; default message is three lines.
 export YSU_MESSAGE_FORMAT="$(print -P '%F{yellow}')alias tip: %alias$(print -P '%f')"
 export YSU_MESSAGE_POSITION="after"
 znap source MichaelAquilina/zsh-you-should-use
 
 ZSH_AUTOSUGGEST_STRATEGY=(history)
-# Without this, autosuggestions re-wraps every zle widget on every prompt, which
-# is most of the cost of pasting a long line. With it, binding happens once at
-# load, so anything that redefines widgets later has to ask for a rebind:
-# zsh-vi-mode does exactly that, and calls _zsh_autosuggest_bind_widgets from
-# zvm_after_init below.
+# Otherwise autosuggestions re-wraps every zle widget on every prompt, which is
+# most of the cost of pasting a long line. Anything redefining widgets later
+# must then request a rebind; zvm_after_init below does.
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 znap source zsh-users/zsh-autosuggestions
 
-# fzf owns the keybindings (Ctrl-T files, Alt-C cd); fzf-tab owns completion.
-# Ctrl-R is deliberately left to atuin, which binds it below.
+# fzf owns Ctrl-T/Alt-C, fzf-tab owns completion, atuin owns Ctrl-R.
 if (( $+commands[fzf] )); then
 	source <(fzf --zsh)
 fi
 
 # --- prompt and shell integrations -------------------------------------------
-#
-# znap eval caches a command's stdout to disk and sources the cache, instead of
-# forking a subshell on every startup. The cache key is the command itself, so
-# it refreshes automatically when the command changes.
+# znap eval caches a command's stdout to disk and sources that, rather than
+# forking on every startup. Cache key is the command, so it self-refreshes.
 
-# Prompt. Kept on p10k rather than starship: the ~730ms that made startup slow
-# was oh-my-zsh's gpg-agent plugin, not the prompt, so switching prompts bought
-# nothing. p10k has a compiled gitstatus daemon and the instant-prompt cache
-# above, and does things starship cannot -- notably swapping a segment's
-# background colour on a dirty worktree, and the `p10k configure` wizard.
-# It is in maintenance mode upstream: stable and not expected to break, but no
-# new features or fixes.
+# Kept on p10k over starship: the ~730ms was omz's gpg-agent plugin, not the
+# prompt. Maintenance mode upstream, but stable.
 znap source romkatv/powerlevel10k
 
 znap eval zoxide 'zoxide init zsh --cmd j'
 znap eval mise 'mise activate zsh'
 znap eval atuin 'atuin init zsh --disable-up-arrow'
 
-# atuin takes Ctrl-R. Up/down stay on prefix-aware history search, which is
-# why atuin is initialised with --disable-up-arrow.
+# Up/down stay on prefix-aware search, hence atuin's --disable-up-arrow.
 znap source zsh-users/zsh-history-substring-search
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
@@ -126,45 +90,30 @@ function zvm_after_init() {
 	bindkey -M vicmd 'k' history-substring-search-up
 	bindkey -M vicmd 'j' history-substring-search-down
 
-	# zvm redefines widgets after autosuggestions bound them, and
-	# ZSH_AUTOSUGGEST_MANUAL_REBIND means nothing re-binds them automatically.
-	# Without this line suggestions stop updating as you type.
+	# zvm redefines widgets after autosuggestions bound them, and MANUAL_REBIND
+	# means nothing does it automatically. Without this, suggestions freeze.
 	(( $+functions[_zsh_autosuggest_bind_widgets] )) && _zsh_autosuggest_bind_widgets
 }
 
 znap source jeffreytse/zsh-vi-mode
 
-# --- paste performance -------------------------------------------------------
-# There used to be a bracketed-paste-magic block here. It never ran: the zstyles
-# were set but nothing autoloaded the function or bound it with
-# `zle -N bracketed-paste bracketed-paste-magic`, so zsh kept using its native
-# widget throughout. That turned out to be the faster arrangement and is now the
-# deliberate one. bracketed-paste-magic replays a paste through self-insert one
-# character at a time to do url quoting; the native widget inserts the whole
-# chunk in a single operation. Do not wire it up as a performance fix.
-#
-# The real cost was autosuggestions rebinding widgets every prompt, handled by
-# ZSH_AUTOSUGGEST_MANUAL_REBIND above.
+# Do not add bracketed-paste-magic as a paste-performance fix: it replays a
+# paste through self-insert one character at a time, while zsh's native widget
+# inserts the chunk in one go. The real cost was MANUAL_REBIND, set above.
 
 # --- local config ------------------------------------------------------------
-# (N) so an empty directory is not an error.
 for f in "${ZDOTDIR:-$HOME/.config/zsh}"/rc.d/*.zsh(N); do
 	source "$f"
 done
 
-# Work config, from a separate private repo cloned into $ZDOTDIR/work. Kept out
-# of this repo because it is public; sourced after rc.d so it can override.
-# Absent on a machine without access to that repo, hence the (N).
+# Work config from a separate private repo; this one is public. After rc.d so
+# it can override, and (N) because the machine may not have it.
 for f in "${ZDOTDIR:-$HOME/.config/zsh}"/work/*.zsh(N); do
 	source "$f"
 done
 
-# p10k's settings, sourced last so they win over anything the plugins set.
-# prompt/init.zsh loads the vendored template, then the local overrides, then
-# the mise segment. See the comments there for how to take a p10k update.
-#
-# INSTANT_PROMPT=quiet is set in prompt/overrides.zsh, which is what keeps
-# rc.d/00-banner.zsh's banner from being reported as unexpected console output
-# during initialisation.
+# Last, so p10k's settings win over anything the plugins set. INSTANT_PROMPT=
+# quiet lives in prompt/overrides.zsh and is what stops the banner in
+# rc.d/00-banner.zsh being reported as unexpected console output.
 [[ ! -r "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh" ]] ||
 	source "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh"

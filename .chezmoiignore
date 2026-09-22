@@ -9,25 +9,19 @@ Brewfile
 .config/superfile/theme/
 
 {{ if ne .chezmoi.os "darwin" }}
-# macOS-only. aerospace is a macOS window manager outright; ghostty and
-# alacritty are cross-platform but are not the terminal on the WSL box, and
-# leaving ghostty in would also make .chezmoiexternal clone its shader repo.
-# Flip any of these back by removing the line if the tool gets installed.
+# macOS-only. aerospace outright; ghostty and alacritty are cross-platform but
+# not the terminal on WSL, and keeping ghostty would also clone its shader repo.
 .config/aerospace
 .config/ghostty
 .config/alacritty
 
-# Scripts are matched on their target name, so the run_onchange_after_ prefix
-# and any .tmpl suffix are stripped here. Naming the source file instead
-# silently fails to match and the script still runs.
+# Scripts match on target name, so the prefix and .tmpl suffix are stripped
+# here. Naming the source file silently fails to match and it still runs.
 
-# Writes macOS system defaults. On Linux the `defaults` command does not exist,
-# so this fails on every apply.
+# `defaults` does not exist on Linux, so this fails on every apply.
 20-macos-defaults.sh
 
-# Brewfile-driven. The Linux counterpart is 11-packages-linux.sh, which reads
-# the apt lists in .chezmoidata.yaml; the two are a matched pair and exactly
-# one of them runs per machine.
+# Brewfile-driven; 11-packages-linux.sh is the apt half. Exactly one runs.
 10-packages.sh
 {{ end }}
 

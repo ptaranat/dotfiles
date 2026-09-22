@@ -1,24 +1,18 @@
-# Repositories chezmoi clones and keeps updated, replacing what were git
-# submodules. A submodule pins a SHA that has to be committed here and needs
-# --recurse-submodules on clone; these are fetched on apply and refreshed on
-# their own schedule instead.
+# Repos chezmoi clones and keeps updated, replacing git submodules: no pinned
+# SHA to commit, no --recurse-submodules, refreshed on their own schedule.
 
-# Private work config: aliases and functions that should not sit in a public
-# repo. .zshrc globs $ZDOTDIR/work/*.zsh after rc.d, so it can override the
-# public config, and a machine without access to this repo just skips it.
+# Private work config. .zshrc globs $ZDOTDIR/work/*.zsh after rc.d so it can
+# override; a machine without access to the repo just skips it.
 [".config/zsh/work"]
     type = "git-repo"
     url = "git@github.com:ptaranat/work.git"
     refreshPeriod = "168h"
 
 {{ if eq .chezmoi.os "darwin" -}}
-# Ghostty cursor shaders.
-#
-# Gated here, not via .chezmoiignore. Externals are fetched regardless of what
-# .chezmoiignore lists: ignoring .config/ghostty does not stop this clone, and
-# `chezmoi ignored` printing the path is not evidence that it will be skipped.
-# On the WSL box this cloned 288K of shaders for a terminal that is not
-# installed.
+# Ghostty cursor shaders. Gated here, not in .chezmoiignore: externals are
+# fetched regardless of what that file lists, and `chezmoi ignored` printing
+# the path is not evidence it will be skipped. On WSL this cloned 288K of
+# shaders for a terminal that is not installed.
 [".config/ghostty/shaders"]
     type = "git-repo"
     url = "https://github.com/sahaj-b/ghostty-cursor-shaders.git"
@@ -26,18 +20,15 @@
 {{ end -}}
 
 # znap, the zsh plugin manager. .zshrc sources znap.zsh from here, so without
-# it a fresh machine gets a shell with no plugins and no prompt. This was
-# previously cloned by hand -- exactly the sort of undocumented setup step this
-# migration exists to remove.
+# it a fresh machine gets no plugins and no prompt. Previously cloned by hand.
 [".local/share/znap/zsh-snap"]
     type = "git-repo"
     url = "https://github.com/marlonrichert/zsh-snap.git"
     refreshPeriod = "168h"
 
-# tpm, the tmux plugin manager. .tmux.conf ends with `run '~/.tmux/plugins/tpm/tpm'`,
-# which fails silently when the clone is absent: tmux starts, the theme and every
-# other plugin are skipped, and the status bar falls back to the stock green one.
-# The plugins tpm manages still need `tpm/bin/install_plugins` once per machine.
+# tpm, the tmux plugin manager. .tmux.conf's trailing `run` fails silently
+# without it: tmux starts, every plugin is skipped, the status bar goes stock.
+# The plugins themselves still need `tpm/bin/install_plugins` once per machine.
 [".tmux/plugins/tpm"]
     type = "git-repo"
     url = "https://github.com/tmux-plugins/tpm.git"

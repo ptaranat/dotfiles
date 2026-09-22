@@ -1,8 +1,6 @@
-# The only zsh file that lives in $HOME. Everything else sits under
-# $XDG_CONFIG_HOME/zsh, which this points zsh at.
-#
-# .zshenv is sourced for every zsh invocation (interactive or not), so keep it
-# to environment setup only: no output, no prompts, nothing slow.
+# The only zsh file in $HOME; everything else sits under $XDG_CONFIG_HOME/zsh,
+# which this points zsh at. Sourced for every invocation, interactive or not,
+# so keep it to environment setup: no output, no prompts, nothing slow.
 
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -11,9 +9,8 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
-# History is configured in .zshrc, not here. macOS ships an /etc/zshrc that
-# hardcodes HISTFILE, HISTSIZE and SAVEHIST, and zsh sources it for every
-# interactive shell after this file, so anything set here would be clobbered.
+# History lives in .zshrc: macOS's /etc/zshrc hardcodes it and is sourced after
+# this file, so anything set here would be clobbered.
 
 # The (N-/) qualifier on every entry below keeps it only when it is an existing
 # directory, so anything uninstalled or moved drops out silently instead of
@@ -23,52 +20,37 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 # shells too (scripts, ssh commands, editor subprocesses).
 path=($HOME/.local/bin(N-/) $path)
 
-# `go install` writes to $GOPATH/bin (~/go/bin) by default, and that directory
-# has never been on PATH here -- go comes from Homebrew rather than mise, so
-# nothing ever added it. Eight binaries (dlv, golangci-lint, buf, ...) had
-# accumulated there unreachable. Pointing GOBIN at ~/.local/bin, prepended just
-# above, means an ad-hoc `go install` lands somewhere that resolves in both
-# interactive and non-interactive shells.
-#
-# Long-lived Go tools still belong in mise's go backend instead, declared in
-# ~/.config/mise/config.toml, so they are versioned and reproducible. GOBIN is
-# for the one-off case.
+# $GOPATH/bin has never been on PATH here (go comes from Homebrew, not mise),
+# so eight binaries had accumulated there unreachable. Pointing GOBIN at
+# ~/.local/bin lands ad-hoc installs somewhere that resolves. Long-lived Go
+# tools belong in mise's go backend instead; this is for the one-off case.
 export GOBIN="$HOME/.local/bin"
 
-# `bun install -g` writes bin shims to $BUN_INSTALL/bin, defaulting to ~/.bun.
-# That directory was on no PATH here, so omp and dw sat unreachable in exactly
-# the way $GOPATH/bin did above. bun itself now comes from mise; ~/.bun keeps
-# only the global packages, which is why this is a plain path entry and not a
-# runtime prepend. Left at the default location rather than moved under
-# $XDG_DATA_HOME: BUN_INSTALL would then have to be set for every context that
-# ever runs bun, and anything missing it would silently rebuild ~/.bun and
-# split the globals across two directories.
+# `bun install -g` writes shims to ~/.bun/bin, which was on no PATH, exactly as
+# above. bun itself comes from mise now, so this holds only global packages and
+# is a plain entry rather than a runtime prepend. Left at the default path:
+# moving it means setting BUN_INSTALL everywhere, and anything that missed it
+# would rebuild ~/.bun and split the globals in two.
 path=($path $HOME/.bun/bin(N-/))
 
-# Homebrew goes here rather than in rc.d/01-environment.zsh, and the ordering
-# is the whole point. rc.d is sourced at the *end* of .zshrc, well after
-# `mise activate`, so a prepend there lands in front of mise and shadows every
-# runtime mise is supposed to own. On the WSL box that meant linuxbrew's node
-# beating mise's, silently, with `mise ls` reporting tools as missing.
-#
-# .zshenv runs before .zshrc entirely, so mise prepends after this and wins.
+# Homebrew here, not rc.d/01-environment.zsh, and the ordering is the point:
+# rc.d is sourced after `mise activate`, so a prepend there shadows every
+# runtime mise owns. On WSL that silently gave linuxbrew's node over mise's.
+# .zshenv runs before .zshrc, so mise prepends after this and wins.
 {{ if eq .chezmoi.os "darwin" -}}
 path=(/opt/homebrew/bin(N-/) /opt/homebrew/sbin(N-/) $path)
 {{- else -}}
 path=(/home/linuxbrew/.linuxbrew/bin(N-/) /home/linuxbrew/.linuxbrew/sbin(N-/) $path)
 {{- end }}
 
-# rustup's installer appends `. "$HOME/.cargo/env"` to this file, which sources
-# a shell script on every zsh invocation to do one path prepend. Written out
-# here instead, in the same form as every other entry above, so reinstalling
-# rustup cannot reintroduce a line chezmoi would then report as drift.
+# rustup's installer appends `. "$HOME/.cargo/env"` here, sourcing a script on
+# every invocation for one prepend. Written out directly instead, so a rustup
+# reinstall cannot reintroduce a line chezmoi would report as drift.
 #
-# This does not outrank Homebrew despite sitting after the prepend above:
-# /etc/profile.d/brew.sh re-prepends linuxbrew for every login shell, well
-# after .zshenv, so brew lands ahead of this. Harmless today because rustup is
-# the only rustc and cargo on this box; the Brewfile's `brew "rust"` is a
-# leftover that was never installed. Installing it would shadow rustup, and the
-# fix then is to drop it from the Brewfile, not to reorder here.
+# This does not outrank Homebrew despite sitting later: /etc/profile.d/brew.sh
+# re-prepends linuxbrew per login shell. Harmless while rustup is the only
+# cargo here; the Brewfile's `brew "rust"` was never installed, and if it were,
+# the fix is to drop it there rather than reorder this.
 path=($HOME/.cargo/bin(N-/) $path)
 
 # Moved out of rc.d/01-environment.zsh. rc.d is sourced at the end of .zshrc,
