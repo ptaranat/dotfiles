@@ -136,8 +136,6 @@ brew "sesh"
 brew "shellcheck"
 # Easy and Repeatable Kubernetes Development
 brew "skaffold"
-# Easiest, most secure way to use WireGuard and 2FA
-brew "tailscale"
 # Very fast implementation of tldr in Rust
 brew "tealdeer"
 # OCR (Optical Character Recognition) engine

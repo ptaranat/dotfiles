@@ -21,6 +21,12 @@ password), writes every file, and installs the Brewfile.
 `-b "$HOME/.local/bin"` matters: without it chezmoi installs to `./bin` in the
 current directory, which is not on `$PATH` for later runs.
 
+Tailscale is deliberately not in the Brewfile. The app is installed once per
+machine, however that machine allows: the App Store here, possibly MDM on a
+work machine. A cask entry would collide with an App Store copy and fail the
+package script on every apply. The app ships its own CLI (Settings > Install
+CLI), which stays in step with the daemon; the Homebrew formula did not.
+
 Then, once the keys are on the machine (the signing key, and an SSH key GitHub
 accepts):
 
