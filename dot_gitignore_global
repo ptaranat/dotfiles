@@ -1,5 +1,3 @@
-# Global ignores: machine-local noise that should never land in any repo.
-
 # macOS
 .DS_Store
 .AppleDouble
@@ -9,5 +7,5 @@
 default.profraw
 *.profraw
 
-# Claude Code machine-local state (shared .claude/ config stays committable)
+# Claude Code local state
 **/.claude/settings.local.json

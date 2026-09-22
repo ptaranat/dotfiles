@@ -27,7 +27,6 @@ focus-follows-mouse.enabled = false
 
 key-mapping.preset = 'qwerty'
 
-# Gaps between windows (inner-*) and monitor edges (outer-*).
 gaps.inner.horizontal = 12
 gaps.inner.vertical =   12
 gaps.outer.left =       12
@@ -37,17 +36,11 @@ gaps.outer.right =      12
 
 [mode.main.binding]
 
-    # pgrep matches the bundle path, not the process name: macOS truncates
-    # process names to 16 chars, so `pgrep -x ghostty` never matched and every
-    # press fell through to `open`, focusing the existing window. Contents/MacOS
-    # is required; a looser `-f Ghostty.app` also matches processes launched
-    # from a Ghostty terminal via the inherited GHOSTTY_RESOURCES_DIR.
+    # pgrep must match Ghostty.app/Contents/MacOS; looser patterns misfire.
     alt-enter = '''exec-and-forget pgrep -f "Ghostty.app/Contents/MacOS" >/dev/null \
       && osascript -e 'tell application "System Events" to tell process "ghostty" to click menu item "New Window" of menu "File" of menu bar 1' \
       || open -a "/Applications/Ghostty.app"'''
-    # Chromium is single-instance, so `open -na Helium` handed off to the
-    # running process and macOS activated it wherever it last lived, not in the
-    # focused workspace. Drive its own File > New Window instead.
+    # Helium is single-instance; `open -na` lands in the wrong workspace.
     alt-w = '''exec-and-forget osascript \
       -e 'if application "Helium" is running then' \
       -e 'tell application "System Events" to tell process "Helium" to click menu item "New Window" of menu "File" of menu bar 1' \
@@ -56,8 +49,7 @@ gaps.outer.right =      12
       -e 'end if' '''
     alt-shift-f = 'macos-native-fullscreen'
 
-    # Toggle big outer gaps to show the wallpaper. The script rewrites the gaps
-    # values in this file; auto-reload-config applies them.
+    # Script rewrites gaps in this file; auto-reload-config applies them.
     alt-shift-z = 'exec-and-forget /Users/panat/.config/aerospace/toggle-zen.sh'
 
     alt-slash = 'layout tiles horizontal vertical'
@@ -109,17 +101,12 @@ gaps.outer.right =      12
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
     backspace = ['close-all-windows-but-current', 'mode main']
 
-    # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
-    #s = ['layout sticky tiling', 'mode main']
-
     alt-shift-h = ['join-with left', 'mode main']
     alt-shift-j = ['join-with down', 'mode main']
     alt-shift-k = ['join-with up', 'mode main']
     alt-shift-l = ['join-with right', 'mode main']
 
-# Float rules, ported from yabai 'manage=off'.
-
-# Finder dialogs only (Copy/Connect/Move/Info/Preferences), not Finder windows
+# Finder dialogs only, not Finder windows
 [[on-window-detected]]
 if.app-id = 'com.apple.finder'
 if.window-title-regex-substring = 'Co(py|nnect)|Move|Info|Pref'
@@ -149,7 +136,6 @@ run = 'layout floating'
 if.window-title-regex-substring = 'Software Update'
 run = 'layout floating'
 
-# About This Mac
 [[on-window-detected]]
 if.app-id = 'com.apple.SystemProfiler'
 run = 'layout floating'

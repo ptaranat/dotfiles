@@ -1,11 +1,11 @@
 tap "nikitabobko/tap"
-# Improved shell history for zsh, bash, fish and nushell
+# Improved shell history
 brew "atuin"
 # Official Amazon AWS command-line interface
 brew "awscli"
-# Clone of cat(1) with syntax highlighting and Git integration
+# cat clone with syntax highlighting and Git
 brew "bat"
-# Yet another cross-platform graphical process/system monitor
+# Graphical process/system monitor
 brew "bottom"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
@@ -37,11 +37,11 @@ brew "jq"
 brew "just"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
-# Ambitious Vim-fork focused on extensibility and agility
+# Vim fork focused on extensibility
 brew "neovim"
 # Pinentry for GPG on Mac
 brew "pinentry-mac"
-# Fast Git hook manager, drop-in alternative to pre-commit
+# Fast Git hook manager, pre-commit alternative
 brew "prek"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
@@ -55,25 +55,23 @@ brew "shellcheck"
 brew "tealdeer"
 # Terminal multiplexer
 brew "tmux"
-# tree-sitter-cli moved to mise (dot_config/mise/config.toml): this file is
-# only installed on macOS, and nvim needs the CLI on Linux too.
-# Extremely fast Python package installer and resolver, written in Rust
+# tree-sitter-cli lives in mise: nvim needs it on Linux too.
+# Fast Python package installer, written in Rust
 brew "uv"
 # Internet file retriever
 brew "wget"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
-# AeroSpace is an i3-like tiling window manager for macOS
+# i3-like tiling window manager
 cask "nikitabobko/tap/aerospace", trusted: true
 # Enable Windows-like alt-tab
 cask "alt-tab"
-# Securely stores and accesses AWS credentials in a development environment
+# Stores AWS credentials securely
 cask "aws-vault-binary"
-# Nerd Font patch of Meslo LG; ghostty uses it for the prompt and eza icons
+# Meslo Nerd Font; ghostty prompt and eza icons
 cask "font-meslo-lg-nerd-font"
-# Terminal emulator that uses platform-native UI and GPU acceleration
+# GPU-accelerated native terminal emulator
 cask "ghostty"
-# Utility to hide menu bar items
 # Chromium-based browser
 cask "helium-browser"
 # Utility to hide menu bar items

@@ -1,8 +1,4 @@
--- Git integration.
-
 return {
-	-- gitsigns replaces mhinz/vim-signify: same gutter marks, plus staging,
-	-- blame and hunk navigation without leaving the buffer.
 	{
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPre", "BufNewFile" },
@@ -33,8 +29,6 @@ return {
 		},
 	},
 
-	-- fugitive, carried over. Nothing in the Lua ecosystem has replaced
-	-- :Git for the less common operations.
 	{
 		"tpope/vim-fugitive",
 		cmd = { "Git", "G", "Gdiffsplit", "Gread", "Gwrite", "Gedit", "GBrowse" },
@@ -44,8 +38,7 @@ return {
 		},
 	},
 
-	-- Open the current line on the forge. Needed because :GBrowse relies on
-	-- vim-rhubarb, which is not installed.
+	-- :GBrowse needs vim-rhubarb, which is not installed
 	{
 		"linrongbin16/gitlinker.nvim",
 		cmd = "GitLink",

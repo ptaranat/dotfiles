@@ -1,15 +1,10 @@
--- Editing, navigation and search.
-
 return {
-	-- Telescope, carried over from the old config with its bindings intact.
 	{
 		"nvim-telescope/telescope.nvim",
 		cmd = "Telescope",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			{
-				-- Native fzf sorter: the pure-Lua one is noticeably slower on
-				-- large repos. Built with make, so it needs a compiler.
 				"nvim-telescope/telescope-fzf-native.nvim",
 				build = "make",
 				cond = function()
@@ -55,9 +50,6 @@ return {
 		end,
 	},
 
-	-- Comment toggling, replacing tpope/vim-commentary. Neovim 0.10+ ships
-	-- gc/gcc natively, so this only adds treesitter-aware context for mixed
-	-- files (JSX inside JS, script blocks in HTML).
 	{
 		"JoosepAlviste/nvim-ts-context-commentstring",
 		event = "VeryLazy",
@@ -68,29 +60,24 @@ return {
 		end,
 	},
 
-	-- Surround text objects. The old config had nothing equivalent.
 	{
 		"kylechui/nvim-surround",
 		event = { "BufReadPost", "BufNewFile" },
 		opts = {},
 	},
 
-	-- Auto-close pairs, replacing Raimondi/delimitMate.
 	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		opts = { check_ts = true },
 	},
 
-	-- Detect indentation from the file, replacing tpope/vim-sleuth.
 	{
 		"NMAC427/guess-indent.nvim",
 		event = { "BufReadPost", "BufNewFile" },
 		opts = {},
 	},
 
-	-- Session management, carried over from Shatur/neovim-session-manager with
-	-- the same bindings.
 	{
 		"Shatur/neovim-session-manager",
 		lazy = false,
@@ -102,13 +89,11 @@ return {
 		},
 		config = function()
 			require("session_manager").setup({
-				-- Explicit, as before: never restore a session unasked.
 				autoload_mode = require("session_manager.config").AutoloadMode.Disabled,
 			})
 		end,
 	},
 
-	-- Jump anywhere on screen with two characters.
 	{
 		"folke/flash.nvim",
 		event = { "BufReadPost", "BufNewFile" },
@@ -119,7 +104,6 @@ return {
 		},
 	},
 
-	-- Supermaven, carried over from the old config.
 	{
 		"supermaven-inc/supermaven-nvim",
 		event = "InsertEnter",
@@ -129,14 +113,11 @@ return {
 				clear_suggestion = "<C-]>",
 				accept_word = "<C-j>",
 			},
-			-- Never suggest by filetype (secrets/config formats).
 			ignore_filetypes = {
 				dotenv = true,
 				gitignore = true,
 			},
-			-- Never suggest in sensitive files, matched by path/name so it
-			-- catches things regardless of detected filetype. Returning true
-			-- disables Supermaven for that buffer.
+			-- returning true disables supermaven for this buffer
 			condition = function()
 				local name = vim.fn.expand("%:t")
 				local path = vim.fn.expand("%:p")

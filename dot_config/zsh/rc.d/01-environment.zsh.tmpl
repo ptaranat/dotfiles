@@ -1,76 +1,48 @@
-# Paths live in .zshenv, not here: this file is sourced at the end of .zshrc,
-# so entries are invisible to non-interactive shells, and after `mise activate`,
-# so a prepend would shadow every mise runtime.
+# Put PATH entries in .zshenv: this runs after mise activate.
 
-# No vim fallback over SSH: the config is Lua now, so vim would be unconfigured.
 export EDITOR='nvim'
 export VISUAL=$EDITOR
 
-# One agent per machine on a fixed socket. Keying off an unset SSH_AUTH_SOCK
-# gave a fresh agent per login shell, so unlocked keys did not carry over.
+# Fixed socket so one agent serves every shell.
 export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
 
-# Nothing here provides a graphical askpass, so declining it turns
-# "exec(ssh-askpass): No such file or directory" into "no passphrase given".
+# No graphical askpass here; avoids exec(ssh-askpass) errors.
 export SSH_ASKPASS_REQUIRE=never
 
 ssh-add -l > /dev/null 2>&1
 agent_state=$?
 
 if (( agent_state == 2 )); then
-	# 2 is "could not open a connection": socket absent or stale.
+	# 2: agent unreachable (socket absent or stale).
 	rm -f "$SSH_AUTH_SOCK"
-	# A fresh machine has no ~/.ssh yet, and ssh-agent will not create it.
 	mkdir -p -m 700 "${SSH_AUTH_SOCK:h}"
 	ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
 fi
 
-# 1 is "agent has no identities", reachable without the branch above (ssh-add
-# -D, or an agent whose shell died first), so it is checked separately.
-#
-# Eager because ssh-keygen ignores AddKeysToAgent when signing. The signing key
-# has no passphrase on purpose: while the agent holds it anything running as
-# this user can sign anyway, and a forged signature is revocable via GitHub's
-# allowed signers. id_rsa grants push access, so it stays encrypted and loads
-# on first use. -q silences "Identity added:" in the first shell of each boot.
+# 1: agent has no identities.
+# Eager: signing ignores AddKeysToAgent. Passphraseless on purpose.
 if (( agent_state != 0 )) && [[ -f ~/.ssh/id_ed25519_signing ]]; then
 	ssh-add -q ~/.ssh/id_ed25519_signing
 fi
 unset agent_state
 
-# --mouse is required or less ignores the wheel, and so does anything built on
-# it (delta shells out to less). -R passes colour only, -r would forward every
-# control character; -F skips the pager when output fits one screen.
+# Without --mouse, less (and delta) ignores the scroll wheel.
 export LESS='--mouse --wheel-lines=3 -RF'
 
-# Bat theme
 export BAT_THEME=base16
 
-# Language
 export LANG=en_US.UTF-8
 
-# fzf + rg
 export FZF_DEFAULT_COMMAND="rg --files --no-ignore --hidden --follow -g '!{.git,node_modules}/*' 2> /dev/null"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-# `fzf --zsh` binds the widgets but ships no options, so previews must be set
-# here. --line-range stops bat rendering a whole file for one screenful.
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-range=:200 {} 2>/dev/null || eza -1 --color=always --icons --group-directories-first {} 2>/dev/null' --preview-window 'right:55%:wrap'"
 export FZF_ALT_C_OPTS="--preview 'eza -1 --color=always --icons --group-directories-first {} 2>/dev/null | head -50'"
 
-# Runtimes come from mise, activated in .zshrc. uv stays for Python packaging:
-# mise owns interpreter versions, uv owns dependencies and venvs.
 export AWS_SDK_LOAD_CONFIG=1
 {{ if ne .chezmoi.os "darwin" }}
-# --- WSL ---------------------------------------------------------------------
-# The only non-darwin machine is WSL. If a plain Linux box joins, gate on
-# .chezmoi.kernel.osrelease containing "microsoft" instead.
-#
-# wslview defers to the Windows default browser. Naming a browser here instead
-# gives two handlers that disagree, so links open twice. (Claude Code also
-# reads $BROWSER and is given /bin/true in ~/.claude/settings.json.)
+# wslview only: naming a browser makes links open twice.
 export BROWSER=wslview
 
-# Explicit rather than relying on aws-vault's autodetection.
 export AWS_VAULT_BACKEND=pass
 {{ end }}

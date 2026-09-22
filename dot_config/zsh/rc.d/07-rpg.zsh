@@ -1,5 +1,3 @@
-# Use uv script for dice rolling. Resolves through ZDOTDIR so it works wherever
-# chezmoi applies the config, with the default path as the fallback.
 alias dice='uv run ${ZDOTDIR:-$HOME/.config/zsh}/rpg.py dice'
 alias thaco='uv run ${ZDOTDIR:-$HOME/.config/zsh}/rpg.py thaco'
 alias d4='roll d4'

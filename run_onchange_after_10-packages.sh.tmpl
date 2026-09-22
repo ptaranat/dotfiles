@@ -1,17 +1,10 @@
 #!/bin/sh
-# Install everything in the Brewfile. First of the numbered scripts, so tools
-# exist before anything uses them (30-completions needs pnpm). The hash below
-# is what makes run_onchange_ work: chezmoi re-runs on rendered-content change,
-# and this script's text rarely changes, so without it edits do nothing.
-#
 # Brewfile hash: {{ include "Brewfile" | sha256sum }}
 
 set -eu
 
 [ "$(uname -s)" = "Darwin" ] || exit 0
-# Checked at its fixed prefix as well as on PATH: on a fresh machine
-# 00-homebrew.sh installs it earlier in this same apply, and chezmoi's
-# environment was captured before that, so PATH does not have it yet.
+# PATH predates 00-homebrew in this apply, so check the prefix too.
 if command -v brew >/dev/null 2>&1; then
 	BREW=brew
 elif [ -x /opt/homebrew/bin/brew ]; then
@@ -26,11 +19,7 @@ BREWFILE="{{ .chezmoi.sourceDir }}/Brewfile"
 
 echo "==> installing packages from Brewfile"
 
-# --no-upgrade is deliberate. `brew bundle` installs *and upgrades* by default,
-# which is how a routine apply replaced tmux under a running server: sessions
-# stayed listable but unattachable, and `brew cleanup` removed the old binary.
-# Upgrade by hand, having checked what is running:
-#     brew bundle --file="$(chezmoi source-path)/Brewfile"
+# --no-upgrade: an upgrade replaced tmux under a running server.
 "$BREW" bundle --file="$BREWFILE" --no-upgrade
 
 echo "==> packages up to date (nothing upgraded; run brew bundle by hand for that)"

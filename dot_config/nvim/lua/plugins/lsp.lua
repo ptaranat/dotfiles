@@ -1,11 +1,3 @@
--- LSP, formatting and linting.
---
--- The old config configured terraformls and gleam by hand via vim.lsp.config
--- and formatted on save with vim.lsp.buf.format() in filetype autocommands.
--- That approach still works and is kept, but mason installs the servers rather
--- than requiring each to be on $PATH already, and conform handles formatting
--- so a project's own prettier/ruff is preferred over whatever the LSP does.
-
 return {
 	{
 		"neovim/nvim-lspconfig",
@@ -15,8 +7,6 @@ return {
 			"mason-org/mason-lspconfig.nvim",
 		},
 		config = function()
-			-- Diagnostics: virtual text off by default because it pushes code
-			-- around; the float on <leader>e shows the detail instead.
 			vim.diagnostic.config({
 				virtual_text = false,
 				severity_sort = true,
@@ -31,7 +21,6 @@ return {
 				},
 			})
 
-			-- Buffer-local maps, set only where a server actually attached.
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("cfg_lsp_attach", { clear = true }),
 				callback = function(event)
@@ -47,7 +36,6 @@ return {
 					map("<leader>la", vim.lsp.buf.code_action, "Code action")
 					map("<leader>ld", vim.lsp.buf.type_definition, "Type definition")
 
-					-- Highlight other references to the symbol under the cursor.
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
 					if client and client:supports_method("textDocument/documentHighlight") then
 						local hl = vim.api.nvim_create_augroup("cfg_lsp_highlight", { clear = false })
@@ -65,9 +53,7 @@ return {
 				end,
 			})
 
-			-- Servers mason should keep installed. gleam is deliberately absent:
-			-- its LSP ships inside the gleam binary itself (installed via brew),
-			-- so mason has nothing to fetch.
+			-- no gleam: its LSP ships inside the gleam binary
 			require("mason-lspconfig").setup({
 				ensure_installed = {
 					"lua_ls",
@@ -82,8 +68,6 @@ return {
 				automatic_installation = true,
 			})
 
-			-- lua_ls needs to be told it is editing neovim config, or every
-			-- `vim.` reference is flagged undefined.
 			vim.lsp.config("lua_ls", {
 				settings = {
 					Lua = {
@@ -95,8 +79,6 @@ return {
 				},
 			})
 
-			-- gleam, as in the old config: the language server is a subcommand
-			-- of the gleam binary.
 			vim.lsp.config("gleam", {
 				cmd = { "gleam", "lsp" },
 				filetypes = { "gleam" },
@@ -106,8 +88,6 @@ return {
 		end,
 	},
 
-	-- Formatting. Prefers a project's own formatter over the LSP, which is
-	-- what the old `vim.lsp.buf.format()` on save could not do.
 	{
 		"stevearc/conform.nvim",
 		event = "BufWritePre",
@@ -141,9 +121,7 @@ return {
 				hcl = { "terraform_fmt" },
 			},
 			format_on_save = function(bufnr)
-				-- gleam and terraform formatted on save, as before. Everything
-				-- else is explicit, so a shared repo's style is not silently
-				-- rewritten on open-and-save.
+				-- allowlist only, so shared repos are not reformatted on save
 				local auto = { gleam = true, terraform = true, tf = true, hcl = true, lua = true }
 				if not auto[vim.bo[bufnr].filetype] then
 					return nil
@@ -153,7 +131,6 @@ return {
 		},
 	},
 
-	-- Linting for tools that are not language servers, replacing w0rp/ale.
 	{
 		"mfussenegger/nvim-lint",
 		event = { "BufReadPost", "BufNewFile" },

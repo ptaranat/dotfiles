@@ -1,9 +1,3 @@
--- lazy.nvim bootstrap. Replaces vim-plug.
---
--- lazy clones itself on first run, so a fresh machine needs nothing beyond
--- neovim and git. Plugin specs live in lua/plugins/*.lua and are picked up
--- automatically by the import below.
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -33,14 +27,12 @@ require("lazy").setup({
 	},
 	install = { colorscheme = { "srcery", "habamax" } },
 	checker = {
-		-- Check for updates but never apply them unprompted.
 		enabled = true,
 		notify = false,
 	},
 	change_detection = { notify = false },
 	performance = {
 		rtp = {
-			-- Disable built-in plugins that are either superseded or unused.
 			disabled_plugins = {
 				"gzip",
 				"tarPlugin",

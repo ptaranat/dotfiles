@@ -18,11 +18,9 @@ def dice(expression):
     
     result = roll(expression)
     try:
-        # Pipe through glow for formatting
         process = subprocess.Popen(['glow', '-'], stdin=subprocess.PIPE, text=True)
         process.communicate(str(result))
     except FileNotFoundError:
-        # Fallback if glow is not available
         print(result)
 
 def thaco(thac0, modifier=0):
@@ -35,11 +33,9 @@ def thaco(thac0, modifier=0):
     result = str(roll(expression)) + "AC"
     
     try:
-        # Pipe through glow for formatting
         process = subprocess.Popen(['glow', '-'], stdin=subprocess.PIPE, text=True)
         process.communicate(result)
     except FileNotFoundError:
-        # Fallback if glow is not available
         print(result)
 
 if __name__ == "__main__":

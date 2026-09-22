@@ -1,50 +1,31 @@
-# mise: runtime version manager, replacing fnm and pyenv. It owns runtime
-# *versions*; uv owns Python packages and venvs, and mise defers to it.
-
 [tools]
 node = "24"
 python = "3.13"
-# Global so it resolves outside a project, which is what lets completions be
-# generated. A project pinning its own version overrides this anyway.
+# Global so completions can be generated outside a project.
 pnpm = "11"
-# Replaces a standalone ~/.bun that sat on no PATH. Global, not per-project,
-# because its CLIs are `#!/usr/bin/env bun` and mise resolves by directory, so
-# a pin would make them work in one repo and fail everywhere else.
+# Global: its CLIs use `env bun`; a project pin breaks them elsewhere.
 bun = "1.3"
-# Node package manager, same author as mise; reads existing lockfiles. Pinned
-# to a major so it cannot change under a project mid-work.
 aube = "1"
-# nvim-treesitter's main branch shells out to this for every parser; without
-# it :TSInstall fails with ENOENT. Here rather than the Brewfile, which is
-# Darwin-only and would never reach the WSL box.
+# Here, not the Brewfile: nvim needs it on Linux too.
 tree-sitter = "0.26"
 
 [settings]
-# Resolved versions in mise.lock, so a project pins builds rather than "24".
 lockfile = true
 
-# Auto-create and source .venv for any project with a uv.lock. "create|source"
-# makes it if missing; plain "source" would only activate an existing one.
 python.uv_venv_auto = "create|source"
 
-# Honour .nvmrc and friends so repos predating mise still pin. Opt-in per tool.
 idiomatic_version_file_enable_tools = ["node", "python"]
 
-# Install a missing tool on demand rather than erroring out.
 auto_install = true
 
-# Cache the computed environment; invalidated when a config file changes.
 env_cache = true
 
 [settings.status]
-# Warn on missing tools instead of silently using the wrong version.
 missing_tools = "always"
 
 [settings.ruby]
 compile = false
 
-# `mise run docs-publish` from any directory: build the Obsidian vault into
-# the tailnet docs site and push it to kurokami. Lives in dungeonbooks/quartz.
 [tasks.docs-publish]
 description = "Build the Dungeon Books vault site and publish it to kurokami"
 dir = "~/projects/dungeonbooks/quartz"
