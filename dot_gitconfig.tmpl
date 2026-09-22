@@ -12,6 +12,26 @@
 	# `!` shells out, so gh resolves on PATH rather than at a fixed prefix.
 	helper = !gh auth git-credential
 {{- end }}
+
+# credential.helper is cumulative, and Xcode's system gitconfig contributes
+# osxkeychain ahead of anything here. For GitHub that means the keychain is
+# asked first and can answer with a stale token that gh would have refreshed.
+# The empty value resets the accumulated list for these hosts, so gh is the
+# only helper consulted; everything else still gets the keychain.
+[credential "https://github.com"]
+	helper =
+{{- if eq .chezmoi.os "darwin" }}
+	helper = /opt/homebrew/bin/gh auth git-credential
+{{- else }}
+	helper = !gh auth git-credential
+{{- end }}
+[credential "https://gist.github.com"]
+	helper =
+{{- if eq .chezmoi.os "darwin" }}
+	helper = /opt/homebrew/bin/gh auth git-credential
+{{- else }}
+	helper = !gh auth git-credential
+{{- end }}
 [alias]
 	graphgpg = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)[gpg:%GK%x20%G?]%C(reset)%n%x20%s%n"
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
@@ -25,6 +45,9 @@
 	ui = auto
 [core]
 	pager = delta
+	# Tilde rather than an absolute path, which would not resolve on the WSL
+	# box. The file itself is managed here too, so both machines get it.
+	excludesfile = ~/.gitignore_global
 [delta]
 	plus-style = "syntax #012800"
 	minus-style = "syntax #340001"
