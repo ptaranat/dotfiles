@@ -1,68 +1,27 @@
--- Colourscheme, statusline, bufferline, and the visual furniture.
-
 return {
-	-- srcery, matching the ghostty and tmux themes.
 	{
 		"srcery-colors/srcery-vim",
 		lazy = false,
 		priority = 1000, -- load before everything else so nothing flashes
 		config = function()
-			-- Italics off, matching how this looked before.
-			--
-			-- The old config set nothing beyond `colorscheme srcery` and got
-			-- no italics, because that version of the plugin only enabled them
-			-- under a GUI or with $TERM_ITALICS=true (unset here):
-			--
-			--   if has('gui_running') || $TERM_ITALICS ==? 'true'
-			--     let g:srcery_italic=1
-			--   else
-			--     let g:srcery_italic=0
-			--
-			-- Newer srcery dropped that conditional and defaults to 1, so
-			-- comments and keywords started rendering italic. Set explicitly
-			-- rather than relying on either default.
+			-- newer srcery defaults italics on, keep them off
 			vim.g.srcery_italic = 0
 
-			-- No colour overrides. The editor briefly rendered darker than the
-			-- terminal because upstream srcery revised three colours in
-			-- ba34fc5 (2025-08-09, "redesign background shades") -- background
-			-- #1c1b19 -> #121110, white #baa67f -> #c5b088, bright black
-			-- #918175 -> #917e6b -- while the ghostty theme still carried the
-			-- older values. That is a deliberate contrast improvement by the
-			-- author, not drift, so the ghostty theme was updated to match
-			-- rather than pinning the plugin backwards here.
-
-			-- Style floating windows. Off by default upstream, but this config
-			-- is full of floats -- completion, telescope, which-key,
-			-- diagnostics -- and without it they fall back to Normal and lose
-			-- their border against the buffer behind them.
 			vim.g.srcery_normal_float = 1
 
 			vim.cmd.colorscheme("srcery")
 		end,
 	},
 
-	-- lualine replaces lightline: same idea, native Lua, and it can show
-	-- LSP and diagnostic state that lightline had no access to.
 	{
 		"nvim-lualine/lualine.nvim",
 		event = "VeryLazy",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		-- Section layout mirrors the old lightline config, which was:
-		--   left  [mode, paste] [fugitive, readonly, filename, modified]
-		--   right [ale] [lineinfo] [percent] [charcode, fileformat, filetype]
-		-- Notably the filename was bare, not a path.
 		opts = {
 			options = {
 				theme = "srcery",
 				globalstatus = true, -- one statusline, not one per split
-				-- Powerline separators. Written as \u escapes because these
-				-- live in the Unicode private use area and do not survive
-				-- being pasted around as literal characters.
-				--   U+E0B0  right-pointing solid, between sections
-				--   U+E0B2  left-pointing solid, on the right-hand sections
-				--   U+E0B1  right-pointing thin, between components
-				--   U+E0B3  left-pointing thin
+				-- \u escapes: private-use glyphs get mangled when pasted
 				section_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
 				component_separators = { left = "\u{E0B1}", right = "\u{E0B3}" },
 			},
@@ -70,19 +29,12 @@ return {
 				lualine_a = { "mode" },
 				lualine_b = {
 					"branch",
-					-- Added: +N ~N -N counts for the working tree. lightline's
-					-- fugitive component only showed the branch name.
 					{ "diff", symbols = { added = "+", modified = "~", removed = "-" } },
 					{ "filename", path = 0, symbols = { modified = " +", readonly = " ", newfile = " " } },
 				},
 				lualine_c = {},
 				lualine_x = {
-					-- diagnostics stands in for the old ale section, and is
-					-- populated by the LSP rather than a separate linter.
 					"diagnostics",
-					-- Added: which language servers are actually attached.
-					-- The old setup gave no indication, so a server silently
-					-- failing to start looked identical to one working.
 					{
 						function()
 							local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -111,8 +63,6 @@ return {
 		},
 	},
 
-	-- bufferline replaces barbar. The Alt-, / Alt-. / Alt-<n> bindings are
-	-- carried over unchanged.
 	{
 		"akinsho/bufferline.nvim",
 		event = "VeryLazy",
@@ -144,8 +94,6 @@ return {
 		},
 	},
 
-	-- Indent guides. indent-blankline v3 is a rewrite with a different API to
-	-- the version the old config used.
 	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
@@ -159,9 +107,6 @@ return {
 		},
 	},
 
-	-- Rainbow delimiters, replacing luochen1990/rainbow. This one is
-	-- treesitter-driven, so it understands the language rather than counting
-	-- brackets.
 	{
 		"HiPhish/rainbow-delimiters.nvim",
 		event = { "BufReadPost", "BufNewFile" },
@@ -170,18 +115,12 @@ return {
 		end,
 	},
 
-	-- Start screen, replacing alpha-nvim.
 	{
 		"goolord/alpha-nvim",
 		event = "VimEnter",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
 			local dashboard = require("alpha.themes.dashboard")
-			-- Buttons are labelled with the leader sequence that triggers them
-			-- elsewhere in the config, the way the stock theme does, rather
-			-- than with single letters that only work on this screen. The
-			-- shortcut passed to button() is what alpha binds locally; the
-			-- label is what you would type in a normal buffer.
 			dashboard.section.buttons.val = {
 				dashboard.button("e", "  New file", "<cmd>ene <BAR> startinsert<CR>"),
 				dashboard.button("SPC f f", "  Find file", "<cmd>Telescope find_files<CR>"),
@@ -196,8 +135,6 @@ return {
 		end,
 	},
 
-	-- Shows the pending keymap sequence. Nothing in the old config did this,
-	-- and it makes a leader-driven setup discoverable.
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
@@ -213,7 +150,6 @@ return {
 		},
 	},
 
-	-- File explorer. The old config had none; netrw is disabled in lazy.lua.
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		branch = "v3.x",

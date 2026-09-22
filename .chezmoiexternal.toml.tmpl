@@ -1,15 +1,5 @@
-# Repos chezmoi clones and keeps updated, replacing git submodules: no pinned
-# SHA to commit, no --recurse-submodules, refreshed on their own schedule.
-
 {{ if and .work (stat (.signingkey | replace "~" .chezmoi.homeDir)) -}}
-# Private work config, sourced by .zshrc after rc.d so it can override.
-#
-# A failed git-repo external is fatal: chezmoi aborts the whole apply and
-# writes nothing, so this cannot be declared on a machine that has no GitHub
-# SSH access yet. It needs the init answer work = true, and waits for the
-# signing key as a proxy for "keys have been copied over". The first apply
-# after that clones it; if SSH to GitHub still is not set up then, that apply
-# fails with the git error rather than silently.
+# Gated on the signing key: a failed clone aborts the whole apply.
 [".config/zsh/work"]
     type = "git-repo"
     url = "git@github.com:ptaranat/work.git"
@@ -17,26 +7,19 @@
 {{ end -}}
 
 {{ if eq .chezmoi.os "darwin" -}}
-# Ghostty cursor shaders. Gated here, not in .chezmoiignore: externals are
-# fetched regardless of what that file lists, and `chezmoi ignored` printing
-# the path is not evidence it will be skipped. On WSL this cloned 288K of
-# shaders for a terminal that is not installed.
+# Gated here: .chezmoiignore does not stop externals.
 [".config/ghostty/shaders"]
     type = "git-repo"
     url = "https://github.com/sahaj-b/ghostty-cursor-shaders.git"
     refreshPeriod = "720h"
 {{ end -}}
 
-# znap, the zsh plugin manager. .zshrc sources znap.zsh from here, so without
-# it a fresh machine gets no plugins and no prompt. Previously cloned by hand.
 [".local/share/znap/zsh-snap"]
     type = "git-repo"
     url = "https://github.com/marlonrichert/zsh-snap.git"
     refreshPeriod = "168h"
 
-# tpm, the tmux plugin manager. .tmux.conf's trailing `run` fails silently
-# without it: tmux starts, every plugin is skipped, the status bar goes stock.
-# The plugins themselves still need `tpm/bin/install_plugins` once per machine.
+# Plugins still need tpm/bin/install_plugins once per machine.
 [".tmux/plugins/tpm"]
     type = "git-repo"
     url = "https://github.com/tmux-plugins/tpm.git"

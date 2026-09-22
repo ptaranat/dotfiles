@@ -1,6 +1,4 @@
-# The only zsh file in $HOME; everything else sits under $XDG_CONFIG_HOME/zsh,
-# which this points zsh at. Sourced for every invocation, interactive or not,
-# so keep it to environment setup: no output, no prompts, nothing slow.
+# Sourced by every zsh, interactive or not: no output, nothing slow.
 
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -9,85 +7,29 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
-# History lives in .zshrc: macOS's /etc/zshrc hardcodes it and is sourced after
-# this file, so anything set here would be clobbered.
-
-# The (N-/) qualifier on every entry below keeps it only when it is an existing
-# directory, so anything uninstalled or moved drops out silently instead of
-# accumulating in $PATH and being searched on every command.
-#
-# Set here, not in .zshrc, so tools in ~/.local/bin resolve in non-interactive
-# shells too (scripts, ssh commands, editor subprocesses).
+# PATH lives here for non-interactive shells. (N-/) skips missing dirs.
 path=($HOME/.local/bin(N-/) $path)
 
-# $GOPATH/bin has never been on PATH here (go comes from Homebrew, not mise),
-# so eight binaries had accumulated there unreachable. Pointing GOBIN at
-# ~/.local/bin lands ad-hoc installs somewhere that resolves. Long-lived Go
-# tools belong in mise's go backend instead; this is for the one-off case.
+# GOPATH/bin is not on PATH, so land go installs in ~/.local/bin.
 export GOBIN="$HOME/.local/bin"
 
-# `bun install -g` writes shims to ~/.bun/bin, which was on no PATH, exactly as
-# above. bun itself comes from mise now, so this holds only global packages and
-# is a plain entry rather than a runtime prepend. Left at the default path:
-# moving it means setting BUN_INSTALL everywhere, and anything that missed it
-# would rebuild ~/.bun and split the globals in two.
+# Keep the default ~/.bun: moving it needs BUN_INSTALL everywhere.
 path=($path $HOME/.bun/bin(N-/))
 
-# Homebrew here, not rc.d/01-environment.zsh, and the ordering is the point:
-# rc.d is sourced after `mise activate`, so a prepend there shadows every
-# runtime mise owns. On WSL that silently gave linuxbrew's node over mise's.
-# .zshenv runs before .zshrc, so mise prepends after this and wins.
+# Must stay in .zshenv so mise (activated in .zshrc) prepends after.
 {{ if eq .chezmoi.os "darwin" -}}
 path=(/opt/homebrew/bin(N-/) /opt/homebrew/sbin(N-/) $path)
 {{- else -}}
 path=(/home/linuxbrew/.linuxbrew/bin(N-/) /home/linuxbrew/.linuxbrew/sbin(N-/) $path)
 {{- end }}
 
-# rustup's installer appends `. "$HOME/.cargo/env"` here, sourcing a script on
-# every invocation for one prepend. Written out directly instead, so a rustup
-# reinstall cannot reintroduce a line chezmoi would report as drift.
-#
-# This does not outrank Homebrew despite sitting later: /etc/profile.d/brew.sh
-# re-prepends linuxbrew per login shell. Harmless while rustup is the only
-# cargo here; the Brewfile's `brew "rust"` was never installed, and if it were,
-# the fix is to drop it there rather than reorder this.
+# Inlined from ~/.cargo/env so a rustup reinstall causes no drift.
 path=($HOME/.cargo/bin(N-/) $path)
 
-# Moved out of rc.d/01-environment.zsh. rc.d is sourced at the end of .zshrc,
-# so anything added there is invisible to non-interactive shells (scripts, ssh
-# commands, editor subprocesses) and to the parts of .zshrc that run earlier.
-# ~/bin holds hermit, which is exactly the kind of thing a script expects to
-# find. This now sits behind mise rather than in front of it, which changes
-# nothing today: mise manages no tool of the same name.
 path=($HOME/bin(N-/) $path)
-
-# opencode's installer appends this to whichever zsh rc file it finds, and it
-# landed in the deployed ~/.config/zsh/.zshrc rather than anything tracked
-# here. Written out in the source so `chezmoi apply` stops reverting it and
-# dropping opencode off PATH.
 path=($HOME/.opencode/bin(N-/) $path)
 
-# OrbStack and the JetBrains Toolbox scripts. Both installers appended
-# themselves to ~/.zprofile, which stopped being read the moment this file
-# started setting ZDOTDIR: zsh takes .zprofile, .zshrc and .zlogin from
-# $ZDOTDIR, so the copy in $HOME is never sourced, not even for login shells.
-#
-# What that actually stranded is the Toolbox scripts (goland, datagrip,
-# rider), which resolve nowhere else. OrbStack's own binaries are reachable
-# regardless, because its installer also symlinks docker, kubectl, orb and
-# orbctl into /usr/local/bin; the entry below is there so this does not depend
-# on symlinks written outside chezmoi's control, and (N-/) makes it free when
-# the directory is absent.
-#
-# Both live here rather than in a $ZDOTDIR/.zprofile so non-interactive shells
-# (scripts, editor subprocesses, agent tooling) get them too. Appended, not
-# prepended, to match what the installers set up: notably this leaves
-# Homebrew's versioned kubectl ahead of the copy OrbStack bundles.
 path=($path $HOME/.orbstack/bin(N-/))
 path=($path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"(N-/))
 
-# OrbStack's completions, which nothing else provides. Its init.zsh sets only
-# this and the PATH entry above, so sourcing that file would add nothing. Kept
-# here beside OrbStack's PATH rather than in .zshrc: it is a plain fpath
-# append, none of the "no output, no prompts, nothing slow" this file avoids.
 fpath+=($HOME/.orbstack/shell/completions/zsh(N-/))

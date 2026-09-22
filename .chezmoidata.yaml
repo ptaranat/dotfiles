@@ -1,20 +1,13 @@
-# Package lists for the Linux box; macOS uses the Brewfile, which is generated
-# by `brew bundle dump` and carries taps and casks apt has no equivalent for.
-# Read by run_onchange_after_11-packages-linux.sh.tmpl, which hashes this file
-# so edits trigger a reinstall. Every name was checked with `apt-cache policy`
-# on Debian trixie: one that does not exist fails the whole apt-get call.
+# Every apt name must exist on Debian trixie or apt-get fails.
 
 packages:
   apt:
-    # Shell, VCS and build basics. Present on any machine that runs this repo.
     core:
       - zsh
       - git
       - git-delta
       - tmux
-      # tmux-256color terminfo, which .tmux.conf sets as default-terminal.
-      # Debian's ncurses-base ships only a minimal set and does not include
-      # it; without this tmux fails to start on the WSL box.
+      # tmux-256color terminfo; tmux fails to start without it.
       - ncurses-term
       - curl
       - wget
@@ -22,11 +15,9 @@ packages:
       - build-essential
       - gnupg
       - locales
-      # bwrap, which Claude Code sandboxes tool calls with. Pinned here because
-      # as a manual brew install `brew autoremove` silently reclaimed it.
+      # bwrap for Claude Code sandbox; brew autoremove drops it.
       - bubblewrap
 
-    # The CLI tools rc.d actually invokes; most of it breaks without these.
     tools:
       - ripgrep
       - fd-find
@@ -42,34 +33,17 @@ packages:
       - mosh
       - httpie
       - hyperfine
-      # v2, same major as the brew formula. Listed because `brew install
-      # awscli` drags in its own python@3.12 that mise cannot see.
+      # Not brew: brew's awscli pulls a python mise cannot see.
       - awscli
 
-  # Tools where brew's version beats apt's. Per-tool quality, not loyalty.
-  #
-  # This OVERRIDES rather than replaces packages.apt, and anything the shell
-  # hard-depends on should appear in both: apt guarantees a fresh machine works,
-  # brew upgrades it where brew exists. Removing the apt entry to "avoid
-  # duplication" leaves a fresh box with no rg and breaks FZF_DEFAULT_COMMAND.
-  #
-  # Nothing installs these automatically yet; see the TODO in the install script.
+  # Overrides apt: keep shell deps in both or fresh boxes break.
   brew:
     linux:
-      # apt has 0.10.4; the nvim config needs >= 0.11 for the native LSP API.
+      # apt has 0.10.4; the nvim config needs >= 0.11.
       - neovim
-      # Moves fast, and is the credential helper and signing path; apt is 2.46.
       - gh
-      # apt 14.1.1 against brew 15.2.0. Also in packages.apt as the floor.
       - ripgrep
-      # apt 1.40.0 against brew 1.57.0: the widest gap of anything here.
       - just
-      # apt 0.60.3 against brew 0.74.1. apt's works (`fzf --zsh` needs >= 0.48),
-      # so this is widget and preview behaviour, not a functional floor.
       - fzf
 
-  # Not in apt, and not worth a brew install. First-party installers or a
-  # single release binary each.
-  #   mise   -> https://mise.run
-  #   sesh   -> GitHub release; dot_tmux.conf's session popup needs it
-  #   bottom, helix, k9s -> GitHub releases, install if actually wanted
+  # Not packaged: mise (mise.run), sesh (GitHub release, tmux needs it).

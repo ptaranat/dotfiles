@@ -1,17 +1,12 @@
 #!/bin/sh
-# Completions no package manager installs. Homebrew drops official ones into
-# $(brew --prefix)/share/zsh/site-functions, already on fpath, so most tools
-# need nothing; check there before hand-rolling anything. pnpm is the exception
-# because it comes from mise, which installs none. Generated once here rather
-# than on every shell start.
+# Homebrew covers most completions; this is for mise's pnpm.
 
 set -eu
 
 DEST="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions"
 mkdir -p "$DEST"
 
-# mise activates via a shell hook, so its tools are unreachable from the plain
-# sh chezmoi uses. The shims are, and each re-execs mise at the right version.
+# mise tools are only on PATH via a shell hook; use the shims.
 PNPM=""
 if command -v pnpm >/dev/null 2>&1; then
 	PNPM="pnpm"
@@ -28,7 +23,5 @@ if [ -n "$PNPM" ]; then
 	fi
 fi
 
-# The cache is keyed on fpath, so a new file needs the dump rebuilt. Removing
-# it is enough; compinit rebuilds on the next shell.
 rm -f "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/compdump" \
       "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/compdump.zwc" 2>/dev/null || true

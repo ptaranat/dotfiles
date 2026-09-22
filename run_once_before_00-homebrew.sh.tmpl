@@ -1,20 +1,15 @@
 {{ if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
-# Install Homebrew on a fresh mac, before any file or later script needs it.
-# run_once_: chezmoi records that it ran and never runs it again.
 set -eu
 
 [ -x /opt/homebrew/bin/brew ] && exit 0
 
-# git comes from the Command Line Tools, and so does the compiler Homebrew
-# needs. Its installer is a GUI prompt, so it cannot be done from here.
 if ! xcode-select -p >/dev/null 2>&1; then
 	echo "==> Xcode Command Line Tools missing: run 'xcode-select --install' first" >&2
 	exit 1
 fi
 
-# Interactive on purpose: it asks for the sudo password and a RETURN.
-# NONINTERACTIVE=1 would instead abort when sudo needs a password.
+# Interactive on purpose: NONINTERACTIVE=1 aborts on the sudo prompt.
 echo "==> installing Homebrew"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 {{ end -}}

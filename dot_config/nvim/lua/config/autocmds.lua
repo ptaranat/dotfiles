@@ -1,11 +1,7 @@
--- Autocommands ported from general.vim.
-
 local augroup = function(name)
 	return vim.api.nvim_create_augroup("cfg_" .. name, { clear = true })
 end
 
--- Relative numbers only where they are useful: absolute while typing, and in
--- windows that do not have focus.
 local numbertoggle = augroup("numbertoggle")
 vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "InsertLeave", "WinEnter" }, {
 	group = numbertoggle,
@@ -24,8 +20,6 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost", "InsertEnter", "WinLeave"
 	end,
 })
 
--- Briefly highlight whatever was just yanked. Replaces having to guess what
--- the last operation covered.
 vim.api.nvim_create_autocmd("TextYankPost", {
 	group = augroup("highlight_yank"),
 	callback = function()
@@ -33,10 +27,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
--- Strip trailing whitespace on save. The old config did this via a setline()
--- map over the whole buffer for a fixed filetype list; this preserves the
--- cursor position and applies everywhere except filetypes where trailing
--- whitespace is meaningful.
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = augroup("trim_whitespace"),
 	callback = function(event)
@@ -52,8 +42,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	end,
 })
 
--- Start git commit messages in insert mode, and enable spell checking for
--- prose filetypes.
 vim.api.nvim_create_autocmd("FileType", {
 	group = augroup("prose"),
 	pattern = { "gitcommit", "markdown" },
@@ -71,7 +59,6 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Reopen a file at the position it was left.
 vim.api.nvim_create_autocmd("BufReadPost", {
 	group = augroup("last_position"),
 	callback = function(event)
@@ -87,7 +74,6 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 	end,
 })
 
--- Close throwaway windows with plain q.
 vim.api.nvim_create_autocmd("FileType", {
 	group = augroup("close_with_q"),
 	pattern = { "help", "qf", "man", "lspinfo", "checkhealth", "startuptime" },
@@ -97,7 +83,6 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
--- Create missing parent directories when writing a new file.
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = augroup("auto_mkdir"),
 	callback = function(event)

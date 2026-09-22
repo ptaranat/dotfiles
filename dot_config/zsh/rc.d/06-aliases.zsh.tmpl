@@ -1,6 +1,5 @@
 alias reload="exec zsh"
-# A function, not an alias: an alias would freeze whichever editor $EDITOR held
-# when this file was sourced.
+# Function so $EDITOR is read at call time.
 e() { ${EDITOR:-nvim} "$@" }
 alias c="clear"
 alias h="history -10"
@@ -15,12 +14,7 @@ alias blue="_ systemctl restart bluetooth"
 alias memo="bat -p ~/.memo.md"
 alias cl="claude"
 
-# attach/create a tmux session by name, or fzf-pick one; bare tm on an empty server -> main
-#
-# When `tm` starts the server, resurrect finishes by switching to whatever
-# session was active at save time, yanking you out of the one you asked for.
-# @tm-target tells the post-restore hook in ~/.tmux.conf to switch back, and is
-# set only when this call started the server.
+# @tm-target makes the post-restore hook in ~/.tmux.conf switch back.
 tm() {
   local change target="$1" server_was_up=1
   [[ -n "$(tmux list-sessions 2>/dev/null)" ]] || server_was_up=0
@@ -40,7 +34,6 @@ tm() {
   }
 }
 
-# Git
 alias ghpr="gh pr create -w"
 alias ghc="gh repo clone"
 alias grum="git rebase upstream/main"
@@ -59,7 +52,6 @@ alias lmr="eza -ls modified --group-directories-first --git"
 alias lazy="nvim +Lazy"
 alias health="nvim +checkhealth"
 
-# chezmoi
 alias cm="chezmoi"
 alias cma="chezmoi apply"
 alias cmd="chezmoi diff"
@@ -67,11 +59,7 @@ alias cme="chezmoi edit --apply"     # edit the source and write it out in one s
 alias cmu="chezmoi update"           # pull, then apply
 alias cms="chezmoi status"
 alias cmcd='cd "$(chezmoi source-path)"'
-# Pull a change made directly to a deployed file back into the source.
-#
-# A function, not plain `chezmoi add`: add regenerates the source from the
-# *rendered* target, so on a template it silently discards every branch for the
-# other OS. Nine managed files are templates, so this is the common case.
+# Refuses templates: chezmoi add would flatten their conditionals.
 cmadd() {
 	local f src rc=0
 	(( $# )) || { print -u2 "cmadd: need a path"; return 1 }
@@ -89,8 +77,6 @@ cmadd() {
 	chezmoi add "$@"
 }
 
-# Warn when a deployed file was edited in place; the next apply reverts those,
-# silently under --force. ~30ms across the tree, on every interactive shell.
 if command -v chezmoi >/dev/null 2>&1; then
 	() {
 		local drift
@@ -103,8 +89,6 @@ if command -v chezmoi >/dev/null 2>&1; then
 	}
 fi
 
-# Via `chezmoi edit`, not the deployed file, which the next apply overwrites.
-# --apply writes the change straight out so the two stay in step.
 alias zshrc="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/.zshrc"
 alias zshenv="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/01-environment.zsh"
 alias zshalias="chezmoi edit --apply ${ZDOTDIR:-$HOME/.config/zsh}/rc.d/06-aliases.zsh"
@@ -118,13 +102,10 @@ alias gitconfig="chezmoi edit --apply ~/.gitconfig"
 alias tmuxconf="chezmoi edit --apply ~/.tmux.conf"
 alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
 
-# Fuzzy-pick any managed file. The named aliases above cover only what was
-# worth naming, which is how completion.lua and editor.lua drifted. Assigned to
-# a variable rather than piped, so cancelling fzf short-circuits the `&&`.
+# Assigned, not piped, so cancelling fzf skips the edit.
 alias cmf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
 alias nvimconf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | rg "/nvim/" | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
 
-# Toys
 alias weather="curl wttr.in"
 alias disks='echo "╓───── m o u n t . p o i n t s"; \
 			echo "╙────────────────────────────────────── ─ ─ "; \
@@ -160,9 +141,6 @@ function mcd() {
 }
 
 {{ if ne .chezmoi.os "darwin" -}}
-# --- WSL ---------------------------------------------------------------------
-# Bridges to the Windows side, each shelling out across /mnt/c. Only where no
-# Linux equivalent exists. pbcopy is one-way: no pbpaste counterpart behaves.
 alias pbcopy='/mnt/c/Windows/System32/clip.exe'
 
 alias neovide="/c/Users/Panat/bin/neovide.exe --wsl --geometry=200x60"

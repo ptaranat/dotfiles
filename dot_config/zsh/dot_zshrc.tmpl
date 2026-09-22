@@ -1,36 +1,25 @@
-# Interactive shell config; non-interactive environment goes in .zshenv.
-# Plugins, prompt and keybindings here, then rc.d/*.zsh at the end.
-
-# p10k instant prompt. Must stay at the very top: it replays a cached prompt
-# before the rest of this file runs, so anything above it that writes output or
-# reads input corrupts the replay.
+# p10k instant prompt: must stay first, nothing above may print.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
 	source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# Replaces omz's gpg-agent plugin, which cost ~730ms of startup for this.
+# Replaces omz's gpg-agent plugin (~730ms of startup).
 export GPG_TTY=$TTY
 
-# --- history -----------------------------------------------------------------
-# Not in .zshenv: macOS's /etc/zshrc hardcodes these and is sourced after it.
+# Not in .zshenv: macOS /etc/zshrc overrides it.
 export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 export HISTSIZE=50000
 export SAVEHIST=50000
 [[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 
-# --- plugins -----------------------------------------------------------------
-
 source "${XDG_DATA_HOME:-$HOME/.local/share}/znap/zsh-snap/znap.zsh"
 zstyle ':znap:*' repos-dir "${XDG_DATA_HOME:-$HOME/.local/share}/znap"
 
-# omz plugins cache completions here. The framework normally sets it; we source
-# only the libs, so without this they write to /completions and fail.
+# Needed because only omz libs are sourced, not the framework.
 export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 [[ -d $ZSH_CACHE_DIR/completions ]] || mkdir -p "$ZSH_CACHE_DIR/completions"
 
-# omz a la carte: its libs without the framework or its update checker.
 znap source ohmyzsh/ohmyzsh lib/{history,key-bindings,completion,directories,git}
-# The macos plugin has no OS guard of its own and only fails on Linux.
 znap source ohmyzsh/ohmyzsh \
 {{ if eq .chezmoi.os "darwin" }}	plugins/macos \
 {{ end }}	plugins/colored-man-pages \
@@ -40,40 +29,28 @@ znap source ohmyzsh/ohmyzsh \
 
 znap source zsh-users/zsh-completions
 znap source aloxaf/fzf-tab
-# F-Sy-H ignores ZSH_HIGHLIGHT_HIGHLIGHTERS (that is the other project's knob)
-# and has no equivalent, so highlighter selection is not configurable here.
 znap source z-shell/F-Sy-H
 
-# Nags when a typed command has an alias; default message is three lines.
 export YSU_MESSAGE_FORMAT="$(print -P '%F{yellow}')alias tip: %alias$(print -P '%f')"
 export YSU_MESSAGE_POSITION="after"
 znap source MichaelAquilina/zsh-you-should-use
 
 ZSH_AUTOSUGGEST_STRATEGY=(history)
-# Otherwise autosuggestions re-wraps every zle widget on every prompt, which is
-# most of the cost of pasting a long line. Anything redefining widgets later
-# must then request a rebind; zvm_after_init below does.
+# Speeds up paste; later widget changes must rebind (zvm_after_init).
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 znap source zsh-users/zsh-autosuggestions
 
-# fzf owns Ctrl-T/Alt-C, fzf-tab owns completion, atuin owns Ctrl-R.
 if (( $+commands[fzf] )); then
 	source <(fzf --zsh)
 fi
 
-# --- prompt and shell integrations -------------------------------------------
-# znap eval caches a command's stdout to disk and sources that, rather than
-# forking on every startup. Cache key is the command, so it self-refreshes.
-
-# Kept on p10k over starship: the ~730ms was omz's gpg-agent plugin, not the
-# prompt. Maintenance mode upstream, but stable.
 znap source romkatv/powerlevel10k
 
 znap eval zoxide 'zoxide init zsh --cmd j'
 znap eval mise 'mise activate zsh'
 znap eval atuin 'atuin init zsh --disable-up-arrow'
 
-# Up/down stay on prefix-aware search, hence atuin's --disable-up-arrow.
+# Up/down stay on substring search, hence --disable-up-arrow.
 znap source zsh-users/zsh-history-substring-search
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
@@ -90,30 +67,23 @@ function zvm_after_init() {
 	bindkey -M vicmd 'k' history-substring-search-up
 	bindkey -M vicmd 'j' history-substring-search-down
 
-	# zvm redefines widgets after autosuggestions bound them, and MANUAL_REBIND
-	# means nothing does it automatically. Without this, suggestions freeze.
+	# Needed with MANUAL_REBIND, else suggestions freeze after zvm.
 	(( $+functions[_zsh_autosuggest_bind_widgets] )) && _zsh_autosuggest_bind_widgets
 }
 
 znap source jeffreytse/zsh-vi-mode
 
-# Do not add bracketed-paste-magic as a paste-performance fix: it replays a
-# paste through self-insert one character at a time, while zsh's native widget
-# inserts the chunk in one go. The real cost was MANUAL_REBIND, set above.
+# Don't add bracketed-paste-magic: it makes pasting slow.
 
-# --- local config ------------------------------------------------------------
 for f in "${ZDOTDIR:-$HOME/.config/zsh}"/rc.d/*.zsh(N); do
 	source "$f"
 done
 
-# Work config from a separate private repo; this one is public. After rc.d so
-# it can override, and (N) because the machine may not have it.
+# Private work config; after rc.d so it can override.
 for f in "${ZDOTDIR:-$HOME/.config/zsh}"/work/*.zsh(N); do
 	source "$f"
 done
 
-# Last, so p10k's settings win over anything the plugins set. INSTANT_PROMPT=
-# quiet lives in prompt/overrides.zsh and is what stops the banner in
-# rc.d/00-banner.zsh being reported as unexpected console output.
+# Last, so p10k settings win over the plugins'.
 [[ ! -r "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh" ]] ||
 	source "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh"

@@ -1,10 +1,3 @@
-# Local powerlevel10k customisations. p10k.zsh is the stock template, vendored
-# verbatim so it can be replaced wholesale on update; everything personal lives
-# here and is sourced after it, so these assignments win.
-
-# --- prompt shape ------------------------------------------------------------
-
-# Single line: no `newline` element either side, no blank line between prompts.
 typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
 
 typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
@@ -12,9 +5,6 @@ typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
 	vcs
 )
 
-# p10k's version-manager segments are all absent: mise replaced those tools,
-# and a custom mise segment needed its own colour, icon and cache handling for
-# something `mise current` answers on demand.
 typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	status
 	command_execution_time
@@ -49,44 +39,29 @@ typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
 	per_directory_history
 )
 
-# --- behaviour ---------------------------------------------------------------
-
-# Collapse previous prompts to the prompt character, for readable scrollback.
 typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
 
-# quiet, not verbose: rc.d/00-banner.zsh's banner would be reported as
-# unexpected console output on every start.
+# quiet: otherwise the rc.d/00-banner.zsh output triggers a warning.
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
-# --- appearance --------------------------------------------------------------
-
-# Empty, not unset: with no classes p10k falls back to styling with a folder
-# icon, and an empty array suppresses it.
+# Empty, not unset: unset falls back to a folder icon.
 typeset -g POWERLEVEL9K_DIR_CLASSES=()
 
-# Drop the icons from these segments; the content is self-explanatory.
 typeset -g POWERLEVEL9K_VCS_VISUAL_IDENTIFIER_EXPANSION=
 typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_VISUAL_IDENTIFIER_EXPANSION=
 typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION=
 
-# Nerd Font battery glyphs. The template declares an array and zsh refuses the
-# retype to a scalar, so it has to be dropped first.
+# Unset first: the template declares it as an array.
 unset POWERLEVEL9K_BATTERY_STAGES
 typeset -g POWERLEVEL9K_BATTERY_STAGES=$'\uf58d\uf579\uf57a\uf57b\uf57c\uf57d\uf57e\uf57f\uf580\uf581\uf578'
 
-# Only while running terraform, not in every directory holding .tf files.
 typeset -g POWERLEVEL9K_TERRAFORM_VERSION_SHOW_ON_COMMAND='terraform|tf|tofu'
 
-# --- git formatter -----------------------------------------------------------
-
-# Redefined rather than patched into the vendored file. Only change from stock:
-# ahead/behind counts show unconditionally, instead of stock's branch that can
-# print the remote branch name instead.
+# Only change from stock: ahead/behind counts always shown.
 function my_git_formatter() {
 	emulate -L zsh
 
 	if [[ -n $P9K_CONTENT ]]; then
-		# Either "loading" or from gitstatus_query in the vcs segment.
 		typeset -g my_git_format=$P9K_CONTENT
 		return
 	fi
@@ -127,8 +102,6 @@ function my_git_formatter() {
 		res+="${meta}:${clean}${(V)VCS_STATUS_REMOTE_BRANCH//\%/%%}"
 	fi
 
-	# Counts, shown whenever non-zero: ⇣ behind, ⇡ ahead, ⇠/⇢ same for the push
-	# remote, * stashes, ~ conflicts, + staged, ! unstaged, ? untracked.
 	(( VCS_STATUS_COMMITS_BEHIND )) && res+=" ${clean}⇣${VCS_STATUS_COMMITS_BEHIND}"
 	(( VCS_STATUS_COMMITS_AHEAD && !VCS_STATUS_COMMITS_BEHIND )) && res+=" "
 	(( VCS_STATUS_COMMITS_AHEAD  )) && res+="${clean}⇡${VCS_STATUS_COMMITS_AHEAD}"

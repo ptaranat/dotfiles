@@ -1,9 +1,4 @@
 #!/bin/sh
-# apt packages for the Linux box; 10-packages.sh is the macOS counterpart, and
-# .chezmoiignore gates each to its own OS. The hash below is what makes
-# run_onchange_ work: chezmoi re-runs on rendered-content change, and this
-# script's text never changes, so editing .chezmoidata.yaml would do nothing.
-#
 # packages hash: {{ list .packages.apt.core .packages.apt.tools | toJson | sha256sum }}
 
 set -eu
@@ -16,21 +11,12 @@ command -v apt-get >/dev/null 2>&1 || {
 
 echo "==> installing apt packages"
 
-# --no-upgrade is deliberate and the part that matters here.
-#
-# `apt-get install` upgrades an already-installed package if a newer candidate
-# exists, so the plain form is not the safe operation it sounds like: measured
-# here it wanted to pull curl and the whole libcurl stack out of backports as a
-# side effect of syncing dotfiles. Same mistake `brew bundle`'s default made on
-# the mac, replacing tmux under a running server. Upgrade by hand instead:
-#     sudo apt-get update && sudo apt-get upgrade
+# --no-upgrade: plain install upgrades installed packages too.
 sudo apt-get update -qq
 sudo apt-get install -y --no-upgrade --no-install-recommends \
 	{{ concat .packages.apt.core .packages.apt.tools | sortAlpha | join " \\\n\t" }}
 
-# Debian ships these as fdfind and batcat to avoid older name collisions, but
-# the zsh config calls them fd and bat. No-ops where linuxbrew already provides
-# them (it sits ahead of ~/.local/bin); they matter on a fresh machine.
+# Debian ships these as fdfind and batcat.
 mkdir -p "$HOME/.local/bin"
 for pair in fdfind:fd batcat:bat; do
 	src="${pair%%:*}"
@@ -42,6 +28,4 @@ done
 
 echo "==> apt packages up to date (nothing upgraded)"
 
-# TODO: the tools in packages.brew.linux (neovim, gh) and the installer-based
-# ones (mise, sesh) are still installed by hand. Automating them is the next
-# step; doing it needs a decision about whether this box keeps linuxbrew at all.
+# TODO: automate packages.brew.linux and the mise/sesh installs.

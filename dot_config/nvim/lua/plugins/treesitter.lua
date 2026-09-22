@@ -1,14 +1,4 @@
--- Treesitter: syntax highlighting, indentation and structural text objects.
---
--- Written against nvim-treesitter's `main` branch, the 1.0 rewrite. That
--- branch dropped `nvim-treesitter.configs` entirely: there is no longer a
--- setup table with highlight/indent/textobject sub-tables. Parsers are
--- installed imperatively with .install(), and highlighting is started per
--- buffer via vim.treesitter.start() from a FileType autocommand.
---
--- The old vimscript config had effectively arrived at the same place, calling
--- pcall(vim.treesitter.start) from a FileType autocommand -- it just did not
--- get indentation or text objects out of it.
+-- targets the main branch: there is no nvim-treesitter.configs
 
 local parsers = {
 	"bash",
@@ -24,7 +14,7 @@ local parsers = {
 	"hcl",
 	"html",
 	"javascript",
-	-- jsonc is not a separate parser on this branch; the json parser covers it
+	-- no jsonc parser on main, json covers it
 	"json",
 	"lua",
 	"luadoc",
@@ -53,7 +43,6 @@ return {
 		config = function()
 			require("nvim-treesitter").setup()
 
-			-- Install anything missing, without blocking startup.
 			local installed = require("nvim-treesitter.config").get_installed("parsers")
 			local missing = vim.tbl_filter(function(p)
 				return not vim.tbl_contains(installed, p)
@@ -71,18 +60,13 @@ return {
 						return
 					end
 
-					-- Skip large files: parsing is fast but not free.
 					local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(event.buf))
 					if ok and stats and stats.size > 100 * 1024 then
 						return
 					end
 
-					-- start() fails when the parser is not installed yet, which
-					-- is expected on first run while .install() is still going.
 					if pcall(vim.treesitter.start, event.buf, lang) then
 						vim.bo[event.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-						-- Treesitter-aware folds, still closed on open by
-						-- foldlevel=99 in options.lua.
 						vim.wo.foldmethod = "expr"
 						vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 					end
@@ -91,8 +75,6 @@ return {
 		end,
 	},
 
-	-- Structural text objects. Also on `main`, with a new select/move API that
-	-- takes the query directly rather than a keymap table.
 	{
 		"nvim-treesitter/nvim-treesitter-textobjects",
 		branch = "main",

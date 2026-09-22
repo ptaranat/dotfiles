@@ -1,6 +1,3 @@
-# Git workflow helpers, adapted from 2KAbhishek/dots2k.
-
-# From the remote's own HEAD, not a hardcoded "main", so master/develop work.
 _git_base_branch() {
 	local base
 	base=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null)
@@ -8,7 +5,6 @@ _git_base_branch() {
 		print -r -- "origin/${base##*/}"
 		return
 	fi
-	# origin/HEAD is often unset on a fresh clone, so ask the remote first.
 	base=$(git ls-remote --symref origin HEAD 2>/dev/null | awk '/^ref:/ {print $2; exit}')
 	if [[ -n $base ]]; then
 		print -r -- "origin/${base##*/}"
@@ -20,8 +16,6 @@ _git_base_branch() {
 	print -r -- HEAD
 }
 
-# Browse everything this branch changed, with the diff in the preview pane.
-# Enter opens the file in $EDITOR.
 review() {
 	git rev-parse --git-dir >/dev/null 2>&1 || { print -u2 "not a git repo"; return 1 }
 	local base=$(_git_base_branch)
@@ -32,8 +26,6 @@ review() {
 		--header "changed vs $base -- enter to edit, esc to quit"
 }
 
-# Run a command over only the changed files. $1 picks the set: "diff" is the
-# branch versus its base, "modified" is the dirty worktree.
 _git_run_on_files() {
 	local mode=$1 pattern=$2
 	shift 2
@@ -47,7 +39,6 @@ _git_run_on_files() {
 	esac
 
 	files=(${(M)files:#*${~pattern}*})
-	# A rename leaves the old path in the list, so skip what is gone.
 	files=(${(@)files:#""})
 	local -a existing
 	local f
@@ -61,8 +52,6 @@ _git_run_on_files() {
 	"$@" $existing
 }
 
-# Lint or test only what changed. `-d` variants use the branch diff; the plain
-# ones use the dirty worktree.
 lintjs()  { _git_run_on_files modified '.(js|jsx|ts|tsx|mjs|cjs)' npx eslint --fix "$@" }
 lintjsd() { _git_run_on_files diff     '.(js|jsx|ts|tsx|mjs|cjs)' npx eslint --fix "$@" }
 fmtjs()   { _git_run_on_files modified '.(js|jsx|ts|tsx|json|md|css|scss|html|yml|yaml)' npx prettier --write "$@" }
@@ -71,7 +60,6 @@ fmtpy()   { _git_run_on_files modified '.py' ruff format "$@" }
 lintsh()  { _git_run_on_files modified '.sh' shellcheck "$@" }
 lintgo()  { _git_run_on_files modified '.go' gofmt -l -w "$@" }
 
-# rg -> fzf -> open the match in $EDITOR at the right line.
 search() {
 	[[ -n $1 ]] || { print -u2 "usage: search <pattern>"; return 1 }
 	local result
@@ -84,23 +72,15 @@ search() {
 	${EDITOR:-vim} "+${line}" "$file"
 }
 
-# Re-run the last command under sudo.
 plz() { eval "sudo $(fc -ln -1)" }
 
-# Run a command in another directory without leaving this one.
 xin() {
 	local dir=$1
 	shift
 	(cd "$dir" && "$@")
 }
 
-# Compare a tool's apt candidate against its brew formula and print the swap.
-# Prints rather than runs: an auto-applying version is how `brew reinstall
-# node` cascaded through llhttp and broke eza and bat.
-#
-# Read it as "is the newer version worth it", not "newer wins". Debian freezes
-# at release and brew tracks upstream, so brew drifts ahead of everything over
-# time; taking every gap rebuilds the 22GB prefix.
+# Prints rather than runs: auto-applying once broke eza and bat.
 _pkgv_norm() { print -r -- "${${1#*:}%%[-~]*}" }
 
 pkgv() {
@@ -109,8 +89,6 @@ pkgv() {
 		return 1
 	fi
 
-	# Where apt package, brew formula and binary are not the same word. A wrong
-	# guess reports "not available", which reads as missing rather than mislooked.
 	local -A _apt=(rg ripgrep fd fd-find tldr tealdeer)
 	local -A _brew=(rg ripgrep fd-find fd tldr tealdeer)
 	local -A _bin=(ripgrep rg fd-find fd tealdeer tldr)
@@ -159,8 +137,6 @@ pkgv() {
 	return 0
 }
 
-# Browse the installed figlet/toilet fonts with a live preview. `fonts` uses a
-# placeholder word, `fonts NETDECKER` your own text; enter renders it full size.
 fonts() {
 	local dir=${FIGLET_FONTDIR:-/usr/share/figlet}
 	local text=${*:-Spellbook}

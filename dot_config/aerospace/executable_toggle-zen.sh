@@ -1,9 +1,5 @@
 #!/usr/bin/env sh
-# Toggle AeroSpace outer gaps between normal and "zen" (wallpaper-visible).
-#
-# There is no runtime gaps command, so this rewrites the config;
-# auto-reload-config picks the write up, hence no reload-config call. It edits
-# a git-tracked file, so the tree shows dirty while zen is active.
+# No runtime gaps command: rewrites the config, auto-reload applies it.
 
 set -eu
 
