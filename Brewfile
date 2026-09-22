@@ -80,6 +80,8 @@ cask "helium-browser"
 cask "hiddenbar"
 # Customise mouse behavior
 cask "linearmouse"
+# Knowledge base
+cask "obsidian"
 # Replacement for Docker Desktop
 cask "orbstack"
 # Launcher and Spotlight replacement
