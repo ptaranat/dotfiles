@@ -74,6 +74,9 @@ cask "font-meslo-lg-nerd-font"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Utility to hide menu bar items
+# Chromium-based browser
+cask "helium-browser"
+# Utility to hide menu bar items
 cask "hiddenbar"
 # Customise mouse behavior
 cask "linearmouse"
