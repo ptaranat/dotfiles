@@ -1,0 +1,13 @@
+# Global ignores: machine-local noise that should never land in any repo.
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# LLVM/Swift coverage output
+default.profraw
+*.profraw
+
+# Claude Code machine-local state (shared .claude/ config stays committable)
+**/.claude/settings.local.json
