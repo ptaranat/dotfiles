@@ -17,6 +17,10 @@ packages:
       - git
       - git-delta
       - tmux
+      # tmux-256color terminfo, which .tmux.conf sets as default-terminal.
+      # Debian's ncurses-base ships only a minimal set and does not include
+      # it; without this tmux fails to start on the WSL box.
+      - ncurses-term
       - curl
       - wget
       - unzip
