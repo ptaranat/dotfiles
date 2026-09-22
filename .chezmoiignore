@@ -12,6 +12,7 @@ Brewfile
 # macOS-only. aerospace outright; ghostty is cross-platform but
 # not the terminal on WSL, and keeping it would also clone its shader repo.
 .config/aerospace
+.config/karabiner
 .config/ghostty
 
 # Scripts match on target name, so the prefix and .tmpl suffix are stripped

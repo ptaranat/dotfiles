@@ -29,6 +29,9 @@ work machine. A cask entry would collide with an App Store copy and fail the
 package script on every apply. The app ships its own CLI (Settings > Install
 CLI), which stays in step with the daemon; the Homebrew formula did not.
 
+Karabiner's first launch needs three approvals in System Settings: its driver
+extension, Input Monitoring, and the keyboard type.
+
 Then, once the keys are on the machine (the signing key, and an SSH key GitHub
 accepts):
 
@@ -58,6 +61,7 @@ dot_config/zsh/
   rc.d/*.zsh            sourced in order; NN- prefixes with gaps for insertion
   prompt/               see below
 dot_config/{ghostty,atuin,mise,aerospace,fzf,git,nvim}/
+dot_config/private_karabiner/  key remaps
 dot_gitconfig.tmpl, dot_gitignore_global, dot_tmux.conf, private_dot_gnupg/
 Brewfile                every formula, cask and tap for the mac
 .chezmoidata.yaml       apt package lists for the Linux box

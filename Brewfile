@@ -78,6 +78,8 @@ cask "ghostty"
 cask "helium-browser"
 # Utility to hide menu bar items
 cask "hiddenbar"
+# Keyboard remapping
+cask "karabiner-elements"
 # Customise mouse behavior
 cask "linearmouse"
 # Knowledge base
