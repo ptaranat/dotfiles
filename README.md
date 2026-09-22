@@ -55,7 +55,7 @@ dot_config/zsh/
   dot_zshrc             plugins, prompt, keybindings
   rc.d/*.zsh            sourced in order; NN- prefixes with gaps for insertion
   prompt/               see below
-dot_config/{ghostty,alacritty,atuin,mise,aerospace,fzf,git,nvim}/
+dot_config/{ghostty,atuin,mise,aerospace,fzf,git,nvim}/
 dot_gitconfig.tmpl, dot_gitignore_global, dot_tmux.conf, private_dot_gnupg/
 Brewfile                every formula, cask and tap for the mac
 .chezmoidata.yaml       apt package lists for the Linux box

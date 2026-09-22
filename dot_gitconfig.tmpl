@@ -40,10 +40,6 @@
 	graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
 	last = log -1 --stat
 	cherry-pit = "!f() { git rebase -r --onto \"$1\"^ \"$1\"; }; f"
-	# Structural diff; see the [diff "difftastic"] section below.
-	dft = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' diff"
-	dlog = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' log -p --ext-diff"
-	dshow = "!DFT_DISPLAY=inline DFT_BACKGROUND=dark git -c diff.external=difft -c core.pager='less -RF' show --ext-diff"
 [color]
 	ui = auto
 [core]
@@ -64,15 +60,6 @@
 [push]
 	default = current
 	autoSetupRemote = true
-# difftastic diffs the syntax tree, so reformatting and moved code stop reading
-# as churn. Opt-in only: delta is better for review and this is not an applyable
-# patch. The defaults are why it reads as unreadable, hence: inline (the split
-# view wraps at normal widths), dark (its only palette knob), and plain less
-# (it emits its own ANSI, which delta cannot parse).
-[diff "difftastic"]
-	command = difft
-[difftool "difftastic"]
-	cmd = difft "$LOCAL" "$REMOTE"
 [difftool]
 	prompt = false
 
