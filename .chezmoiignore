@@ -28,3 +28,8 @@ Brewfile
 # apt-driven, and the other half of the pair above.
 11-packages-linux.sh
 {{ end }}
+
+{{ if not (and .work .workemail) }}
+# Only a work machine has a work identity to commit as.
+.config/git/work.gitconfig
+{{ end }}

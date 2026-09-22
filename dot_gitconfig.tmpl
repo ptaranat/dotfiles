@@ -125,6 +125,13 @@
 	# diff3 without the lines both sides agree on. Needs git >= 2.35.
 	conflictstyle = zdiff3
 
+{{- if and .work .workemail .workdir }}
+# Work repos commit as the work address, everything else as .email. The
+# trailing slash makes gitdir match every repo under the directory.
+[includeIf "gitdir:{{ .workdir | trimSuffix "/" }}/"]
+	path = ~/.config/git/work.gitconfig
+{{- end }}
+
 # Machine-local overrides; git skips an include it cannot read. Last in the
 # file on purpose, since git takes the last value it sees and this has to be
 # able to override allowedSignersFile.
