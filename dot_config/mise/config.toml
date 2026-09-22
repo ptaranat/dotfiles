@@ -18,12 +18,6 @@ aube = "1"
 # it :TSInstall fails with ENOENT. Here rather than the Brewfile, which is
 # Darwin-only and would never reach the WSL box.
 tree-sitter = "0.26"
-# Entire: records Claude Code sessions as git checkpoint refs. Via mise's go
-# backend, not `go install`: go comes from brew here, so $GOPATH/bin is on no
-# PATH and the binary would be unfindable. Its hooks are guarded by
-# `command -v entire` and would silently no-op. Pinned so a background update
-# cannot change the on-disk checkpoint format mid-pilot.
-"go:github.com/entireio/cli/cmd/entire" = "0"
 
 [settings]
 # Resolved versions in mise.lock, so a project pins builds rather than "24".

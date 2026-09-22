@@ -14,7 +14,9 @@ The first line is a GUI prompt and has to finish before the second: it provides
 
 `init` asks three questions and keeps the answers in
 `~/.config/chezmoi/chezmoi.toml`, never in this public repo: whether this is a
-work machine, the commit email, and the path to the SSH signing public key.
+work machine, the commit email, and the path to the SSH signing public key. A
+work machine is also asked for the work commit email and the work directory it
+applies under.
 The first apply then installs Homebrew if it is missing (it asks for your
 password), writes every file, and installs the Brewfile.
 
@@ -55,7 +57,7 @@ dot_config/zsh/
   dot_zshrc             plugins, prompt, keybindings
   rc.d/*.zsh            sourced in order; NN- prefixes with gaps for insertion
   prompt/               see below
-dot_config/{ghostty,alacritty,atuin,mise,aerospace,fzf,git,nvim}/
+dot_config/{ghostty,atuin,mise,aerospace,fzf,git,nvim}/
 dot_gitconfig.tmpl, dot_gitignore_global, dot_tmux.conf, private_dot_gnupg/
 Brewfile                every formula, cask and tap for the mac
 .chezmoidata.yaml       apt package lists for the Linux box

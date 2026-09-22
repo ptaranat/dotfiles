@@ -20,6 +20,8 @@ agent_state=$?
 if (( agent_state == 2 )); then
 	# 2 is "could not open a connection": socket absent or stale.
 	rm -f "$SSH_AUTH_SOCK"
+	# A fresh machine has no ~/.ssh yet, and ssh-agent will not create it.
+	mkdir -p -m 700 "${SSH_AUTH_SOCK:h}"
 	ssh-agent -a "$SSH_AUTH_SOCK" > /dev/null
 fi
 

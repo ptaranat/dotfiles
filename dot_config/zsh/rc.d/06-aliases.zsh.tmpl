@@ -159,18 +159,7 @@ function mcd() {
 	fi
 }
 
-{{ if eq .chezmoi.os "darwin" -}}
-# Markedit. macOS only: `open -a` has no Linux equivalent.
-markedit() {
-	if [ -t 0 ]; then
-		open -a Markedit "$@"
-	else
-		local f="$(mktemp -d -t dw)/note.md"
-		cat > "$f"
-		open -a Markedit "$f"
-	fi
-}
-{{- else -}}
+{{ if ne .chezmoi.os "darwin" -}}
 # --- WSL ---------------------------------------------------------------------
 # Bridges to the Windows side, each shelling out across /mnt/c. Only where no
 # Linux equivalent exists. pbcopy is one-way: no pbpaste counterpart behaves.

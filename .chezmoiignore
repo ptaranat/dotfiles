@@ -9,11 +9,10 @@ Brewfile
 .config/superfile/theme/
 
 {{ if ne .chezmoi.os "darwin" }}
-# macOS-only. aerospace outright; ghostty and alacritty are cross-platform but
-# not the terminal on WSL, and keeping ghostty would also clone its shader repo.
+# macOS-only. aerospace outright; ghostty is cross-platform but
+# not the terminal on WSL, and keeping it would also clone its shader repo.
 .config/aerospace
 .config/ghostty
-.config/alacritty
 
 # Scripts match on target name, so the prefix and .tmpl suffix are stripped
 # here. Naming the source file silently fails to match and it still runs.
@@ -28,4 +27,9 @@ Brewfile
 {{ if eq .chezmoi.os "darwin" }}
 # apt-driven, and the other half of the pair above.
 11-packages-linux.sh
+{{ end }}
+
+{{ if not (and .work .workemail) }}
+# Only a work machine has a work identity to commit as.
+.config/git/work.gitconfig
 {{ end }}
