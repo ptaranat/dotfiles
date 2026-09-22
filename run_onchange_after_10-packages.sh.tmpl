@@ -9,10 +9,17 @@
 set -eu
 
 [ "$(uname -s)" = "Darwin" ] || exit 0
-command -v brew >/dev/null 2>&1 || {
+# Checked at its fixed prefix as well as on PATH: on a fresh machine
+# 00-homebrew.sh installs it earlier in this same apply, and chezmoi's
+# environment was captured before that, so PATH does not have it yet.
+if command -v brew >/dev/null 2>&1; then
+	BREW=brew
+elif [ -x /opt/homebrew/bin/brew ]; then
+	BREW=/opt/homebrew/bin/brew
+else
 	echo "==> brew not installed; skipping package install"
 	exit 0
-}
+fi
 
 BREWFILE="{{ .chezmoi.sourceDir }}/Brewfile"
 [ -f "$BREWFILE" ] || exit 0
@@ -24,6 +31,6 @@ echo "==> installing packages from Brewfile"
 # stayed listable but unattachable, and `brew cleanup` removed the old binary.
 # Upgrade by hand, having checked what is running:
 #     brew bundle --file="$(chezmoi source-path)/Brewfile"
-brew bundle --file="$BREWFILE" --no-upgrade
+"$BREW" bundle --file="$BREWFILE" --no-upgrade
 
 echo "==> packages up to date (nothing upgraded; run brew bundle by hand for that)"
