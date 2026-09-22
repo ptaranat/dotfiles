@@ -1,12 +1,20 @@
 # Repos chezmoi clones and keeps updated, replacing git submodules: no pinned
 # SHA to commit, no --recurse-submodules, refreshed on their own schedule.
 
-# Private work config. .zshrc globs $ZDOTDIR/work/*.zsh after rc.d so it can
-# override; a machine without access to the repo just skips it.
+{{ if and .work (stat (.signingkey | replace "~" .chezmoi.homeDir)) -}}
+# Private work config, sourced by .zshrc after rc.d so it can override.
+#
+# A failed git-repo external is fatal: chezmoi aborts the whole apply and
+# writes nothing, so this cannot be declared on a machine that has no GitHub
+# SSH access yet. It needs the init answer work = true, and waits for the
+# signing key as a proxy for "keys have been copied over". The first apply
+# after that clones it; if SSH to GitHub still is not set up then, that apply
+# fails with the git error rather than silently.
 [".config/zsh/work"]
     type = "git-repo"
     url = "git@github.com:ptaranat/work.git"
     refreshPeriod = "168h"
+{{ end -}}
 
 {{ if eq .chezmoi.os "darwin" -}}
 # Ghostty cursor shaders. Gated here, not in .chezmoiignore: externals are

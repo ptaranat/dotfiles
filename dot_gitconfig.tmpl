@@ -1,10 +1,13 @@
+{{- $signingkey := .signingkey | replace "~" .chezmoi.homeDir -}}
+{{- $cansign := stat $signingkey -}}
 [user]
 	name = Panat Taranat
-	email = panat@taranat.com
+	# Both from the init prompt, so a work machine gets its own identity
+	# without an employer address landing in this public repo.
+	email = {{ .email }}
 	# A public key path, not a GPG key id. Keep the tilde: a hardcoded
-	# /home/panat would not resolve on the mac. Dedicated rather than id_rsa so
-	# it can be rotated without touching anything that authenticates.
-	signingkey = ~/.ssh/id_ed25519_signing.pub
+	# /home/panat would not resolve on the mac.
+	signingkey = {{ .signingkey }}
 [credential]
 {{- if eq .chezmoi.os "darwin" }}
 	helper = /opt/homebrew/bin/gh auth git-credential
@@ -84,10 +87,13 @@
 	# Without this `git log --show-signature` reports "No principal matched"
 	# even for signatures git just made.
 	allowedSignersFile = ~/.config/git/allowed_signers
+# Signing turns on only once the key exists. On a fresh machine it arrives
+# after the first apply; unconditional gpgsign made every commit fail until
+# then. Re-run `chezmoi apply` after copying the key over to flip these.
 [commit]
-	gpgsign = true
+	gpgsign = {{ if $cansign }}true{{ else }}false{{ end }}
 [tag]
-	gpgsign = true
+	gpgsign = {{ if $cansign }}true{{ else }}false{{ end }}
 [init]
 	defaultBranch = main
 [filter "lfs"]
@@ -134,7 +140,6 @@
 
 # Machine-local overrides; git skips an include it cannot read. Last in the
 # file on purpose, since git takes the last value it sees and this has to be
-# able to override allowedSignersFile. The work identity lives here so no
-# employer name lands in this public repo.
+# able to override allowedSignersFile.
 [include]
 	path = ~/.gitconfig-local
