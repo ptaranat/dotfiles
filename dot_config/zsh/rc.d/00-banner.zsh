@@ -1,3 +1,13 @@
+# Per-host art lives in the private work repo so hostnames stay out of here.
+_HOST_BANNERS=("${ZDOTDIR:-$HOME/.config/zsh}"/work/banners/${(L)HOST%%.*}{.txt,/*.txt}(N))
+if (( $#_HOST_BANNERS )); then
+  clear
+  cat "${_HOST_BANNERS[RANDOM % $#_HOST_BANNERS + 1]}"
+  unset _HOST_BANNERS
+  return
+fi
+unset _HOST_BANNERS
+
 _RAND=$(( RANDOM % 5 + 1 ))
 
 case $_RAND in
