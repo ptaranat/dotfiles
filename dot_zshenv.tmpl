@@ -21,7 +21,8 @@ path=($HOME/.local/bin(N-/) $path)
 export GOBIN="$HOME/.local/bin"
 
 # Keep the default ~/.bun: moving it needs BUN_INSTALL everywhere.
-path=($path $HOME/.bun/bin(N-/))
+# bun puts new globals under $XDG_CACHE_HOME/.bun when that is set.
+path=($path $XDG_CACHE_HOME/.bun/bin(N-/) $HOME/.bun/bin(N-/))
 
 # Must stay in .zshenv so mise (activated in .zshrc) prepends after.
 {{ if eq .chezmoi.os "darwin" -}}
