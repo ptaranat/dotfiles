@@ -1,0 +1,35 @@
+#!/bin/sh
+# packages hash: {{ list .packages.pacman.core .packages.pacman.tools .packages.pacman.aur | toJson | sha256sum }}
+
+set -eu
+
+command -v pacman >/dev/null 2>&1 || {
+	echo "==> pacman not found; skipping package install"
+	exit 0
+}
+
+echo "==> installing pacman packages"
+
+# No -y: an apply never upgrades the system. If a mirror 404s, run paru -Syu.
+# No --noconfirm: it answers no to replacing a conflicting package, like tldr
+# for tealdeer, and the whole install aborts.
+sudo pacman -S --needed \
+	{{ concat .packages.pacman.core .packages.pacman.tools | sortAlpha | join " \\\n\t" }}
+
+aur=""
+for helper in paru yay; do
+	if command -v "$helper" >/dev/null 2>&1; then
+		aur=$helper
+		break
+	fi
+done
+
+if [ -n "$aur" ]; then
+	echo "==> installing AUR packages with $aur"
+	"$aur" -S --needed --noconfirm \
+		{{ .packages.pacman.aur | sortAlpha | join " \\\n\t\t" }}
+else
+	echo "==> no AUR helper; skipped: {{ .packages.pacman.aur | join " " }}"
+fi
+
+echo "==> pacman packages up to date (nothing upgraded)"

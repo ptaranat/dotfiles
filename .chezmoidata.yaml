@@ -1,4 +1,5 @@
-# Every apt name must exist on Debian trixie or apt-get fails.
+# Every apt name must exist on Debian trixie and every pacman name in the Arch
+# repos, or the install fails.
 
 packages:
   apt:
@@ -29,6 +30,7 @@ packages:
       - shellcheck
       - just
       - glow
+      - micro
       - tealdeer
       - mosh
       - httpie
@@ -46,4 +48,53 @@ packages:
       - just
       - fzf
 
-  # Not packaged: mise (mise.run), sesh (GitHub release, tmux needs it).
+  # Not packaged for apt: mise (mise.run), sesh (GitHub release, tmux needs it).
+
+  # Arch covers the apt and brew.linux lists in one place, mise included.
+  pacman:
+    core:
+      - zsh
+      - git
+      - git-delta
+      - git-lfs
+      - tmux
+      - ncurses
+      - curl
+      - wget
+      - unzip
+      - base-devel
+      - gnupg
+      # /usr/bin/pinentry picks qt, gtk or curses from the session.
+      - pinentry
+      - openssh
+      - bubblewrap
+      - chezmoi
+      - mise
+
+    tools:
+      - neovim
+      - github-cli
+      - ripgrep
+      - fd
+      - bat
+      - eza
+      - fzf
+      - zoxide
+      - atuin
+      - jq
+      - shellcheck
+      - just
+      - glow
+      - micro
+      - tealdeer
+      - mosh
+      - httpie
+      - hyperfine
+      - aws-cli-v2
+      - dos2unix
+      - wl-clipboard
+      - ttf-meslo-nerd
+
+    # Installed only when paru or yay is present.
+    aur:
+      - sesh-bin

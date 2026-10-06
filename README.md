@@ -1,8 +1,13 @@
 # dotfiles
 
-macOS config, managed with [chezmoi](https://chezmoi.io).
+Config for macOS, Arch (EndeavourOS included) and Debian under WSL, managed
+with [chezmoi](https://chezmoi.io). `.chezmoitemplates/flavor` decides which
+of `darwin`, `wsl`, `arch` or `linux` a machine is, and every OS-specific
+branch reads it.
 
 ## Bootstrap a new machine
+
+On the mac:
 
 ```sh
 xcode-select --install
@@ -22,6 +27,17 @@ password), writes every file, and installs the Brewfile.
 
 `-b "$HOME/.local/bin"` matters: without it chezmoi installs to `./bin` in the
 current directory, which is not on `$PATH` for later runs.
+
+On Arch:
+
+```sh
+sudo pacman -S --needed git chezmoi
+chezmoi init --apply ptaranat
+```
+
+The apply installs the pacman lists from `.chezmoidata.yaml` without upgrading
+the system, and the AUR list when paru or yay is present. `init` asks the same
+questions as on the mac.
 
 Tailscale is deliberately not in the Brewfile. The app is installed once per
 machine, however that machine allows: the App Store here, possibly MDM on a
@@ -61,10 +77,11 @@ dot_config/zsh/
   rc.d/*.zsh            sourced in order; NN- prefixes with gaps for insertion
   prompt/               see below
 dot_config/{ghostty,atuin,mise,aerospace,fzf,git,nvim}/
+.chezmoitemplates/flavor darwin, wsl, arch or linux
 dot_config/private_karabiner/  key remaps
 dot_gitconfig.tmpl, dot_gitignore_global, dot_tmux.conf, private_dot_gnupg/
 Brewfile                every formula, cask and tap for the mac
-.chezmoidata.yaml       apt package lists for the Linux box
+.chezmoidata.yaml       apt lists for WSL, pacman and AUR lists for Arch
 run_*                   install Homebrew, packages, macOS defaults, completions
 ```
 

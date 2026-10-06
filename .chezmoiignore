@@ -7,22 +7,33 @@ Brewfile
 
 .config/superfile/theme/
 
-{{ if ne .chezmoi.os "darwin" }}
+{{ $flavor := includeTemplate "flavor" . | trim -}}
+
+{{ if ne $flavor "darwin" }}
 .config/aerospace
 .config/karabiner
-.config/ghostty
 
 # Scripts match by target name: no run_ prefix, no .tmpl suffix.
 20-macos-defaults.sh
 10-packages.sh
 {{ end }}
 
-{{ if eq .chezmoi.os "darwin" }}
-11-packages-linux.sh
+{{ if not (has $flavor (list "darwin" "arch")) }}
+.config/ghostty
+{{ end }}
 
-# Reaches into /mnt/c for Gpg4win and has no meaning off WSL. The mac names
-# pinentry-mac directly in gpg-agent.conf and needs no dispatcher.
+{{ if ne $flavor "wsl" }}
+# Reaches into /mnt/c for Gpg4win and has no meaning off WSL. The mac and Arch
+# name their pinentry directly in gpg-agent.conf and need no dispatcher.
 .local/bin/pinentry-wsl
+{{ end }}
+
+{{ if has $flavor (list "darwin" "arch") }}
+11-packages-linux.sh
+{{ end }}
+
+{{ if ne $flavor "arch" }}
+12-packages-arch.sh
 {{ end }}
 
 {{ if not (and .work .workemail) }}

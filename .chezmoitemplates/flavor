@@ -1,0 +1,10 @@
+{{- /* One of darwin, wsl, arch, linux. Callers: includeTemplate "flavor" . | trim */ -}}
+{{- if eq .chezmoi.os "darwin" -}}
+darwin
+{{- else if .chezmoi.kernel.osrelease | lower | contains "microsoft" -}}
+wsl
+{{- else if has (get .chezmoi.osRelease "id") (list "arch" "endeavouros") -}}
+arch
+{{- else -}}
+linux
+{{- end -}}

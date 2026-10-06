@@ -1,6 +1,10 @@
 allow-loopback-pinentry
-{{ if eq .chezmoi.os "darwin" -}}
+{{ $flavor := includeTemplate "flavor" . | trim -}}
+{{ if eq $flavor "darwin" -}}
 pinentry-program /opt/homebrew/bin/pinentry-mac
+{{- else if ne $flavor "wsl" -}}
+# Arch's wrapper picks qt, gtk or curses from the session.
+pinentry-program /usr/bin/pinentry
 {{- else -}}
 # Dispatcher: Gpg4win dialog locally, pinentry-curses over ssh.
 # pass and aws-vault depend on this pinentry, not just git signing.

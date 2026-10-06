@@ -35,6 +35,8 @@ brew "gnupg"
 brew "jq"
 # Handy way to save and run project-specific commands
 brew "just"
+# Terminal text editor, for quick edits
+brew "micro"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
 # Vim fork focused on extensibility

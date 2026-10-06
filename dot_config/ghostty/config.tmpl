@@ -9,6 +9,16 @@ cursor-style-blink = true
 # Shell integration forces a blinking bar; no-cursor keeps the block.
 shell-integration-features = no-cursor
 
+{{ if eq .chezmoi.os "darwin" -}}
 custom-shader = shaders/cursor_warp.glsl
 
 keybind = global:cmd+grave_accent=toggle_quick_terminal
+{{- else -}}
+confirm-close-surface = false
+
+keybind = global:super+grave_accent=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-screen = main
+quick-terminal-animation-duration = 0.15
+quick-terminal-autohide = false
+{{- end }}

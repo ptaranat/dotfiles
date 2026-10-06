@@ -40,9 +40,11 @@ export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always --line-ran
 export FZF_ALT_C_OPTS="--preview 'eza -1 --color=always --icons --group-directories-first {} 2>/dev/null | head -50'"
 
 export AWS_SDK_LOAD_CONFIG=1
-{{ if ne .chezmoi.os "darwin" }}
+{{ $flavor := includeTemplate "flavor" . | trim -}}
+{{ if eq $flavor "wsl" }}
 # wslview only: naming a browser makes links open twice.
 export BROWSER=wslview
-
+{{ end }}
+{{ if ne $flavor "darwin" }}
 export AWS_VAULT_BACKEND=pass
 {{ end }}

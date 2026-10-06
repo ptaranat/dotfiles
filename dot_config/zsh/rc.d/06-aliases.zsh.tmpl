@@ -141,8 +141,32 @@ function mcd() {
 	fi
 }
 
-{{ if ne .chezmoi.os "darwin" -}}
+{{ $flavor := includeTemplate "flavor" . | trim -}}
+{{ if eq $flavor "wsl" -}}
 alias pbcopy='/mnt/c/Windows/System32/clip.exe'
 
 alias neovide="/c/Users/Panat/bin/neovide.exe --wsl --geometry=200x60"
+{{- end }}
+{{- if eq $flavor "arch" }}
+alias pbcopy="wl-copy"
+
+# pa = paru. The omz archlinux plugin owns the pac* names, hence pasc/pascc.
+alias paupg="paru -Syu"
+alias pasu="paru -Syu --noconfirm"
+alias pain="paru -S"
+alias pains="paru -U"
+alias painsd="paru -S --asdeps"
+alias pare="paru -R"
+alias parem="paru -Rns"
+alias parep="paru -Si"
+alias pareps="paru -Ss"
+alias paloc="paru -Qi"
+alias palocs="paru -Qs"
+alias palst="paru -Qe"
+alias paups="paru -Qua"
+alias paorph="paru -Qtd"
+alias pasc="paru -Sc"
+alias pascc="paru -Scc"
+alias pamir="paru -Syy"
+alias paconf="paru -Pg"
 {{- end }}

@@ -1,5 +1,9 @@
+# Athanor brings its own prompt and greeting, so p10k and the banner sit out.
+_athanor=${XDG_CONFIG_HOME:-$HOME/.config}/athanor/athanor.zsh
+[[ -r $_athanor ]] || unset _athanor
+
 # p10k instant prompt: must stay first, nothing above may print.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+if [[ -z $_athanor && -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
 	source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -22,6 +26,7 @@ export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 znap source ohmyzsh/ohmyzsh lib/{history,key-bindings,completion,directories,git}
 znap source ohmyzsh/ohmyzsh \
 {{ if eq .chezmoi.os "darwin" }}	plugins/macos \
+{{ end }}{{ if eq (includeTemplate "flavor" . | trim) "arch" }}	plugins/archlinux \
 {{ end }}	plugins/colored-man-pages \
 	plugins/{git,gitfast,git-extras} \
 	plugins/npm \
@@ -44,7 +49,7 @@ if (( $+commands[fzf] )); then
 	source <(fzf --zsh)
 fi
 
-znap source romkatv/powerlevel10k
+[[ -n $_athanor ]] || znap source romkatv/powerlevel10k
 
 znap eval zoxide 'zoxide init zsh --cmd j'
 znap eval mise 'mise activate zsh'
@@ -84,6 +89,11 @@ for f in "${ZDOTDIR:-$HOME/.config/zsh}"/work/*.zsh(N); do
 	source "$f"
 done
 
-# Last, so p10k settings win over the plugins'.
-[[ ! -r "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh" ]] ||
+# Last, so the prompt wins over the plugins'. The markers let athanor's
+# installer and doctor see that the hook is already here.
+# >>> athanor >>>
+[[ -z $_athanor ]] || source "$_athanor"
+# <<< athanor <<<
+[[ -n $_athanor || ! -r "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh" ]] ||
 	source "${ZDOTDIR:-$HOME/.config/zsh}/prompt/init.zsh"
+unset _athanor

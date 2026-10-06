@@ -7,7 +7,7 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
-# gpg forwards this to gpg-agent; ~/.local/bin/pinentry-wsl picks curses over ssh.
+# gpg forwards this to gpg-agent; on WSL ~/.local/bin/pinentry-wsl picks curses over ssh.
 if [[ -n $SSH_CONNECTION || -n $SSH_TTY ]]; then
 	export PINENTRY_USER_DATA=curses
 else

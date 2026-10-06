@@ -1,3 +1,5 @@
+[[ -z $_athanor ]] || return
+
 # Per-host art lives in the private work repo so hostnames stay out of here.
 _HOST_BANNERS=("${ZDOTDIR:-$HOME/.config/zsh}"/work/banners/${(L)HOST%%.*}{.txt,/*.txt}(N))
 if (( $#_HOST_BANNERS )); then
