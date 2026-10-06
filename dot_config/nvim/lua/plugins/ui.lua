@@ -1,3 +1,6 @@
+-- athanor's installer links its colorscheme here; machines without it keep srcery
+local athanor = vim.uv.fs_stat(vim.fn.stdpath("config") .. "/colors/athanor.lua") ~= nil
+
 return {
 	{
 		"srcery-colors/srcery-vim",
@@ -9,7 +12,7 @@ return {
 
 			vim.g.srcery_normal_float = 1
 
-			vim.cmd.colorscheme("srcery")
+			vim.cmd.colorscheme(athanor and "athanor" or "srcery")
 		end,
 	},
 
@@ -19,7 +22,7 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		opts = {
 			options = {
-				theme = "srcery",
+				theme = athanor and "athanor" or "srcery",
 				globalstatus = true, -- one statusline, not one per split
 				-- \u escapes: private-use glyphs get mangled when pasted
 				section_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
@@ -46,7 +49,7 @@ return {
 							end, clients)
 							return " " .. table.concat(names, ",")
 						end,
-						color = { fg = "#918175" }, -- srcery bright black, deliberately quiet
+						color = { fg = athanor and 8 or "#918175" }, -- bright black, deliberately quiet
 					},
 				},
 				lualine_y = { "location", "progress" },
