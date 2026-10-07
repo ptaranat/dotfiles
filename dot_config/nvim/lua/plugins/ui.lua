@@ -25,8 +25,8 @@ return {
 				theme = athanor and "athanor" or "srcery",
 				globalstatus = true, -- one statusline, not one per split
 				-- \u escapes: private-use glyphs get mangled when pasted
-				section_separators = { left = "\u{E0B0}", right = "\u{E0B2}" },
-				component_separators = { left = "\u{E0B1}", right = "\u{E0B3}" },
+				section_separators = athanor and "" or { left = "\u{E0B0}", right = "\u{E0B2}" },
+				component_separators = athanor and "" or { left = "\u{E0B1}", right = "\u{E0B3}" },
 			},
 			sections = {
 				lualine_a = { "mode" },
@@ -53,7 +53,10 @@ return {
 					},
 				},
 				lualine_y = { "location", "progress" },
-				lualine_z = { "fileformat", "filetype" },
+				lualine_z = {
+					{ "fileformat", symbols = athanor and { unix = "unix", dos = "dos", mac = "mac" } or nil },
+					{ "filetype", colored = not athanor },
+				},
 			},
 			inactive_sections = {
 				lualine_a = {},
@@ -73,7 +76,7 @@ return {
 		opts = {
 			options = {
 				diagnostics = "nvim_lsp",
-				separator_style = "slant",
+				separator_style = athanor and { "", "" } or "slant",
 				offsets = {
 					{ filetype = "neo-tree", text = "Explorer", separator = true },
 				},
