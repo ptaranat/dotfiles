@@ -44,6 +44,15 @@ export AWS_SDK_LOAD_CONFIG=1
 {{ if eq $flavor "wsl" }}
 # wslview only: naming a browser makes links open twice.
 export BROWSER=wslview
+
+# WSL sets this only for wsl.exe shells. ssh and mosh logins get none, and
+# moshi-hook then puts its socket in /tmp where local agents never look.
+[[ -z $XDG_RUNTIME_DIR && -d /wslg/runtime-dir ]] && export XDG_RUNTIME_DIR=/wslg/runtime-dir
+
+# No systemd for moshi-hook's user unit; flock keeps it to one daemon.
+if (( $+commands[moshi-hook] )) && ! pgrep -xu $USER moshi-hook >/dev/null; then
+	setsid -f flock -n "$XDG_STATE_HOME/moshi/serve.lock" moshi-hook serve >/dev/null 2>&1
+fi
 {{ end }}
 {{ if ne $flavor "darwin" }}
 export AWS_VAULT_BACKEND=pass
