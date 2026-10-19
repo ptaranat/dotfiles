@@ -2,10 +2,9 @@
 node = "24"
 python = "3.13"
 # Global so completions can be generated outside a project.
-pnpm = "11"
+pnpm = "latest"
 # Global: its CLIs use `env bun`; a project pin breaks them elsewhere.
-bun = "1.3"
-aube = "1"
+bun = "1"
 # Here, not the Brewfile: nvim needs it on Linux too.
 tree-sitter = "0.26"
 # Cross-model PR review. Resolves to the aqua release binary, not npm.
