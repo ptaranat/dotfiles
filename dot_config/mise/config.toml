@@ -9,6 +9,8 @@ bun = "1"
 tree-sitter = "0.26"
 # Cross-model PR review. Resolves to the aqua release binary, not npm.
 codex = "latest"
+# Runs a repo's GitHub Actions locally in Docker (guild: `pnpm test:act`).
+act = "latest"
 
 [settings]
 lockfile = true
