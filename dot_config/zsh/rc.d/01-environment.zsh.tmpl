@@ -53,6 +53,11 @@ export BROWSER=wslview
 if (( $+commands[moshi-hook] )) && ! pgrep -xu $USER moshi-hook >/dev/null; then
 	setsid -f flock -n "$XDG_STATE_HOME/moshi/serve.lock" moshi-hook serve >/dev/null 2>&1
 fi
+# Same for macrod, the Macro agent runtime. `macrod service` exits when stdin
+# reaches EOF, so sleep holds it open.
+if (( $+commands[macrod] )) && [[ -f ~/.macrod/macrod.toml ]] && ! pgrep -xu $USER macrod >/dev/null; then
+        setsid -f flock -n ~/.macrod/service.lock sh -c 'sleep infinity | exec macrod service --config ~/.macrod/macrod.toml >>~/.macrod/macrod.log 2>&1' >/dev/null 2>&1
+fi
 {{ end }}
 {{ if ne $flavor "darwin" }}
 export AWS_VAULT_BACKEND=pass
