@@ -11,6 +11,8 @@ tree-sitter = "0.26"
 codex = "latest"
 # Runs a repo's GitHub Actions locally in Docker (guild: `pnpm test:act`).
 act = "latest"
+# Secrets CLI for the self-hosted Infisical (`infisical run` wraps castellan).
+infisical = { version = "latest", asset_pattern = "cli_{{ version }}_{{ os(macos='darwin') }}_{{ arch(x64='amd64') }}.tar.gz" }
 
 [settings]
 lockfile = true
