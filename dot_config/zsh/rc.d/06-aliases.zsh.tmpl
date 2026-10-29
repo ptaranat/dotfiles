@@ -12,6 +12,50 @@ alias agenda="gcalcli agenda --color-now-marker brightblue"
 alias tfer="terraformer"
 alias blue="_ systemctl restart bluetooth"
 alias memo="bat -p ~/.memo.md"
+# Type a command into a session's newest pane once its shell has drawn a
+# prompt. Typing it, rather than passing it to tmux, leaves the shell open
+# after the command exits. Keys sent before the shell is ready get lost, so
+# wait for the pane to show something first.
+_tmux_type() {
+  local target="$1" cmd="$2" i
+  for i in {1..50}; do
+    [[ -n "$(tmux capture-pane -p -t "$target" 2>/dev/null | tr -d '[:space:]')" ]] && break
+    sleep 0.1
+  done
+  sleep 0.2
+  tmux send-keys -t "$target" "$cmd" Enter
+}
+
+# Claude Code always runs inside tmux, one session per folder name, prefixed
+# with the parent folder when another directory already holds that name.
+# Outside tmux, `claude` opens (or rejoins) that session and starts it there;
+# a session that already exists gets a new window. Inside tmux, when piped,
+# for subcommands, or with a flag that doesn't open a session, it runs as
+# normal.
+claude() {
+  local -a subcommands=(agents attach auth auto-mode doctor gateway import
+    install logs mcp plugin plugins purge respawn rm setup-token stop kill
+    ultrareview update upgrade)
+  local -a direct_flags=(-p --print -v --version -h --help --bg)
+  local -a given_direct_flags=(${argv:*direct_flags})
+  if [[ -n "$TMUX" || ! -t 0 || ! -t 1 ]] \
+    || (( ${subcommands[(Ie)$1]} )) || (( $#given_direct_flags )); then
+    command claude "$@"
+    return
+  fi
+  local session="${${${PWD:t}:-root}//[.:]/-}"
+  local existing="$(tmux display-message -p -t "=$session:" '#{session_path}' 2>/dev/null)"
+  if [[ -n "$existing" && "${existing:A}" != "${PWD:A}" ]]; then
+    session="${${PWD:h:t}//[.:]/-}-$session"
+  fi
+  if tmux has-session -t "=$session" 2>/dev/null; then
+    tmux new-window -t "=$session:" -c "$PWD" || return
+  else
+    tmux new-session -d -s "$session" -c "$PWD" || return
+  fi
+  _tmux_type "=$session:" "command claude ${(j: :)${(q)@}}"
+  tmux attach-session -t "=$session"
+}
 alias cl="claude"
 
 # @tm-target makes the post-restore hook in ~/.tmux.conf switch back.
