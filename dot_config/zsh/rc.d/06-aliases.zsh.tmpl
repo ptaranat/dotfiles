@@ -29,18 +29,6 @@ claude() {
   claude-tmux -- "$@" >/dev/null
 }
 
-# mtui lives in its own tmux session so it can jump between Claude sessions.
-mtui() {
-  if ! tmux has-session -t '=mtui' 2>/dev/null; then
-    tmux new-session -d -s mtui -c ~/projects/mongoose \
-      "$SHELL -ic 'command mtui; exec $SHELL'" || return
-  fi
-  if [[ -n "$TMUX" ]]; then
-    tmux switch-client -t '=mtui'
-  else
-    tmux attach-session -t '=mtui'
-  fi
-}
 alias cl="claude"
 
 # @tm-target makes the post-restore hook in ~/.tmux.conf switch back.
