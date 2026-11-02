@@ -1,0 +1,56 @@
+#!/usr/bin/env zsh
+# claude-tmux [-C dir] [-d] [--] [claude args...]
+#
+# Starts Claude Code in the tmux session for a project folder: one session per
+# folder name, prefixed with the parent folder when another directory already
+# holds that name. An existing session gets a new window. Prints the window it
+# opened, then switches to it (inside tmux) or attaches (outside), unless -d.
+
+emulate -L zsh
+setopt err_return no_unset
+
+usage() { print -u2 "usage: claude-tmux [-C dir] [-d] [--] [claude args...]"; exit 2 }
+
+dir=$PWD
+detach=0
+while (( $# )); do
+  case $1 in
+    -C) (( $# >= 2 )) || usage; dir=$2; shift 2 ;;
+    -d) detach=1; shift ;;
+    -h|--help) usage ;;
+    --) shift; break ;;
+    *) break ;;
+  esac
+done
+
+dir=${dir:A}
+[[ -d $dir ]] || { print -u2 "claude-tmux: no such directory: $dir"; exit 1 }
+
+session=${${${dir:t}:-root}//[.:]/-}
+existing=$(tmux display-message -p -t "=$session:" '#{session_path}' 2>/dev/null) || existing=
+if [[ -n $existing && ${existing:A} != $dir ]]; then
+  session=${${dir:h:t}//[.:]/-}-$session
+fi
+
+if tmux has-session -t "=$session" 2>/dev/null; then
+  window=$(tmux new-window -d -P -F '#{session_name}:#{window_index}' -t "=$session:" -c "$dir")
+else
+  window=$(tmux new-session -d -P -F '#{session_name}:#{window_index}' -s "$session" -c "$dir")
+fi
+
+# Typed into the shell instead of passed to tmux, so the shell outlives claude.
+# Keys sent before the shell has drawn its prompt are lost, so wait for it.
+for i in {1..50}; do
+  [[ -n ${"$(tmux capture-pane -p -t "$window" 2>/dev/null)"//[[:space:]]/} ]] && break
+  sleep 0.1
+done
+sleep 0.2
+tmux send-keys -t "$window" "command claude ${(j: :)${(q)@}}" Enter
+
+print -r -- "$window"
+(( detach )) && exit 0
+if [[ -n ${TMUX:-} ]]; then
+  tmux switch-client -t "$window"
+else
+  tmux attach-session -t "$window"
+fi
