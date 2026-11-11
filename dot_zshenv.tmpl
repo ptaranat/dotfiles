@@ -35,6 +35,12 @@ path=(/home/linuxbrew/.linuxbrew/bin(N-/) /home/linuxbrew/.linuxbrew/sbin(N-/) $
 path=($HOME/.cargo/bin(N-/) $path)
 
 path=($HOME/bin(N-/) $path)
+{{- if eq (includeTemplate "flavor" . | trim) "wsl" }}
+
+# appendWindowsPath is off, so Windows-targeted builds need cargo.exe added.
+# Appended: only *.exe names live there, nothing shadows the Linux toolchain.
+path=($path /c/Users/$USER/.cargo/bin(N-/))
+{{- end }}
 
 path=($path $HOME/.orbstack/bin(N-/))
 path=($path "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"(N-/))
