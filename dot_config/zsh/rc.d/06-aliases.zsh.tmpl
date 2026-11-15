@@ -95,15 +95,23 @@ cmadd() {
 	chezmoi add "$@"
 }
 
-if command -v chezmoi >/dev/null 2>&1; then
+if (( $+commands[chezmoi] )); then
 	() {
-		local drift
-		drift=$(chezmoi status 2>/dev/null) || return
-		[[ -n "$drift" ]] || return
-		print -u2 "chezmoi: deployed files differ from source, apply would revert them:"
-		print -u2 "$drift"
-		print -u2 "  keep the deployed version: cmadd <path>"
-		print -u2 "  discard it:                chezmoi apply <path>"
+		local cache=${XDG_CACHE_HOME:-$HOME/.cache}/zsh/chezmoi-drift
+		if [[ -s $cache ]]; then
+			print -u2 "chezmoi: deployed files differ from source, apply would revert them:"
+			print -u2 -r -- "$(<$cache)"
+			print -u2 "  keep the deployed version: cmadd <path>"
+			print -u2 "  discard it:                chezmoi apply <path>"
+		fi
+		{
+			mkdir -p ${cache:h}
+			if chezmoi status >| $cache.$$ 2>/dev/null; then
+				mv -f $cache.$$ $cache
+			else
+				rm -f $cache.$$
+			fi
+		} &!
 	}
 fi
 
@@ -118,7 +126,7 @@ alias nvimkeys="chezmoi edit --apply ~/.config/nvim/lua/config/keymaps.lua"
 alias nvimplug="chezmoi edit --apply ~/.config/nvim/lua/plugins/ui.lua"
 alias gitconfig="chezmoi edit --apply ~/.gitconfig"
 alias tmuxconf="chezmoi edit --apply ~/.tmux.conf"
-alias brewfile="$EDITOR \"$(chezmoi source-path)/Brewfile\""
+alias brewfile='$EDITOR "$(chezmoi source-path)/Brewfile"'
 
 # Assigned, not piped, so cancelling fzf skips the edit.
 alias cmf='_cmsel=$(chezmoi managed --path-style=absolute --include=files | fzf --preview "chezmoi cat {}" --preview-window "right:60%") && chezmoi edit --apply "$_cmsel"; unset _cmsel'
